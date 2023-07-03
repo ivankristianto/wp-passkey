@@ -1,0 +1,50 @@
+# Environments #
+################
+.env
+
+# Builds #
+##########
+**/dist/*
+
+# Packages #
+############
+node_modules/
+vendor/
+npm-debug.log
+wordpress/
+
+# Files #
+############
+*.7z
+*.dmg
+*.gz
+*.bz2
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+*.tgz
+*.local
+
+# Logs and databases #
+######################
+*.log
+*.sql
+
+# PhpStorm #
+############
+.idea
+
+# VS Code #
+###########
+.vscode/*
+
+# Ignore temporary OS files #
+############################
+.DS_Store
+.DS_Store?
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db

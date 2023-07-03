@@ -1,0 +1,27 @@
+{
+  "arrowParens": "avoid",
+  "bracketSpacing": true,
+  "parenSpacing": true,
+  "printWidth": 120,
+  "quoteProps": "consistent",
+  "semi": true,
+  "singleQuote": true,
+  "trailingComma": "all",
+  "useTabs": true,
+  "overrides": [
+    {
+      "files": [ "*.css", "*.scss" ],
+      "options": {
+        "singleQuote": false
+      }
+    },
+    {
+      "files": [ "*.json" ],
+      "options": {
+        "singleQuote": false,
+        "tabWidth": 2,
+        "useTabs": false
+      }
+    }
+  ]
+}

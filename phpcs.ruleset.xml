@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<ruleset name="wp-passkeys">
+    <description>PHPCS rules for WordPress Passkeys</description>
+
+    <!-- Defaults -->
+    <arg name="extensions" value="php"/>
+    <config name="show_progress" value="1"/>
+
+	<!-- Don't restrict file and directory names -->
+    <rule ref="vendor/humanmade/coding-standards">
+		<exclude name="HM.Files.ClassFileName.MismatchedName" />
+		<exclude name="HM.Files.NamespaceDirectoryName" />
+		<exclude name="WordPress.Files.FileName.NotHyphenatedLowercase" />
+    </rule>
+
+	<rule ref="WordPress.Files.FileName">
+		<properties>
+			<property name="strict_class_file_names" value="false" />
+		</properties>
+	</rule>
+
+    <!-- Use PHPDoc rules -->
+    <rul ref="WordPress-Docs"/>
+
+    <!-- Ignore 3rd-party code -->
+    <exclude-pattern>vendor/*</exclude-pattern>
+</ruleset>

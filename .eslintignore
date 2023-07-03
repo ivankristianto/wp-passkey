@@ -1,0 +1,12 @@
+# Minified Files
+*.min.js
+
+# External Libraries
+**/node_modules/*
+**/vendor/*
+
+# Platform
+/wordpress/*
+
+# Build assets
+/assets/dist/*

@@ -40,6 +40,10 @@ wordpress/
 ###########
 .vscode/*
 
+# Testing #
+###########
+.config/cache/*
+
 # Ignore temporary OS files #
 ############################
 .DS_Store

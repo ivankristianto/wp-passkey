@@ -17,7 +17,9 @@
   "require-dev": {
     "humanmade/coding-standards": "^1.1.1",
     "johnpbloch/wordpress": "dev-master",
+    "phpstan/phpstan": "1.11.x-dev",
     "phpunit/phpunit": "^8.5",
+    "szepeviktor/phpstan-wordpress": "^1.2",
     "wp-phpunit/wp-phpunit": "^5.9",
     "yoast/phpunit-polyfills": "^2.0@dev"
   },

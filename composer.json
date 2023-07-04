@@ -1,5 +1,5 @@
 {
-  "name": "ivankristianto/wp-passkeys",
+  "name": "ivankristianto/wp-passkey",
   "description": "This plugin provides easy mechanism to load scripts asynchronously and on demand.",
   "type": "wordpress-plugin",
   "license": "GPL-2.0+",

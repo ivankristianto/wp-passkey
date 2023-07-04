@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name: WordPress Passkeys
+ * Plugin Name: WordPress Passkey
  * Description: Provides passwordless authentication on WordPress
  * Author: Ivan Kristianto
  * Author URI: https://www.ivankristianto.com
@@ -9,7 +9,7 @@
 
 declare( strict_types=1 );
 
-namespace WP\Passkeys;
+namespace WP\Passkey;
 
 require_once __DIR__ . '/inc/namespace.php';
 

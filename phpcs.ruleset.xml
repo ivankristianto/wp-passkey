@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <ruleset name="wp-passkeys">
-    <description>PHPCS rules for WordPress Passkeys</description>
+    <description>PHPCS rules for WordPress Passkey</description>
 
     <!-- Defaults -->
     <arg name="extensions" value="php"/>

@@ -1,5 +1,5 @@
 {
-  "name": "@ivankristianto/wp-passkeys",
+  "name": "@ivankristianto/wp-passkey",
   "version": "0.1.0",
   "type": "module",
   "scripts": {
@@ -8,7 +8,7 @@
     "lint:js": "eslint './assets/src/' --ext .js",
     "lint:php": "composer lint",
     "lint": "npm run lint:js && npm run lint:php",
-    "test-unit-php": "wp-env run phpunit 'phpunit -c /var/www/html/wp-content/plugins/wp-passkeys/phpunit.xml.dist --verbose'",
+    "test-unit-php": "wp-env run phpunit 'phpunit -c /var/www/html/wp-content/plugins/wp-passkey/phpunit.xml.dist --verbose'",
     "release": "composer install --no-dev --ignore-platform-reqs && npm run build && ./bin/release",
     "server": "wp-env"
   },

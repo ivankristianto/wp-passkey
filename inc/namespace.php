@@ -5,7 +5,7 @@
 
 declare( strict_types = 1 );
 
-namespace WP\Passkeys;
+namespace WP\Passkey;
 
 /**
  * Connect namespace methods to hooks and filters.

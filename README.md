@@ -1,3 +1,3 @@
-# WordPress Passkeys
+# WordPress Passkey
 
 TBA

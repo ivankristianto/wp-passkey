@@ -11,6 +11,8 @@ declare( strict_types=1 );
 
 namespace WP\Passkey;
 
+require_once __DIR__ . '/inc/rest-api.php';
 require_once __DIR__ . '/inc/namespace.php';
 
+// Kickstart the plugin.
 bootstrap();

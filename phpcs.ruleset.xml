@@ -1,17 +1,39 @@
 <?xml version="1.0"?>
 <ruleset name="wp-passkey">
-    <description>PHPCS rules for WordPress Passkey</description>
+	<description>PHPCS rules for WordPress Passkey</description>
 
-    <!-- Defaults -->
-    <arg name="extensions" value="php"/>
-    <config name="show_progress" value="1"/>
+	<!-- Check for PHP cross-version compatibility. -->
+	<config name="testVersion" value="8.2-"/>
+
+	<!--
+		Prevent errors caused by WordPress Coding Standards not supporting PHP 8.0+.
+		See https://github.com/WordPress/WordPress-Coding-Standards/issues/2035
+
+		Note that the &#38; is an escaped & (ampersand); the & character must be escaped in XML documents
+	-->
+	<ini name="error_reporting" value="E_ALL &#38; ~E_DEPRECATED" />
+
+	<!-- Check for WP cross-version compatibility. -->
+	<config name="minimum_supported_wp_version" value="6.2"/>
+
+	<!-- Only scan PHP files. -->
+	<arg name="extensions" value="php"/>
+
+	<!-- Whenever possible, cache the scan results and re-use those for unchanged files on the next scan. -->
+	<arg name="cache"/>
+
+	<!-- Set the memory limit to 256M.
+		For most standard PHP configurations, this means the memory limit will temporarily be raised.
+		Ref: https://github.com/squizlabs/PHP_CodeSniffer/wiki/Advanced-Usage#specifying-phpini-settings
+	-->
+	<ini name="memory_limit" value="256M"/>
 
 	<!-- Don't restrict file and directory names -->
-    <rule ref="vendor/humanmade/coding-standards">
+	<rule ref="vendor/humanmade/coding-standards">
 		<exclude name="HM.Files.ClassFileName.MismatchedName" />
 		<exclude name="HM.Files.NamespaceDirectoryName" />
 		<exclude name="WordPress.Files.FileName.NotHyphenatedLowercase" />
-    </rule>
+	</rule>
 
 	<rule ref="WordPress.Files.FileName">
 		<properties>
@@ -19,9 +41,9 @@
 		</properties>
 	</rule>
 
-    <!-- Use PHPDoc rules -->
-    <rul ref="WordPress-Docs"/>
+	<!-- Use PHPDoc rules -->
+	<rul ref="WordPress-Docs"/>
 
-    <!-- Ignore 3rd-party code -->
-    <exclude-pattern>vendor/*</exclude-pattern>
+	<!-- Ignore 3rd-party code -->
+	<exclude-pattern>vendor/*</exclude-pattern>
 </ruleset>

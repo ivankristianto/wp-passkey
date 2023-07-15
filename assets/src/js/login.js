@@ -14,8 +14,6 @@ async function authenticate() {
 		} );
 
 		asseResp = await startAuthentication( response );
-
-		console.log( 'Anything > asseResp', asseResp ); // eslint-disable-line no-console
 	} catch ( error ) {
 		throw error;
 	}
@@ -28,7 +26,10 @@ async function authenticate() {
 			data: asseResp,
 		} );
 
-		console.log( 'Anything > response', response ); // eslint-disable-line no-console
+		if ( response.status === 'verified' ) {
+			// Redirect to the admin dashboard.
+			window.location.href = '/wp-admin/';
+		}
 	} catch ( error ) {
 		throw error;
 	}

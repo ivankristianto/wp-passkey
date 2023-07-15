@@ -14,8 +14,6 @@ async function createRegistration() {
 			method: 'POST',
 		} );
 
-		console.log( 'Anything > response', response ); // eslint-disable-line no-console
-
 		attResp = await startRegistration( response );
 	} catch ( error ) {
 		throw error;
@@ -28,8 +26,6 @@ async function createRegistration() {
 			method: 'POST',
 			data: attResp,
 		} );
-
-		console.log( 'Anything > response', response ); // eslint-disable-line no-console
 	} catch ( error ) {
 		throw error;
 	}

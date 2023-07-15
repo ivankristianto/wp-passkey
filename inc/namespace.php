@@ -13,4 +13,7 @@ namespace WP\Passkey;
  * @return void
  */
 function bootstrap() : void {
+	Rest_API\bootstrap();
+	User_Profile\bootstrap();
+	Login\bootstrap();
 }

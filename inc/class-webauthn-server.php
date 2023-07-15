@@ -204,9 +204,11 @@ class Webauthn_Server {
 			throw new InvalidDataException( $data, 'Invalid request.' );
 		}
 
+		$public_key_credential_source_repository = new Source_Repository();
+
 		$authenticator_attestation_response_validator = AuthenticatorAttestationResponseValidator::create(
 			$attestation_statement_support_manager,
-			null,
+			$public_key_credential_source_repository,
 			null,
 			ExtensionOutputCheckerHandler::create()
 		);
@@ -226,6 +228,8 @@ class Webauthn_Server {
 
 		// Delete the challenge from user meta.
 		delete_user_meta( $user->ID, 'wp_passkey_challenge' );
+
+		$public_key_credential_source_repository->saveCredentialSource( $public_key_credential_source );
 
 		return $public_key_credential_source;
 	}
@@ -257,8 +261,10 @@ class Webauthn_Server {
 			throw new InvalidDataException( $data, 'Invalid request.' );
 		}
 
+		$public_key_credential_source_repository = new Source_Repository();
+
 		$authenticator_assertion_response_validator = AuthenticatorAssertionResponseValidator::create(
-			null,  // The Credential Repository service.
+			$public_key_credential_source_repository,  // The Credential Repository service.
 			null,                  // The token binding handler.
 			ExtensionOutputCheckerHandler::create(),       // The extension output checker handler.
 			$this->get_algorithm_manager()                      // The COSE Algorithm Manager.
@@ -270,11 +276,11 @@ class Webauthn_Server {
 		$public_key_credential_request_options = $this->create_assertion_request( $challenge );
 
 		$public_key_credential_source = $authenticator_assertion_response_validator->check(
-			$public_key_credential->getRawId(),
+			$public_key_credential->getId(),
 			$authenticator_assertion_response,
 			$public_key_credential_request_options,
 			$this->get_current_domain(),
-			null, // @TODO: Come back to this to check user handle.
+			null,
 			[ 'localhost' ] // Secure RelyingParty, to make localhost enable.
 		);
 

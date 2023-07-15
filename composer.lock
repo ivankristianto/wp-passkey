@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0b0b5a37877ad3c13025ba7ff1ecff6c",
+    "content-hash": "387f81808cec10998f3e78416898689d",
     "packages": [
         {
             "name": "brick/math",
@@ -62,35 +62,76 @@
             "time": "2023-01-15T23:12:38+00:00"
         },
         {
-            "name": "lcobucci/clock",
-            "version": "3.2.x-dev",
+            "name": "kucrut/vite-for-wp",
+            "version": "dev-main",
             "source": {
                 "type": "git",
-                "url": "https://github.com/lcobucci/clock.git",
-                "reference": "d3a6b7f239b895eed937367e914427ceb5ebe61f"
+                "url": "https://github.com/kucrut/vite-for-wp.git",
+                "reference": "850e04b16b7bebfe6b1a276845d20bd99874fd56"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/lcobucci/clock/zipball/d3a6b7f239b895eed937367e914427ceb5ebe61f",
-                "reference": "d3a6b7f239b895eed937367e914427ceb5ebe61f",
+                "url": "https://api.github.com/repos/kucrut/vite-for-wp/zipball/850e04b16b7bebfe6b1a276845d20bd99874fd56",
+                "reference": "850e04b16b7bebfe6b1a276845d20bd99874fd56",
+                "shasum": ""
+            },
+            "require-dev": {
+                "dealerdirect/phpcodesniffer-composer-installer": "^0.7.2",
+                "wp-coding-standards/wpcs": "^2.3"
+            },
+            "default-branch": true,
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "vite-for-wp.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-2.0-only"
+            ],
+            "authors": [
+                {
+                    "name": "Dzikri Aziz"
+                }
+            ],
+            "description": "Vite integration for WordPress plugins and themes development.",
+            "support": {
+                "issues": "https://github.com/kucrut/vite-for-wp/issues",
+                "source": "https://github.com/kucrut/vite-for-wp/tree/v0.5.2"
+            },
+            "time": "2022-12-14T14:07:54+00:00"
+        },
+        {
+            "name": "lcobucci/clock",
+            "version": "3.0.x-dev",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/lcobucci/clock.git",
+                "reference": "039ef98c6b57b101d10bd11d8fdfda12cbd996dc"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/lcobucci/clock/zipball/039ef98c6b57b101d10bd11d8fdfda12cbd996dc",
+                "reference": "039ef98c6b57b101d10bd11d8fdfda12cbd996dc",
                 "shasum": ""
             },
             "require": {
-                "php": "~8.2.0",
+                "php": "~8.1.0 || ~8.2.0",
                 "psr/clock": "^1.0"
             },
             "provide": {
                 "psr/clock-implementation": "1.0"
             },
             "require-dev": {
-                "infection/infection": "^0.27",
-                "lcobucci/coding-standard": "^10.0.0",
-                "phpstan/extension-installer": "^1.3.1",
-                "phpstan/phpstan": "^1.10.22",
-                "phpstan/phpstan-deprecation-rules": "^1.1.3",
-                "phpstan/phpstan-phpunit": "^1.3.13",
-                "phpstan/phpstan-strict-rules": "^1.5.1",
-                "phpunit/phpunit": "^10.2.3"
+                "infection/infection": "^0.26",
+                "lcobucci/coding-standard": "^9.0",
+                "phpstan/extension-installer": "^1.2",
+                "phpstan/phpstan": "^1.9.4",
+                "phpstan/phpstan-deprecation-rules": "^1.1.1",
+                "phpstan/phpstan-phpunit": "^1.3.2",
+                "phpstan/phpstan-strict-rules": "^1.4.4",
+                "phpunit/phpunit": "^9.5.27"
             },
             "default-branch": true,
             "type": "library",
@@ -112,7 +153,7 @@
             "description": "Yet another clock abstraction",
             "support": {
                 "issues": "https://github.com/lcobucci/clock/issues",
-                "source": "https://github.com/lcobucci/clock/tree/3.2.x"
+                "source": "https://github.com/lcobucci/clock/tree/3.0.0"
             },
             "funding": [
                 {
@@ -124,7 +165,7 @@
                     "type": "patreon"
                 }
             ],
-            "time": "2023-07-03T00:16:40+00:00"
+            "time": "2022-12-19T15:00:24+00:00"
         },
         {
             "name": "paragonie/constant_time_encoding",
@@ -2022,12 +2063,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan.git",
-                "reference": "33869559a5a5e49b7134e735ec1b5663d4fac666"
+                "reference": "9083f9b34412a39a2fb2bbb3f138d7decbc314a2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/33869559a5a5e49b7134e735ec1b5663d4fac666",
-                "reference": "33869559a5a5e49b7134e735ec1b5663d4fac666",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/9083f9b34412a39a2fb2bbb3f138d7decbc314a2",
+                "reference": "9083f9b34412a39a2fb2bbb3f138d7decbc314a2",
                 "shasum": ""
             },
             "require": {
@@ -2077,7 +2118,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2023-07-03T19:30:35+00:00"
+            "time": "2023-07-14T00:46:32+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",
@@ -2383,12 +2424,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "c8bf4ddc3ee3263c2f77477cbd1849832f34f473"
+                "reference": "07d34586b6ee7803c611b31e67408c8a8656d53a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/c8bf4ddc3ee3263c2f77477cbd1849832f34f473",
-                "reference": "c8bf4ddc3ee3263c2f77477cbd1849832f34f473",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/07d34586b6ee7803c611b31e67408c8a8656d53a",
+                "reference": "07d34586b6ee7803c611b31e67408c8a8656d53a",
                 "shasum": ""
             },
             "require": {
@@ -2473,7 +2514,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2023-06-28T05:06:28+00:00"
+            "time": "2023-07-10T06:37:01+00:00"
         },
         {
             "name": "sebastian/code-unit-reverse-lookup",
@@ -3210,12 +3251,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/squizlabs/PHP_CodeSniffer.git",
-                "reference": "d148febc2a2eb82972121d7f962883f7a5697b55"
+                "reference": "b8d7e94fe41708c3b2d10f72d515fb56723176c9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/squizlabs/PHP_CodeSniffer/zipball/d148febc2a2eb82972121d7f962883f7a5697b55",
-                "reference": "d148febc2a2eb82972121d7f962883f7a5697b55",
+                "url": "https://api.github.com/repos/squizlabs/PHP_CodeSniffer/zipball/b8d7e94fe41708c3b2d10f72d515fb56723176c9",
+                "reference": "b8d7e94fe41708c3b2d10f72d515fb56723176c9",
                 "shasum": ""
             },
             "require": {
@@ -3260,7 +3301,7 @@
                 "source": "https://github.com/squizlabs/PHP_CodeSniffer",
                 "wiki": "https://github.com/squizlabs/PHP_CodeSniffer/wiki"
             },
-            "time": "2023-05-26T22:32:02+00:00"
+            "time": "2023-07-14T06:20:15+00:00"
         },
         {
             "name": "symfony/polyfill-php73",
@@ -3615,6 +3656,7 @@
     "minimum-stability": "dev",
     "stability-flags": {
         "johnpbloch/wordpress": 20,
+        "phpstan/phpstan": 20,
         "yoast/phpunit-polyfills": 20
     },
     "prefer-stable": false,

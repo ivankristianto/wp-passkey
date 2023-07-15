@@ -12,6 +12,7 @@ use WP_Error;
 use WP_Passkey\Webauthn_Server;
 use WP_REST_Request;
 use WP_REST_Response;
+use WP_User;
 
 /**
  * Connect namespace methods to hooks and filters.
@@ -109,10 +110,6 @@ function register_response( WP_REST_Request $request ): WP_REST_Response|WP_Erro
 	try {
 		$user = wp_get_current_user();
 		$public_key_credential_source = $webauthn_server->validate_attestation_response( $data, $user );
-
-		// Store the public key credential source.
-		$public_key = $public_key_credential_source->jsonSerialize();
-		update_user_meta( $user->ID, 'wp_passkey_' . $public_key['publicKeyCredentialId'], $public_key );
 	} catch ( Exception $error ) {
 		return new WP_Error( 'public_key_validation_failed', $error->getMessage(), [ 'status' => 400 ] );
 	}
@@ -160,12 +157,21 @@ function signin_response( WP_REST_Request $request ): WP_REST_Response|WP_Error 
 
 	try {
 		$public_key_credential_source = $webauthn_server->validate_assertion_response( $data );
+
+		$user_handle = $public_key_credential_source->getUserHandle();
+		$user = get_user_by( 'login', $user_handle );
+
+		if ( ! $user instanceof WP_User ) {
+			throw new Exception( 'User not found.', 400 );
+		}
+
+		wp_set_auth_cookie( $user->ID, true, is_ssl() );
 	} catch ( Exception $error ) {
 		return new WP_Error( 'public_key_validation_failed', $error->getMessage(), [ 'status' => 400 ] );
 	}
 
 	return rest_ensure_response( [
 		'status' => 'verified',
-		'message' => 'Successfully registered.',
+		'message' => 'Successfully signin with Passkey.',
 	] );
 }

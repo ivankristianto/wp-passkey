@@ -46,4 +46,5 @@
 
 	<!-- Ignore 3rd-party code -->
 	<exclude-pattern>vendor/*</exclude-pattern>
+	<exclude-pattern>wordpress/*</exclude-pattern>
 </ruleset>

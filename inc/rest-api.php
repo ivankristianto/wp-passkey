@@ -36,6 +36,10 @@ function register_rest_api_endpoints() {
 		[
 			'methods'  => 'POST',
 			'callback' => __NAMESPACE__ . '\\register_request',
+			'permission_callback' => function () {
+				// Only allow users who logged in with minimum capability.
+				return current_user_can( 'read' );
+			},
 		]
 	);
 
@@ -46,6 +50,10 @@ function register_rest_api_endpoints() {
 		[
 			'methods'  => 'POST',
 			'callback' => __NAMESPACE__ . '\\register_response',
+			'permission_callback' => function () {
+				// Only allow users who logged in with minimum capability.
+				return current_user_can( 'read' );
+			},
 		]
 	);
 
@@ -67,6 +75,7 @@ function register_rest_api_endpoints() {
 		[
 			'methods'  => 'POST',
 			'callback' => __NAMESPACE__ . '\\signin_response',
+			'permission_callback' => '__return_true',
 		]
 	);
 

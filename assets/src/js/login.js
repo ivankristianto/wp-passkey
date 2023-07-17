@@ -7,13 +7,17 @@ import domReady from '@wordpress/dom-ready';
  */
 async function authenticate() {
 	let asseResp;
+	let requestId;
 	try {
 		const response = await apiFetch( {
 			path: '/wp-passkey/v1/signin-request',
 			method: 'POST',
 		} );
 
-		asseResp = await startAuthentication( response );
+		const { options, request_id } = response;
+
+		requestId = request_id;
+		asseResp = await startAuthentication( options );
 	} catch ( error ) {
 		throw error;
 	}
@@ -23,12 +27,18 @@ async function authenticate() {
 		const response = await apiFetch( {
 			path: '/wp-passkey/v1/signin-response',
 			method: 'POST',
-			data: asseResp,
+			data: {
+				request_id: requestId,
+				asseResp,
+			},
 		} );
 
 		if ( response.status === 'verified' ) {
-			// Redirect to the admin dashboard.
-			window.location.href = '/wp-admin/';
+			// Get redirect_to from query string.
+			const urlParams = new URLSearchParams( window.location.search );
+			const redirect_to = urlParams.get( 'redirect_to' ) || '/wp-admin';
+			// Redirect to redirect url or wp-admin as default.
+			window.location.href = redirect_to;
 		}
 	} catch ( error ) {
 		throw error;
@@ -48,6 +58,14 @@ domReady( async () => {
 	}
 
 	if ( browserSupportsWebAuthnAutofill() ) {
-		await authenticate();
+		try {
+			await authenticate();
+		} catch ( error ) {
+			// Show error message.
+			const errorElement = document.getElementById( 'wp-passkey-error' );
+			if ( errorElement ) {
+				errorElement.style.display = 'block';
+			}
+		}
 	}
 } );

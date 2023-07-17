@@ -126,7 +126,7 @@ class Webauthn_Server {
 	 * @param WP_User $user Current User.
 	 * @param string|null $challenge Challenge string.
 	 * @return PublicKeyCredentialCreationOptions
-	 * @throws InvalidDataException
+	 * @throws InvalidDataException If the challenge is invalid.
 	 */
 	public function create_attestation_request( WP_User $user, ?string $challenge = null ) : PublicKeyCredentialCreationOptions {
 		$rp_entity = $this->get_relying_party();
@@ -138,6 +138,16 @@ class Webauthn_Server {
 			$challenge = wp_generate_uuid4();
 		}
 
+		$public_key_credential_source_repository = new Source_Repository();
+		$excluded_credentials = $public_key_credential_source_repository->findAllForUserEntity( $user_entity );
+
+		$excluded_public_key_descriptors = array_map(
+			function ( PublicKeyCredentialSource $credential ) {
+				return $credential->getPublicKeyCredentialDescriptor();
+			},
+			$excluded_credentials
+		);
+
 		$public_key_credential_creation_options = PublicKeyCredentialCreationOptions::create(
 			$rp_entity,
 			$user_entity,
@@ -146,6 +156,7 @@ class Webauthn_Server {
 		)
 		->setTimeout( 30_000 )
 		->setAuthenticatorSelection( $authenticator_selection )
+		->excludeCredentials( ...$excluded_public_key_descriptors )
 		->setAttestation( PublicKeyCredentialCreationOptions::ATTESTATION_CONVEYANCE_PREFERENCE_NONE );
 
 		// Store challenge in User meta.
@@ -162,16 +173,15 @@ class Webauthn_Server {
 	 */
 	public function create_assertion_request( ?string $challenge = null ) : PublicKeyCredentialRequestOptions {
 		if ( ! $challenge ) {
-			$challenge = 'ivan1234';// wp_generate_uuid4();
+			$challenge = wp_generate_uuid4();
 		}
 
 		$public_key_credential_request_options = PublicKeyCredentialRequestOptions::create(
 			$challenge,
+		)
+		->setUserVerification(
+			PublicKeyCredentialRequestOptions::USER_VERIFICATION_REQUIREMENT_REQUIRED
 		);
-		// ->allowCredentials( 30_000 )
-
-		// Store challenge in User meta.
-		// update_user_meta( $user->ID, 'wp_passkey_signin_challenge', $challenge );
 
 		return $public_key_credential_request_options;
 	}
@@ -182,8 +192,8 @@ class Webauthn_Server {
 	 * @param string $data Data from the request.
 	 * @param WP_User $user Current User.
 	 * @return PublicKeyCredentialSource
-	 * @throws InvalidDataException
-	 * @throws Throwable
+	 * @throws InvalidDataException If the request is invalid.
+	 * @throws Throwable If the request is invalid.
 	 */
 	public function validate_attestation_response( string $data, WP_User $user ) : PublicKeyCredentialSource {
 		$attestation_statement_support_manager = AttestationStatementSupportManager::create();
@@ -238,11 +248,12 @@ class Webauthn_Server {
 	 * Validate Assertion Response in Signin.
 	 *
 	 * @param string $data Data from the request.
+	 * @param string $challenge Challenge string.
 	 * @return PublicKeyCredentialSource
-	 * @throws InvalidDataException
-	 * @throws Throwable
+	 * @throws InvalidDataException If the request is invalid.
+	 * @throws Throwable If the request is invalid or if there is an error while validating the assertion response.
 	 */
-	public function validate_assertion_response( string $data ) : PublicKeyCredentialSource {
+	public function validate_assertion_response( string $data, string $challenge ) : PublicKeyCredentialSource {
 		$attestation_statement_support_manager = AttestationStatementSupportManager::create();
 		$attestation_statement_support_manager->add( NoneAttestationStatementSupport::create() );
 
@@ -269,9 +280,6 @@ class Webauthn_Server {
 			ExtensionOutputCheckerHandler::create(),       // The extension output checker handler.
 			$this->get_algorithm_manager()                      // The COSE Algorithm Manager.
 		);
-
-		// Get expected challenge from session.
-		$challenge = 'ivan1234';// get_user_meta( $user->ID, 'wp_passkey_challenge', true );
 
 		$public_key_credential_request_options = $this->create_assertion_request( $challenge );
 

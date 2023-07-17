@@ -129,6 +129,7 @@ function register_response( WP_REST_Request $request ): WP_REST_Response|WP_Erro
  */
 function signin_request( WP_REST_Request $request ): WP_REST_Response|WP_Error {
 	$webauthn_server = new Webauthn_Server();
+	$request_id = wp_generate_uuid4();
 
 	try {
 		$public_key_credential_request_options = $webauthn_server->create_assertion_request();
@@ -136,7 +137,18 @@ function signin_request( WP_REST_Request $request ): WP_REST_Response|WP_Error {
 		return new WP_Error( 'invalid_request', 'Invalid request.', [ 'status' => 400 ] );
 	}
 
-	return rest_ensure_response( $public_key_credential_request_options );
+	$challenge = $public_key_credential_request_options->getChallenge();
+
+	// Store the challenge in transient for 60 seconds.
+	// For some hosting transient set to persistent object cache like Redis/Memcache. By default it stored in options table.
+	set_transient( 'wp_passkey_' . $request_id, $challenge, 60 );
+
+	$response = [
+		'options' => $public_key_credential_request_options,
+		'request_id' => $request_id,
+	];
+
+	return rest_ensure_response( $response );
 }
 
 /**
@@ -147,7 +159,7 @@ function signin_request( WP_REST_Request $request ): WP_REST_Response|WP_Error {
  * @return WP_REST_Response|WP_Error
  */
 function signin_response( WP_REST_Request $request ): WP_REST_Response|WP_Error {
-	$data = $request->get_body();
+	$data = $request->get_json_params();
 
 	if ( ! $data ) {
 		return new WP_Error( 'invalid_request', 'Invalid request.', [ 'status' => 400 ] );
@@ -155,14 +167,29 @@ function signin_response( WP_REST_Request $request ): WP_REST_Response|WP_Error 
 
 	$webauthn_server = new Webauthn_Server();
 
+	// Destruct request_id and asseResp from $data.
+	$request_id = $data['request_id'];
+	$assertion_response = json_encode( $data['asseResp'] );
+
+	// Get challenge from cache.
+	$challenge = get_transient( 'wp_passkey_' . $request_id );
+
+	// If $challenge not exists, return WP_Error.
+	if ( ! $challenge ) {
+		return new WP_Error( 'invalid_challenge', 'Invalid Challenge.', [ 'status' => 400 ] );
+	}
+
+	// Delete challenge from cache.
+	delete_transient( 'wp_passkey_' . $request_id );
+
 	try {
-		$public_key_credential_source = $webauthn_server->validate_assertion_response( $data );
+		$public_key_credential_source = $webauthn_server->validate_assertion_response( $assertion_response, $challenge );
 
 		$user_handle = $public_key_credential_source->getUserHandle();
 		$user = get_user_by( 'login', $user_handle );
 
 		if ( ! $user instanceof WP_User ) {
-			throw new Exception( 'User not found.', 400 );
+			return new WP_Error( 'user_not_found', 'User not found.', [ 'status' => 404 ] );
 		}
 
 		wp_set_auth_cookie( $user->ID, true, is_ssl() );

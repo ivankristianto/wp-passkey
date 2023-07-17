@@ -33,13 +33,15 @@ async function authenticate() {
 			},
 		} );
 
-		if ( response.status === 'verified' ) {
-			// Get redirect_to from query string.
-			const urlParams = new URLSearchParams( window.location.search );
-			const redirect_to = urlParams.get( 'redirect_to' ) || '/wp-admin';
-			// Redirect to redirect url or wp-admin as default.
-			window.location.href = redirect_to;
+		if ( response.status !== 'verified' ) {
+			throw new Error( 'Passkey authentication failed.' );
 		}
+
+		// Get redirect_to from query string.
+		const urlParams = new URLSearchParams( window.location.search );
+		const redirect_to = urlParams.get( 'redirect_to' ) || '/wp-admin';
+		// Redirect to redirect url or wp-admin as default.
+		window.location.href = redirect_to;
 	} catch ( error ) {
 		throw error;
 	}
@@ -61,11 +63,11 @@ domReady( async () => {
 		try {
 			await authenticate();
 		} catch ( error ) {
-			// Show error message.
-			const errorElement = document.getElementById( 'wp-passkey-error' );
-			if ( errorElement ) {
-				errorElement.style.display = 'block';
-			}
+			// Get redirect_to from query string.
+			const urlParams = new URLSearchParams( window.location.search );
+			urlParams.append( 'wp_passkey_error', error.message );
+			// Redirect to current page with error message.
+			window.location.href = `${ window.location.pathname }?${ urlParams.toString() }`;
 		}
 	}
 } );

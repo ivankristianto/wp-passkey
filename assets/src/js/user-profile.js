@@ -2,6 +2,8 @@ import { browserSupportsWebAuthn, startRegistration } from '@simplewebauthn/brow
 import apiFetch from '@wordpress/api-fetch';
 import domReady from '@wordpress/dom-ready';
 
+import '../scss/user-profile.scss';
+
 /**
  * Create Passkey Registration.
  */
@@ -26,13 +28,17 @@ async function createRegistration() {
 			method: 'POST',
 			data: attResp,
 		} );
+
+		if ( response.status === 'verified' ) {
+			window.location.reload();
+		}
 	} catch ( error ) {
 		throw error;
 	}
 }
 
 domReady( () => {
-	const registerButton = document.querySelector( '.wp-register-passkey' );
+	const registerButton = document.querySelector( '.wp-register-new-passkey' );
 	const registerMessage = document.querySelector( '.wp-register-passkey--message' );
 
 	if ( ! registerButton || ! registerMessage ) {
@@ -45,16 +51,17 @@ domReady( () => {
 		return;
 	}
 
-	registerButton.addEventListener( 'click', () => {
+	registerButton.addEventListener( 'click', async () => {
 		try {
-			createRegistration();
+			await createRegistration();
 		} catch ( error ) {
 			// Some basic error handling
 			if ( error.name === 'InvalidStateError' ) {
-				registerMessage.innerText = 'Error: Authenticator was probably already registered by user';
+				registerMessage.innerText = 'Error: Authenticator was probably already registered by you';
 			} else {
-				registerMessage.innerText = error;
+				registerMessage.innerText = `Error: ${ error.message }`;
 			}
+			registerMessage.classList.add( 'error' );
 		}
 	} );
 } );

@@ -77,18 +77,18 @@ class Webauthn_Server {
 	 */
 	public function get_public_key_credential_parameters_list() : array {
 		return [
-			PublicKeyCredentialParameters::create( 'public-key', Algorithms::COSE_ALGORITHM_ES256 ),
-			PublicKeyCredentialParameters::create( 'public-key', Algorithms::COSE_ALGORITHM_ES256K ),
-			PublicKeyCredentialParameters::create( 'public-key', Algorithms::COSE_ALGORITHM_ES384 ),
-			PublicKeyCredentialParameters::create( 'public-key', Algorithms::COSE_ALGORITHM_ES512 ),
-			PublicKeyCredentialParameters::create( 'public-key', Algorithms::COSE_ALGORITHM_RS256 ),
-			PublicKeyCredentialParameters::create( 'public-key', Algorithms::COSE_ALGORITHM_RS384 ),
-			PublicKeyCredentialParameters::create( 'public-key', Algorithms::COSE_ALGORITHM_RS512 ),
-			PublicKeyCredentialParameters::create( 'public-key', Algorithms::COSE_ALGORITHM_PS256 ),
-			PublicKeyCredentialParameters::create( 'public-key', Algorithms::COSE_ALGORITHM_PS384 ),
-			PublicKeyCredentialParameters::create( 'public-key', Algorithms::COSE_ALGORITHM_PS512 ),
-			PublicKeyCredentialParameters::create( 'public-key', Algorithms::COSE_ALGORITHM_ED256 ),
-			PublicKeyCredentialParameters::create( 'public-key', Algorithms::COSE_ALGORITHM_ED512 ),
+			PublicKeyCredentialParameters::create( 'public-key', Algorithms::COSE_ALGORITHM_ES256 ),  // ECDSA w/ SHA-256.
+			PublicKeyCredentialParameters::create( 'public-key', Algorithms::COSE_ALGORITHM_ES256K ), // ECDSA w/ SHA-256K.
+			PublicKeyCredentialParameters::create( 'public-key', Algorithms::COSE_ALGORITHM_ES384 ),  // ECDSA w/ SHA-384.
+			PublicKeyCredentialParameters::create( 'public-key', Algorithms::COSE_ALGORITHM_ES512 ),  // ECDSA w/ SHA-512.
+			PublicKeyCredentialParameters::create( 'public-key', Algorithms::COSE_ALGORITHM_RS256 ),  // RSASSA-PKCS1-v1_5 w/ SHA-256.
+			PublicKeyCredentialParameters::create( 'public-key', Algorithms::COSE_ALGORITHM_RS384 ),  // RSASSA-PKCS1-v1_5 w/ SHA-384.
+			PublicKeyCredentialParameters::create( 'public-key', Algorithms::COSE_ALGORITHM_RS512 ),  // RSASSA-PKCS1-v1_5 w/ SHA-512.
+			PublicKeyCredentialParameters::create( 'public-key', Algorithms::COSE_ALGORITHM_PS256 ),  // RSASSA-PSS w/ SHA-256.
+			PublicKeyCredentialParameters::create( 'public-key', Algorithms::COSE_ALGORITHM_PS384 ),  // RSASSA-PSS w/ SHA-384.
+			PublicKeyCredentialParameters::create( 'public-key', Algorithms::COSE_ALGORITHM_PS512 ),  // RSASSA-PSS w/ SHA-512.
+			PublicKeyCredentialParameters::create( 'public-key', Algorithms::COSE_ALGORITHM_ED256 ),  // EdDSA w/ SHA-256.
+			PublicKeyCredentialParameters::create( 'public-key', Algorithms::COSE_ALGORITHM_ED512 ),  // EdDSA w/ SHA-512.
 		];
 	}
 
@@ -193,7 +193,6 @@ class Webauthn_Server {
 	 * @param WP_User $user Current User.
 	 * @return PublicKeyCredentialSource
 	 * @throws InvalidDataException If the request is invalid.
-	 * @throws Throwable If the request is invalid.
 	 */
 	public function validate_attestation_response( string $data, WP_User $user ) : PublicKeyCredentialSource {
 		$attestation_statement_support_manager = AttestationStatementSupportManager::create();
@@ -251,7 +250,6 @@ class Webauthn_Server {
 	 * @param string $challenge Challenge string.
 	 * @return PublicKeyCredentialSource
 	 * @throws InvalidDataException If the request is invalid.
-	 * @throws Throwable If the request is invalid or if there is an error while validating the assertion response.
 	 */
 	public function validate_assertion_response( string $data, string $challenge ) : PublicKeyCredentialSource {
 		$attestation_statement_support_manager = AttestationStatementSupportManager::create();
@@ -275,10 +273,10 @@ class Webauthn_Server {
 		$public_key_credential_source_repository = new Source_Repository();
 
 		$authenticator_assertion_response_validator = AuthenticatorAssertionResponseValidator::create(
-			$public_key_credential_source_repository,  // The Credential Repository service.
-			null,                  // The token binding handler.
-			ExtensionOutputCheckerHandler::create(),       // The extension output checker handler.
-			$this->get_algorithm_manager()                      // The COSE Algorithm Manager.
+			$public_key_credential_source_repository, // The Credential Repository service.
+			null,                                     // The token binding handler.
+			ExtensionOutputCheckerHandler::create(),  // The extension output checker handler.
+			$this->get_algorithm_manager()            // The COSE Algorithm Manager.
 		);
 
 		$public_key_credential_request_options = $this->create_assertion_request( $challenge );

@@ -61,7 +61,7 @@ function display_user_passkeys( WP_User $user ) {
 
 	$user_entity = PublicKeyCredentialUserEntity::create(
 		$user->user_login,   // Name.
-		$user->user_login,  // Use user login as the ID.
+		$user->user_login,   // Use user login as the ID.
 		$user->display_name, // Display name.
 	);
 

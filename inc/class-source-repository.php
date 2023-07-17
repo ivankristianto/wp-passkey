@@ -76,6 +76,9 @@ class Source_Repository implements PublicKeyCredentialSourceRepository {
 			$public_keys
 		);
 
+		// Removes null values.
+		$public_keys = array_filter( $public_keys );
+
 		return array_map(
 			function( $public_key ) {
 				return PublicKeyCredentialSource::createFromArray( $public_key );
@@ -102,7 +105,7 @@ class Source_Repository implements PublicKeyCredentialSourceRepository {
 		}
 
 		// Store the public key credential source. And need to add extra slashes to escape the slashes in the JSON.
-		$public_key_json = addcslashes( wp_json_encode( $public_key, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE ), '\\' );
+		$public_key_json = addcslashes( wp_json_encode( $public_key, JSON_UNESCAPED_SLASHES ), '\\' );
 		update_user_meta( $user->ID, 'wp_passkey_' . $public_key['publicKeyCredentialId'], $public_key_json );
 	}
 

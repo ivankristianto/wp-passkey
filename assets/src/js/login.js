@@ -47,6 +47,26 @@ async function authenticate() {
 	}
 }
 
+/**
+ * Show error message.
+ *
+ * @param {string} message Error message.
+ */
+function showError( message ) {
+	const loginForm = document.getElementById( 'loginform' );
+
+	// Create Error element if not exists.
+	const errorElement = document.createElement( 'div' );
+	errorElement.id = 'login_error';
+	errorElement.className = 'notice notice-error';
+	errorElement.innerHTML = message;
+
+	// Add error element before login form.
+	loginForm.parentNode.insertBefore( errorElement, loginForm );
+
+	loginForm.classList.add( 'shake' );
+}
+
 domReady( async () => {
 	// If the browser doesn't support WebAuthn, don't do anything.
 	if ( ! browserSupportsWebAuthn() ) {
@@ -63,11 +83,7 @@ domReady( async () => {
 		try {
 			await authenticate();
 		} catch ( error ) {
-			// Get redirect_to from query string.
-			const urlParams = new URLSearchParams( window.location.search );
-			urlParams.append( 'wp_passkey_error', error.message );
-			// Redirect to current page with error message.
-			window.location.href = `${ window.location.pathname }?${ urlParams.toString() }`;
+			showError( error.message );
 		}
 	}
 } );

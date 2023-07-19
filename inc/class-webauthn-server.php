@@ -176,9 +176,12 @@ class Webauthn_Server {
 			$challenge = wp_generate_uuid4();
 		}
 
+		$rp_entity = $this->get_relying_party();
 		$public_key_credential_request_options = PublicKeyCredentialRequestOptions::create(
 			$challenge,
 		)
+		->setRpId( $rp_entity->getId() )
+		->setTimeout( 30_000 )
 		->setUserVerification(
 			PublicKeyCredentialRequestOptions::USER_VERIFICATION_REQUIREMENT_REQUIRED
 		);

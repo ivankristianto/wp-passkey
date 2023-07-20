@@ -104,6 +104,10 @@ class Source_Repository implements PublicKeyCredentialSourceRepository {
 			throw new Exception( 'User not found.', 400 );
 		}
 
+		// Custom data to store.
+		$public_key['name'] = $public_key['userHandle'];
+		$public_key['created'] = time();
+
 		// Store the public key credential source. And need to add extra slashes to escape the slashes in the JSON.
 		$public_key_json = addcslashes( wp_json_encode( $public_key, JSON_UNESCAPED_SLASHES ), '\\' );
 		update_user_meta( $user->ID, 'wp_passkey_' . $public_key['publicKeyCredentialId'], $public_key_json );

@@ -1,0 +1,9 @@
+{
+  "name": "${localWorkspaceFolderBasename}",
+  "workspaceFolder": "/var/www/html/wp-content/plugins/wp-passkey",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "wordpress",
+  "forwardPorts": [ 9999 ],
+  "postCreateCommand": "/var/www/html/wp-content/plugins/wp-passkey/.devcontainer/setup.sh",
+  "remoteUser": "www-data"
+}

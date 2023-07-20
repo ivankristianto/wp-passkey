@@ -35,6 +35,10 @@
 		<exclude name="WordPress.Files.FileName.NotHyphenatedLowercase" />
 	</rule>
 
+	<rule ref="Squiz.Commenting.FunctionComment.EmptyThrows">
+		<severity>0</severity>
+	</rule>
+
 	<rule ref="WordPress.Files.FileName">
 		<properties>
 			<property name="strict_class_file_names" value="false" />

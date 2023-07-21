@@ -4,7 +4,7 @@
  * Description: Provides passwordless authentication on WordPress
  * Author: Ivan Kristianto
  * Author URI: https://www.ivankristianto.com
- * Version: 0.0.1
+ * Version: 0.1.0
  */
 
 declare( strict_types=1 );

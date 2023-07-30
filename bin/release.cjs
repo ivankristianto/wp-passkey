@@ -31,7 +31,7 @@ function getPluginVersion() {
 function generateFilename() {
 	const version = getPluginVersion();
 
-	return sanitizeFilename( `lazy-load-scripts.v${ version }.zip` );
+	return sanitizeFilename( `wp-passkey.v${ version }.zip` );
 }
 
 /**
@@ -42,7 +42,7 @@ function generateFilename() {
 async function makeRelease() {
 	const root = dirname( __dirname );
 	const releaseDir = resolve( root, 'release' );
-	const pluginDir = resolve( releaseDir, 'lazy-load-scripts' );
+	const pluginDir = resolve( releaseDir, 'wp-passkey' );
 	const filename = resolve( root, generateFilename() );
 
 	console.log( `Creating ${ filename }` ); // eslint-disable-line no-console

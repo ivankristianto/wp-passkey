@@ -40,6 +40,7 @@ async function authenticate() {
 		// Get redirect_to from query string.
 		const urlParams = new URLSearchParams( window.location.search );
 		const redirect_to = urlParams.get( 'redirect_to' ) || '/wp-admin';
+
 		// Redirect to redirect url or wp-admin as default.
 		window.location.href = redirect_to;
 	} catch ( error ) {
@@ -74,6 +75,7 @@ domReady( async () => {
 	}
 
 	const usernameField = document.getElementById( 'user_login' );
+
 	// add autocomplete="webauthn" to the username field.
 	if ( usernameField ) {
 		usernameField.setAttribute( 'autocomplete', 'username webauthn' );

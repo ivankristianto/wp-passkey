@@ -21,6 +21,7 @@ use Cose\Algorithm\Signature\RSA\PS512;
 use Cose\Algorithm\Signature\RSA\RS256;
 use Cose\Algorithm\Signature\RSA\RS384;
 use Cose\Algorithm\Signature\RSA\RS512;
+use Exception;
 use Webauthn\AttestationStatement\AttestationObjectLoader;
 use Webauthn\AttestationStatement\AttestationStatementSupportManager;
 use Webauthn\AttestationStatement\NoneAttestationStatementSupport;
@@ -251,6 +252,7 @@ class Webauthn_Server {
 	 * @param string $challenge Challenge string.
 	 * @return PublicKeyCredentialSource
 	 * @throws InvalidDataException If the request is invalid.
+	 * @throws Exception If the credential id is not found.
 	 */
 	public function validate_assertion_response( string $data, string $challenge ) : PublicKeyCredentialSource {
 		$attestation_statement_support_manager = AttestationStatementSupportManager::create();
@@ -281,9 +283,14 @@ class Webauthn_Server {
 		);
 
 		$public_key_credential_request_options = $this->create_assertion_request( $challenge );
+		$public_key_credential_source = $public_key_credential_source_repository->findOneByCredentialId( $public_key_credential->getId() );
+
+		if ( ! $public_key_credential_source instanceof PublicKeyCredentialSource ) {
+			throw new Exception( 'credential_not_found', 404 );
+		}
 
 		$public_key_credential_source = $authenticator_assertion_response_validator->check(
-			$public_key_credential->getId(),
+			$public_key_credential_source,
 			$authenticator_assertion_response,
 			$public_key_credential_request_options,
 			$this->get_current_domain(),

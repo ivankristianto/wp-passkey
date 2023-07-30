@@ -1,0 +1,37 @@
+{
+  "name": "ivankristianto/wp-passkey",
+  "description": "This plugin provides easy mechanism to load scripts asynchronously and on demand.",
+  "type": "wordpress-plugin",
+  "license": "GPL-2.0+",
+  "minimum-stability": "dev",
+  "authors": [
+    {
+      "name": "Ivan Kristianto",
+      "email": "ivan@ivankristianto.com"
+    }
+  ],
+  "require": {
+    "php": ">=8.1",
+    "web-auth/webauthn-lib": "^4.6.3",
+    "kucrut/vite-for-wp": "dev-main"
+  },
+  "require-dev": {
+    "humanmade/coding-standards": "^1.1.1",
+    "johnpbloch/wordpress": "dev-master",
+    "phpstan/phpstan": "1.11.x-dev",
+    "phpunit/phpunit": "^8.5",
+    "szepeviktor/phpstan-wordpress": "^1.2",
+    "wp-phpunit/wp-phpunit": "^5.9",
+    "yoast/phpunit-polyfills": "^2.0@dev"
+  },
+  "scripts": {
+    "format": "./vendor/bin/phpcbf -p --standard=phpcs.ruleset.xml ./inc",
+    "lint": "./vendor/bin/phpcs -p --standard=phpcs.ruleset.xml ./inc"
+  },
+  "config": {
+    "allow-plugins": {
+      "johnpbloch/wordpress-core-installer": true,
+      "dealerdirect/phpcodesniffer-composer-installer": true
+    }
+  }
+}

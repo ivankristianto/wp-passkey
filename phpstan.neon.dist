@@ -1,0 +1,10 @@
+includes:
+  - vendor/szepeviktor/phpstan-wordpress/extension.neon
+parameters:
+  level: max
+  tmpDir: .config/cache/phpstan/
+  paths:
+    - inc
+	excludePaths:
+    scan:
+      - wordpress

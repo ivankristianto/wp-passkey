@@ -1,0 +1,59 @@
+{
+    "name": "web-auth/webauthn-lib",
+    "type": "library",
+    "license": "MIT",
+    "description": "FIDO2/Webauthn Support For PHP",
+    "keywords": [
+        "FIDO",
+        "FIDO2",
+        "webauthn"
+    ],
+    "homepage": "https://github.com/web-auth",
+    "authors": [
+        {
+            "name": "Florent Morselli",
+            "homepage": "https://github.com/Spomky"
+        },
+        {
+            "name": "All contributors",
+            "homepage": "https://github.com/web-auth/webauthn-library/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.1",
+        "ext-json": "*",
+        "ext-openssl": "*",
+        "ext-mbstring": "*",
+        "paragonie/constant_time_encoding": "^2.6",
+        "psr/event-dispatcher": "^1.0",
+        "psr/http-client": "^1.0",
+        "psr/http-factory": "^1.0",
+        "psr/log": "^1.0|^2.0|^3.0",
+        "spomky-labs/cbor-php": "^3.0",
+        "symfony/uid": "^6.1",
+        "web-auth/cose-lib": "^4.0.12",
+        "web-auth/metadata-service": "self.version"
+    },
+    "autoload": {
+        "psr-4": {
+            "Webauthn\\": "src/"
+        }
+    },
+    "extra": {
+        "thanks": {
+            "name": "web-auth/webauthn-framework",
+            "url": "https://github.com/web-auth/webauthn-framework"
+        }
+    },
+    "suggest": {
+        "psr/log-implementation": "Recommended to receive logs from the library",
+        "web-token/jwt-key-mgmt": "Mandatory for the AndroidSafetyNet Attestation Statement support",
+        "web-token/jwt-signature-algorithm-rsa": "Mandatory for the AndroidSafetyNet Attestation Statement support",
+        "web-token/jwt-signature-algorithm-ecdsa": "Recommended for the AndroidSafetyNet Attestation Statement support",
+        "web-token/jwt-signature-algorithm-eddsa": "Recommended for the AndroidSafetyNet Attestation Statement support",
+        "symfony/event-dispatcher": "Recommended to use dispatched events"
+    },
+    "require-dev": {
+        "symfony/event-dispatcher": "^6.1"
+    }
+}

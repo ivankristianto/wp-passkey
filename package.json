@@ -5,6 +5,7 @@
   "scripts": {
     "build": "npm run clean && vite build",
     "clean": "rimraf assets/dist",
+    "cli": "wp-env run cli",
     "dev": "vite",
     "lint:js": "eslint './assets/src/' --ext .js",
     "lint:php": "composer lint",

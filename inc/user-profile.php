@@ -44,7 +44,7 @@ function enqueue_scripts() {
 		'assets/src/js/user-profile.js',
 		[
 			'handle' => 'wp-passkeys-user-profile',
-			'dependencies' => [ 'wp-api-fetch', 'wp-dom-ready' ],
+			'dependencies' => [ 'wp-api-fetch', 'wp-dom-ready', 'wp-i18n' ],
 			'in-footer' => true,
 		]
 	);
@@ -72,34 +72,61 @@ function display_user_passkeys( WP_User $user ) {
 		<p class="description">
 			<?php esc_html_e( 'Passkeys are used to authenticate you when you log in to your account.', 'wp-passkey' ); ?>
 		</p>
-		<?php
-		// @TODO: Change to WP_List_Table.
-		?>
 		<table class="wp-list-table wp-passkey-list-table widefat fixed striped table-view-list">
 			<thead>
 				<tr>
-					<th class="col-name" scope="col"><?php esc_html_e( 'Fingerprint', 'wp-passkey' ); ?></th>
-					<th class="col-name" scope="col"><?php esc_html_e( 'Type', 'wp-passkey' ); ?></th>
+					<th class="manage-column column-name column-primary" scope="col"><?php esc_html_e( 'Name', 'wp-passkey' ); ?></th>
+					<th class="manage-column column-created-date" scope="col"><?php esc_html_e( 'Created Date', 'wp-passkey' ); ?></th>
+					<th class="manage-column column-type" scope="col"><?php esc_html_e( 'Type', 'wp-passkey' ); ?></th>
+					<th class="manage-column column-action" scope="col"><?php esc_html_e( 'Action', 'wp-passkey' ); ?></th>
 				</tr>
 			</thead>
 			<tbody>
 				<?php
-				foreach ( $public_key_credentials as $public_key_credential ) :
+				if ( empty( $public_key_credentials ) ) :
 					?>
 					<tr>
-						<td>
-							<?php echo esc_html( Base64UrlSafe::encode( $public_key_credential->getPublicKeyCredentialDescriptor()->getId() ) ); ?>
-						</td>
-						<td>
-							<?php echo esc_html( $public_key_credential->getPublicKeyCredentialDescriptor()->getType() ); ?>
+						<td colspan="4">
+							<?php esc_html_e( 'No passkeys found.', 'wp-passkey' ); ?>
 						</td>
 					</tr>
+					<?php
+				endif;
+
+				foreach ( $public_key_credentials as $public_key_credential ) :
+					$name = $public_key_credential->name;
+					$fingerprint = Base64UrlSafe::encodeUnpadded( $public_key_credential->getPublicKeyCredentialId() );
+					?>
+				<tr>
+					<td>
+						<?php echo esc_html( $name ); ?>
+					</td>
+					<td>
+						<?php
+							echo date_i18n( __( 'F j, Y' ), $public_key_credential->created );
+						?>
+					</td>
+					<td>
+						<?php echo esc_html( $public_key_credential->getPublicKeyCredentialDescriptor()->getType() ); ?>
+					</td>
+					<td>
+						<?php
+							printf(
+								'<button type="button" data-id="%1$s" name="%2$s" id="%1$s" class="button delete" aria-label="%3$s">%4$s</button>',
+								esc_attr( $fingerprint ),
+								esc_attr( $name ),
+								/* translators: %s: the application password's given name. */
+								esc_attr( sprintf( __( 'Revoke "%s"' ), $name ) ),
+								__( 'Revoke' )
+							);
+						?>
+					</td>
+				</tr>
 				<?php endforeach; ?>
 			</tbody>
 		</table>
 		<button type="button" class="button button-secondary wp-register-new-passkey hide-if-no-js" aria-expanded="false"><?php esc_html_e( 'Register New Passkey', 'wp-passkey' ); ?></button>
 		<div class="wp-register-passkey--message"></div>
 	</div>
-
 	<?php
 }

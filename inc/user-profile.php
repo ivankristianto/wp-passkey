@@ -94,16 +94,16 @@ function display_user_passkeys( WP_User $user ) {
 				endif;
 
 				foreach ( $public_key_credentials as $public_key_credential ) :
-					$name = $public_key_credential->name;
+					$extra_data = $public_key_credential_source_repository->get_extra_data( $public_key_credential );
 					$fingerprint = Base64UrlSafe::encodeUnpadded( $public_key_credential->getPublicKeyCredentialId() );
 					?>
 				<tr>
 					<td>
-						<?php echo esc_html( $name ); ?>
+						<?php echo esc_html( $extra_data['name'] ?? '' ); ?>
 					</td>
 					<td>
 						<?php
-							echo date_i18n( __( 'F j, Y' ), $public_key_credential->created );
+							echo date_i18n( __( 'F j, Y' ), $extra_data['created'] ?? '' );
 						?>
 					</td>
 					<td>
@@ -114,9 +114,9 @@ function display_user_passkeys( WP_User $user ) {
 							printf(
 								'<button type="button" data-id="%1$s" name="%2$s" id="%1$s" class="button delete" aria-label="%3$s">%4$s</button>',
 								esc_attr( $fingerprint ),
-								esc_attr( $name ),
+								esc_attr( $extra_data['name'] ?? '' ),
 								/* translators: %s: the application password's given name. */
-								esc_attr( sprintf( __( 'Revoke "%s"' ), $name ) ),
+								esc_attr( sprintf( __( 'Revoke "%s"' ), $extra_data['name'] ?? '' ) ),
 								__( 'Revoke' )
 							);
 						?>

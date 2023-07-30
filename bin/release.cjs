@@ -56,7 +56,14 @@ async function makeRelease() {
 	await fse.ensureDir( pluginDir );
 
 	// Copy files to the release directory.
-	const fileCopyPromises = [ cp( 'readme.md' ), cp( 'readme.txt' ), cp( 'plugin.php' ), cp( 'assets/dist' ), cp( 'inc' ), cp( 'vendor' ) ];
+	const fileCopyPromises = [
+		cp( 'readme.md' ),
+		cp( 'readme.txt' ),
+		cp( 'plugin.php' ),
+		cp( 'assets/dist' ),
+		cp( 'inc' ),
+		cp( 'vendor' ),
+	];
 	await Promise.all( fileCopyPromises );
 
 	// Archive the release directory.

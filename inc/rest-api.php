@@ -9,9 +9,11 @@ namespace WP\Passkey\Rest_API;
 
 use Exception;
 use WP_Error;
+use WP_Passkey\Source_Repository;
 use WP_Passkey\Webauthn_Server;
 use WP_REST_Request;
 use WP_REST_Response;
+use WP_REST_Server;
 use WP_User;
 
 /**
@@ -34,7 +36,7 @@ function register_rest_api_endpoints() {
 		'wp-passkey/v1',
 		'/register-request',
 		[
-			'methods'  => 'POST',
+			'methods' => WP_REST_Server::CREATABLE,
 			'callback' => __NAMESPACE__ . '\\register_request',
 			'permission_callback' => function () {
 				// Only allow users who logged in with minimum capability.
@@ -48,7 +50,7 @@ function register_rest_api_endpoints() {
 		'wp-passkey/v1',
 		'/register-response',
 		[
-			'methods'  => 'POST',
+			'methods' => WP_REST_Server::CREATABLE,
 			'callback' => __NAMESPACE__ . '\\register_response',
 			'permission_callback' => function () {
 				// Only allow users who logged in with minimum capability.
@@ -62,7 +64,7 @@ function register_rest_api_endpoints() {
 		'wp-passkey/v1',
 		'/signin-request',
 		[
-			'methods'  => 'POST',
+			'methods' => WP_REST_Server::CREATABLE,
 			'callback' => __NAMESPACE__ . '\\signin_request',
 			'permission_callback' => '__return_true',
 		]
@@ -73,9 +75,23 @@ function register_rest_api_endpoints() {
 		'wp-passkey/v1',
 		'/signin-response',
 		[
-			'methods'  => 'POST',
+			'methods'  => WP_REST_Server::CREATABLE,
 			'callback' => __NAMESPACE__ . '\\signin_response',
 			'permission_callback' => '__return_true',
+		]
+	);
+
+	// Register rest endpoint for revoke passkey.
+	register_rest_route(
+		'wp-passkey/v1',
+		'/revoke',
+		[
+			'methods' => WP_REST_Server::CREATABLE,
+			'callback' => __NAMESPACE__ . '\\revoke_request',
+			'permission_callback' => function () {
+				// Only allow users who logged in with minimum capability.
+				return current_user_can( 'read' );
+			},
 		]
 	);
 
@@ -118,7 +134,9 @@ function register_response( WP_REST_Request $request ): WP_REST_Response|WP_Erro
 
 	try {
 		$user = wp_get_current_user();
-		$public_key_credential_source = $webauthn_server->validate_attestation_response( $data, $user );
+
+		// Try to valiate the response, will throw error when validation failed.
+		$webauthn_server->validate_attestation_response( $data, $user );
 	} catch ( Exception $error ) {
 		return new WP_Error( 'public_key_validation_failed', $error->getMessage(), [ 'status' => 400 ] );
 	}
@@ -209,5 +227,43 @@ function signin_response( WP_REST_Request $request ): WP_REST_Response|WP_Error 
 	return rest_ensure_response( [
 		'status' => 'verified',
 		'message' => 'Successfully signin with Passkey.',
+	] );
+}
+
+/**
+ * Function to revoke request.
+ *
+ * @param WP_REST_Request $request The request object.
+ * @return WP_REST_Response|WP_Error $response The response object.
+ */
+function revoke_request( WP_REST_Request $request ): WP_REST_Response | WP_Error {
+	$data = $request->get_json_params();
+
+	if ( ! $data ) {
+		return new WP_Error( 'invalid_request', 'Invalid request.', [ 'status' => 400 ] );
+	}
+
+	$fingerprint = $data['fingerprint'];
+
+	if ( ! $fingerprint ) {
+		return new WP_Error( 'invalid_request', 'Invalid request.', [ 'status' => 400 ] );
+	}
+
+	$public_key_credential_source_repository = new Source_Repository();
+	$credential = $public_key_credential_source_repository->findOneByCredentialId( $fingerprint );
+
+	if ( ! $credential ) {
+		return new WP_Error( 'not_found', 'Fingeprint Not Found.', [ 'status' => 404 ] );
+	}
+
+	try {
+		$public_key_credential_source_repository->deleteCredentialSource( $credential );
+	} catch ( Exception $error ) {
+		return new WP_Error( 'invalid_request', 'Invalid request: ' . $error->getMessage(), [ 'status' => 400 ] );
+	}
+
+	return rest_ensure_response( [
+		'status' => 'success',
+		'message' => 'Successfully revoked.',
 	] );
 }

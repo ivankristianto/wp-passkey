@@ -81,7 +81,10 @@ class Source_Repository implements PublicKeyCredentialSourceRepository {
 
 		return array_map(
 			function( $public_key ) {
-				return PublicKeyCredentialSource::createFromArray( $public_key );
+				$public_key_credential_source = PublicKeyCredentialSource::createFromArray( $public_key );
+				$public_key_credential_source->name = $public_key['name'] ?? '';
+				$public_key_credential_source->created = $public_key['created'] ?? '';
+				return $public_key_credential_source;
 			},
 			$public_keys
 		);
@@ -111,6 +114,33 @@ class Source_Repository implements PublicKeyCredentialSourceRepository {
 		// Store the public key credential source. And need to add extra slashes to escape the slashes in the JSON.
 		$public_key_json = addcslashes( wp_json_encode( $public_key, JSON_UNESCAPED_SLASHES ), '\\' );
 		update_user_meta( $user->ID, 'wp_passkey_' . $public_key['publicKeyCredentialId'], $public_key_json );
+	}
+
+	/**
+	 * Delete a credential source.
+	 *
+	 * @param PublicKeyCredentialSource $public_key_credential_source The credential source to delete.
+	 * @return void
+	 * @throws InvalidArgumentException
+	 * @throws RangeException
+	 * @throws TypeError
+	 * @throws Exception
+	 */
+	public function deleteCredentialSource( PublicKeyCredentialSource $public_key_credential_source ): void {
+		$public_key_credential_id = Base64UrlSafe::encodeUnpadded( $public_key_credential_source->getPublicKeyCredentialId() );
+
+		$user_handle = $public_key_credential_source->getUserHandle();
+		$user = get_user_by( 'login', $user_handle );
+
+		if ( ! $user instanceof WP_User ) {
+			throw new Exception( 'User not found.', 404 );
+		}
+
+		$is_success = delete_user_meta( $user->ID, 'wp_passkey_' . $public_key_credential_id );
+
+		if ( ! $is_success ) {
+			throw new Exception( 'Unable to delete credential source.', 500 );
+		}
 	}
 
 }

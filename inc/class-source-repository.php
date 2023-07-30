@@ -5,7 +5,7 @@
 
 declare( strict_types = 1 );
 
-namespace WP_Passkey;
+namespace WP\Passkey;
 
 use Exception;
 use ParagonIE\ConstantTime\Base64UrlSafe;

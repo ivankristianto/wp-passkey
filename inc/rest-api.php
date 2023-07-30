@@ -8,9 +8,9 @@ declare(strict_types=1);
 namespace WP\Passkey\Rest_API;
 
 use Exception;
+use WP\Passkey\Source_Repository;
+use WP\Passkey\Webauthn_Server;
 use WP_Error;
-use WP_Passkey\Source_Repository;
-use WP_Passkey\Webauthn_Server;
 use WP_REST_Request;
 use WP_REST_Response;
 use WP_REST_Server;
@@ -263,7 +263,7 @@ function signin_response( WP_REST_Request $request ): WP_REST_Response|WP_Error 
 
 	return rest_ensure_response( [
 		'status' => 'verified',
-		'message' => 'Successfully signin with Passkey.',
+		'message' => __( 'Successfully signin with Passkey.', 'wp-passkey' ),
 	] );
 }
 
@@ -283,14 +283,14 @@ function revoke_request( WP_REST_Request $request ): WP_REST_Response | WP_Error
 	$fingerprint = $data['fingerprint'];
 
 	if ( ! $fingerprint ) {
-		return new WP_Error( 'invalid_request', 'Invalid request.', [ 'status' => 400 ] );
+		return new WP_Error( 'invalid_request', 'Fingerprint param not exist.', [ 'status' => 400 ] );
 	}
 
 	$public_key_credential_source_repository = new Source_Repository();
 	$credential = $public_key_credential_source_repository->findOneByCredentialId( $fingerprint );
 
 	if ( ! $credential ) {
-		return new WP_Error( 'not_found', 'Fingeprint Not Found.', [ 'status' => 404 ] );
+		return new WP_Error( 'not_found', 'Fingeprint not found.', [ 'status' => 404 ] );
 	}
 
 	try {
@@ -301,6 +301,6 @@ function revoke_request( WP_REST_Request $request ): WP_REST_Response | WP_Error
 
 	return rest_ensure_response( [
 		'status' => 'success',
-		'message' => 'Successfully revoked.',
+		'message' => __( 'Successfully revoked.', 'wp-passkey' ),
 	] );
 }

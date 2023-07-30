@@ -10,7 +10,7 @@ namespace WP\Passkey\User_Profile;
 use Kucrut\Vite;
 use ParagonIE\ConstantTime\Base64UrlSafe;
 use Webauthn\PublicKeyCredentialUserEntity;
-use WP_Passkey\Source_Repository;
+use WP\Passkey\Source_Repository;
 use WP_Screen;
 use WP_User;
 
@@ -115,7 +115,7 @@ function display_user_passkeys( WP_User $user ) {
 								'<button type="button" data-id="%1$s" name="%2$s" id="%1$s" class="button delete" aria-label="%3$s">%4$s</button>',
 								esc_attr( $fingerprint ),
 								esc_attr( $extra_data['name'] ?? '' ),
-								/* translators: %s: the application password's given name. */
+								/* translators: %s: the passkey's given name. */
 								esc_attr( sprintf( __( 'Revoke "%s"' ), $extra_data['name'] ?? '' ) ),
 								__( 'Revoke' )
 							);

@@ -17,15 +17,16 @@ jobs:
         id: get_version
         run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
       - name: Create Release
-        uses: technote-space/release-github-actions@v7
+        uses: technote-space/release-github-actions@v8
         with:
+          BUILD_COMMAND: 'composer install --no-dev --ignore-platform-reqs && npm ci && npm run build'
           CLEAN_TEST_TAG: true
           CLEAN_TARGETS: .[!.]*,__tests__,src,package.json,package-lock.json,node_modules,tests,*.xml,vite.config.js,composer.lock,bin,.vscode
           COMMIT_MESSAGE: 'Built release for ${{ steps.get_version.outputs.VERSION }}. For a full change log look at the notes within the original/${{ steps.get_version.outputs.VERSION }} release.'
           CREATE_MAJOR_VERSION_TAG: false
           CREATE_MINOR_VERSION_TAG: false
           CREATE_PATCH_VERSION_TAG: false
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
           ORIGINAL_TAG_PREFIX: original/
           OUTPUT_BUILD_INFO_FILENAME: build.json
           TEST_TAG_PREFIX: test/

@@ -241,8 +241,6 @@ class Webauthn_Server {
 		// Delete the challenge from user meta.
 		delete_user_meta( $user->ID, 'wp_passkey_challenge' );
 
-		$public_key_credential_source_repository->saveCredentialSource( $public_key_credential_source );
-
 		return $public_key_credential_source;
 	}
 

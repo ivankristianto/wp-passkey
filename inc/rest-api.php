@@ -110,7 +110,7 @@ function register_request( WP_REST_Request $request ): WP_REST_Response|WP_Error
 	try {
 		$public_key_credential_creation_options = $webauthn_server->create_attestation_request( wp_get_current_user() );
 	} catch ( Exception $error ) {
-		return new WP_Error( 'invalid_request', 'Invalid request.', [ 'status' => 400 ] );
+		return new WP_Error( 'invalid_request', 'Invalid request: ' . $error->getMessage(), [ 'status' => 400 ] );
 	}
 
 	return rest_ensure_response( $public_key_credential_creation_options );
@@ -135,8 +135,45 @@ function register_response( WP_REST_Request $request ): WP_REST_Response|WP_Erro
 	try {
 		$user = wp_get_current_user();
 
-		// Try to valiate the response, will throw error when validation failed.
-		$webauthn_server->validate_attestation_response( $data, $user );
+		// Try to validate and save the response, will throw error when validation failed.
+		$credential = $webauthn_server->validate_attestation_response( $data, $user );
+
+		// Save credential source to database.
+		$public_key_credential_source_repository = new Source_Repository();
+
+		// Get platform from user agent.
+		$user_agent = $request->get_header( 'User-Agent' );
+
+		switch ( true ) {
+			case preg_match( '/android/i', $user_agent ):
+				$platform = 'Android';
+				break;
+			case preg_match( '/iphone/i', $user_agent ):
+				$platform = 'iPhone / iOS';
+				break;
+			case preg_match( '/linux/i', $user_agent ):
+				$platform = 'Linux';
+				break;
+			case preg_match( '/macintosh|mac os x/i', $user_agent ):
+				$platform = 'Mac OS';
+				break;
+			case preg_match( '/windows|win32/i', $user_agent ):
+				$platform = 'Windows';
+				break;
+			default:
+				$platform = 'unknown';
+				break;
+		}
+
+		$extra_data = [
+			'name' => "Generated on $platform",
+			'created' => time(),
+			'user_agent' => $user_agent,
+		];
+
+		// Finally store the credential source to database.
+		$public_key_credential_source_repository->saveCredentialSource( $credential, $extra_data );
+
 	} catch ( Exception $error ) {
 		return new WP_Error( 'public_key_validation_failed', $error->getMessage(), [ 'status' => 400 ] );
 	}
@@ -161,7 +198,7 @@ function signin_request( WP_REST_Request $request ): WP_REST_Response|WP_Error {
 	try {
 		$public_key_credential_request_options = $webauthn_server->create_assertion_request();
 	} catch ( Exception $error ) {
-		return new WP_Error( 'invalid_request', 'Invalid request.', [ 'status' => 400 ] );
+		return new WP_Error( 'invalid_request', 'Invalid request: ' . $error->getMessage(), [ 'status' => 400 ] );
 	}
 
 	$challenge = $public_key_credential_request_options->getChallenge();

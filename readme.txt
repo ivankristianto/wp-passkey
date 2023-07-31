@@ -1,4 +1,4 @@
-=== WP Passkey ===
+=== Passkey ===
 Contributors: ivankristianto
 Requires at least: 6.1
 Tags: identity, authentication, passwordless, login, security

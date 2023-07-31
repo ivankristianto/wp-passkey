@@ -1,9 +1,9 @@
 <?php return array(
     'root' => array(
         'name' => 'ivankristianto/wp-passkey',
-        'pretty_version' => '0.2.1',
-        'version' => '0.2.1.0',
-        'reference' => 'a6af46bc90a21dc6f2c964f50bdc5c7fc0f9e3c9',
+        'pretty_version' => '0.2.2',
+        'version' => '0.2.2.0',
+        'reference' => 'e8aecbed551c7ed564ef0ca4f9f7f879f0e935f5',
         'type' => 'wordpress-plugin',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -20,9 +20,9 @@
             'dev_requirement' => false,
         ),
         'ivankristianto/wp-passkey' => array(
-            'pretty_version' => '0.2.1',
-            'version' => '0.2.1.0',
-            'reference' => 'a6af46bc90a21dc6f2c964f50bdc5c7fc0f9e3c9',
+            'pretty_version' => '0.2.2',
+            'version' => '0.2.2.0',
+            'reference' => 'e8aecbed551c7ed564ef0ca4f9f7f879f0e935f5',
             'type' => 'wordpress-plugin',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

@@ -1,6 +1,6 @@
 {
   "name": "ivankristianto/wp-passkey",
-  "description": "This plugin provides easy mechanism to load scripts asynchronously and on demand.",
+  "description": "Provides passwordless authentication for WordPress.",
   "type": "wordpress-plugin",
   "license": "GPL-2.0+",
   "minimum-stability": "dev",

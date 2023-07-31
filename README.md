@@ -16,11 +16,11 @@ This plugin allows you to set a passkey for your WordPress site. If the passkey 
 
 ### Passkey Registration
 
-![Passkey Registration](https://raw.githubusercontent.com/ivankristianto/wp-passkey/.screenshots/register.gif)
+![Passkey Registration](.screenshots/register.gif)
 
 ### Login with Passkey
 
-![Login with Passkey](https://raw.githubusercontent.com/ivankristianto/wp-passkey/.screenshots/login.gif)
+![Login with Passkey](.screenshots/login.gif)
 
 ## Installation
 

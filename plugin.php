@@ -9,7 +9,7 @@
  *
  * Plugin Name:  WordPress Passkey
  * Description:  Provides passwordless authentication for WordPress
- * Version:      0.2.0
+ * Version:      0.2.1
  * Author:       Ivan Kristianto
  * Author URI:   https://github.com/ivankristianto/
  * Text Domain:  wp-passkey

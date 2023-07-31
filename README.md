@@ -12,6 +12,16 @@ Source and Read more about Passkeys: [Google Developers](https://developers.goog
 
 This plugin allows you to set a passkey for your WordPress site. If the passkey is not set, the site will be locked down and only users with the passkey will be able to access the site.
 
+## Screenshots
+
+### Passkey Registration
+
+![Passkey Registration](.screenshots/register.gif)
+
+### Login with Passkey
+
+![Login with Passkey](.screenshots/login.gif)
+
 ## Installation
 
 1. Upload the plugin files to the `/wp-content/plugins/wp-passkey` directory, or install the plugin through the WordPress plugins screen directly.
@@ -111,6 +121,11 @@ Once the Codespace is ready, you can run the visit the url provided by GitHub Co
 If you would like to contribute to this plugin, please fork the repository and submit a pull request.
 
 ## Changelog
+
+### 0.2.1
+
+- Fix release GitHub action.
+
 
 ### 0.2.0
 

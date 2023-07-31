@@ -1,4 +1,4 @@
-# WordPress Passkey
+# WP Passkey
 
 > This plugin still considered as experimental. Use it at your own risk.
 

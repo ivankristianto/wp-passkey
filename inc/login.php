@@ -29,7 +29,7 @@ function enqueue_scripts() {
 	}
 
 	Vite\enqueue_asset(
-		WP_PASSKEY_DIR . '/assets/dist',
+		trailingslashit( WP_PASSKEY_DIR ) . 'assets/dist',
 		'assets/src/js/login.js',
 		[
 			'handle' => 'wp-passkeys-login',

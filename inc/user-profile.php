@@ -40,7 +40,7 @@ function enqueue_scripts() {
 	}
 
 	Vite\enqueue_asset(
-		WP_PASSKEY_DIR . '/assets/dist',
+		trailingslashit( WP_PASSKEY_DIR ) . 'assets/dist',
 		'assets/src/js/user-profile.js',
 		[
 			'handle' => 'wp-passkeys-user-profile',

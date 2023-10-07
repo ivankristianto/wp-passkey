@@ -17,7 +17,7 @@
   "devDependencies": {
     "@babel/core": "^7.21.8",
     "@babel/eslint-parser": "^7.21.8",
-    "@kucrut/vite-for-wp": "^0.5.2",
+    "@kucrut/vite-for-wp": "^0.6.1",
     "@wordpress/babel-preset-default": "^7.20.0",
     "@wordpress/env": "^8.2.0",
     "@wordpress/eslint-plugin": "^14.5.0",
@@ -29,7 +29,8 @@
     "rollup-plugin-external-globals": "^0.8.0",
     "sanitize-filename": "^1.6.3",
     "sass": "^1.63.6",
-    "vite": "^4.4.4"
+    "vite": "^4.4.4",
+    "vite-plugin-external": "^4.0.1"
   },
   "dependencies": {
     "@simplewebauthn/browser": "^7.2.0"

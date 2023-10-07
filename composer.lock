@@ -67,17 +67,16 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/kucrut/vite-for-wp.git",
-                "reference": "850e04b16b7bebfe6b1a276845d20bd99874fd56"
+                "reference": "1341255cc379a3433032d4e610c5c338b8ada9af"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/kucrut/vite-for-wp/zipball/850e04b16b7bebfe6b1a276845d20bd99874fd56",
-                "reference": "850e04b16b7bebfe6b1a276845d20bd99874fd56",
+                "url": "https://api.github.com/repos/kucrut/vite-for-wp/zipball/1341255cc379a3433032d4e610c5c338b8ada9af",
+                "reference": "1341255cc379a3433032d4e610c5c338b8ada9af",
                 "shasum": ""
             },
             "require-dev": {
-                "dealerdirect/phpcodesniffer-composer-installer": "^0.7.2",
-                "wp-coding-standards/wpcs": "^2.3"
+                "wp-coding-standards/wpcs": "^3.0"
             },
             "default-branch": true,
             "type": "library",
@@ -98,9 +97,9 @@
             "description": "Vite integration for WordPress plugins and themes development.",
             "support": {
                 "issues": "https://github.com/kucrut/vite-for-wp/issues",
-                "source": "https://github.com/kucrut/vite-for-wp/tree/v0.5.2"
+                "source": "https://github.com/kucrut/vite-for-wp/tree/main"
             },
-            "time": "2022-12-14T14:07:54+00:00"
+            "time": "2023-09-23T08:06:40+00:00"
         },
         {
             "name": "lcobucci/clock",
@@ -3655,6 +3654,7 @@
     "aliases": [],
     "minimum-stability": "dev",
     "stability-flags": {
+        "kucrut/vite-for-wp": 20,
         "johnpbloch/wordpress": 20,
         "phpstan/phpstan": 20,
         "yoast/phpunit-polyfills": 20

@@ -69,7 +69,7 @@ async function makeRelease() {
 	// Archive the release directory.
 	const archive = archiver( 'zip', { zlib: { level: 9 } } );
 	archive.pipe( fse.createWriteStream( filename ) );
-	archive.directory( pluginDir, 'lazy-load-scripts', {} );
+	archive.directory( pluginDir, 'passwordless-authentication', {} );
 	await archive.finalize();
 
 	// Remove release folder at the end.

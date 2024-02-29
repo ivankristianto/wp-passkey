@@ -2,12 +2,12 @@
 /**
  * Provides passwordless authentication for WordPress
  *
- * @package   wp-passkey
+ * @package   passworldless-authentication
  * @author    Ivan Kristianto <ivan@ivankristianto.com>
  * @copyright 2023 Ivan Kristianto
  * @license   GPL v2 or later
  *
- * Plugin Name:  Passkey
+ * Plugin Name:  Passwordless Authentication
  * Description:  Provides passwordless authentication for WordPress
  * Version:      0.2.2
  * Author:       Ivan Kristianto

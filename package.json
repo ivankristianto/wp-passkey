@@ -10,7 +10,7 @@
     "lint:js": "eslint './assets/src/' --ext .js",
     "lint:php": "composer lint",
     "lint": "npm run lint:js && npm run lint:php",
-    "test-unit-php": "wp-env run tests-cli --env-cwd=wp-content/plugins/passwordless-authentication vendor/bin/phpunit",
+    "test-unit-php": "wp-env run tests-cli --env-cwd=wp-content/plugins/wp-passkey vendor/bin/phpunit",
     "release": "composer install --no-dev --ignore-platform-reqs && npm run build && ./bin/release.cjs",
     "server": "wp-env"
   },

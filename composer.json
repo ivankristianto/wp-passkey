@@ -1,5 +1,5 @@
 {
-  "name": "ivankristianto/wp-passkey",
+  "name": "ivankristianto/passwordless-authentication",
   "description": "Provides passwordless authentication for WordPress.",
   "type": "wordpress-plugin",
   "license": "GPL-2.0+",

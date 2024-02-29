@@ -2,17 +2,17 @@
 /**
  * Provides passwordless authentication for WordPress
  *
- * @package   passworldless-authentication
+ * @package   passwordless-authentication
  * @author    Ivan Kristianto <ivan@ivankristianto.com>
  * @copyright 2023 Ivan Kristianto
  * @license   GPL v2 or later
  *
  * Plugin Name:  Passwordless Authentication
  * Description:  Provides passwordless authentication for WordPress
- * Version:      0.2.2
+ * Version:      0.3.0
  * Author:       Ivan Kristianto
  * Author URI:   https://github.com/ivankristianto/
- * Text Domain:  wp-passkey
+ * Text Domain:  passwordless-authentication
  * Requires PHP: 8.1
  *
  * This program is free software; you can redistribute it and/or modify

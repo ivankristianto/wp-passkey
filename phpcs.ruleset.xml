@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<ruleset name="wp-passkey">
-	<description>PHPCS rules for WP Passkey</description>
+<ruleset name="passwordless-authentication">
+	<description>PHPCS rules for WP Passwordless Authentication</description>
 
 	<!-- Check for PHP cross-version compatibility. -->
 	<config name="testVersion" value="8.2-"/>

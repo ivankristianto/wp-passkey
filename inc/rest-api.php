@@ -234,7 +234,7 @@ function signin_response( WP_REST_Request $request ): WP_REST_Response|WP_Error 
 
 	// Destruct request_id and asseResp from $data.
 	$request_id         = $data['request_id'];
-	$assertion_response = json_encode( $data['asseResp'] );
+	$assertion_response = wp_json_encode( $data['asseResp'] );
 
 	// Get challenge from cache.
 	$challenge = get_transient( 'wp_passkey_' . $request_id );

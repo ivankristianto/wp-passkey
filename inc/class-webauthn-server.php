@@ -331,7 +331,7 @@ class Webauthn_Server {
 	 */
 	private function get_current_domain(): string {
 		// Only get the domain frm the site url.
-		$domain = parse_url( get_site_url(), PHP_URL_HOST );
+		$domain = wp_parse_url( get_site_url(), PHP_URL_HOST );
 
 		return $domain;
 	}

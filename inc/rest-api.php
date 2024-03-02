@@ -5,11 +5,11 @@
 
 declare(strict_types=1);
 
-namespace WP\Passkey\Rest_API;
+namespace BioAuth\Rest_API;
 
 use Exception;
-use WP\Passkey\Source_Repository;
-use WP\Passkey\Webauthn_Server;
+use BioAuth\Source_Repository;
+use BioAuth\Webauthn_Server;
 use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;

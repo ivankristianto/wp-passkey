@@ -30,7 +30,7 @@
 
 declare( strict_types=1 );
 
-namespace WP\Passkey;
+namespace BioAuth;
 
 /**
  * Shortcut constant to the path of this file.

@@ -7,7 +7,7 @@
 
 declare( strict_types = 1 );
 
-namespace WP\Passkey;
+namespace BioAuth;
 
 use Cose\Algorithms;
 use Cose\Algorithm\Manager;

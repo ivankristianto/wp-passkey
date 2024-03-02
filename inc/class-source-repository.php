@@ -7,7 +7,7 @@
 
 declare( strict_types = 1 );
 
-namespace WP\Passkey;
+namespace BioAuth;
 
 use Exception;
 use ParagonIE\ConstantTime\Base64UrlSafe;

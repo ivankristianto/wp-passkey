@@ -5,12 +5,12 @@
 
 declare( strict_types = 1 );
 
-namespace WP\Passkey\User_Profile;
+namespace BioAuth\User_Profile;
 
 use Kucrut\Vite;
 use ParagonIE\ConstantTime\Base64UrlSafe;
 use Webauthn\PublicKeyCredentialUserEntity;
-use WP\Passkey\Source_Repository;
+use BioAuth\Source_Repository;
 use WP_Screen;
 use WP_User;
 

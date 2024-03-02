@@ -5,7 +5,7 @@
 
 declare( strict_types = 1 );
 
-namespace WP\Passkey\Login;
+namespace BioAuth\Login;
 
 use Kucrut\Vite;
 

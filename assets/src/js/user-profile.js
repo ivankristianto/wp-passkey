@@ -63,7 +63,7 @@ domReady( () => {
 			if ( error.name === 'InvalidStateError' ) {
 				registerMessage.innerText = __(
 					'Error: Authenticator was probably already registered by you',
-					'wp-passkey',
+					'biometric-authentication',
 				);
 			} else {
 				registerMessage.innerText = `Error: ${ error.message }`;
@@ -84,7 +84,7 @@ async function revokePasskey( event ) {
 	if (
 		// eslint-disable-next-line no-alert
 		! window.confirm(
-			__( 'Are you sure you want to revoke this passkey? This action cannot be undone.', 'wp-passkey' ),
+			__( 'Are you sure you want to revoke this passkey? This action cannot be undone.', 'biometric-authentication' ),
 		)
 	) {
 		return;

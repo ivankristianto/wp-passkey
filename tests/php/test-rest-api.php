@@ -3,7 +3,7 @@
  * Sample Test file
  */
 
-namespace WP_Passkey\Tests\Phpunit;
+namespace BioAuth\Tests\Phpunit;
 
 use WP_REST_Request;
 use WP_UnitTestCase;
@@ -32,15 +32,12 @@ class Test_Rest_API extends WP_UnitTestCase {
 	 * @throws ExpectationFailedException
 	 */
 	public function test_signin_request() {
-		$request = new WP_REST_Request( 'POST', '/wp-passkey/v1/signin-request' );
+		$request  = new WP_REST_Request( 'POST', '/wp-passkey/v1/signin-request' );
 		$response = rest_get_server()->dispatch( $request );
-		$data = $response->get_data();
+		$data     = $response->get_data();
 
 		$this->assertArrayHasKey( 'request_id', $data );
 		$this->assertArrayHasKey( 'options', $data );
-		// $response = $request->
-
-		// $this->assertNotEmpty( $response->get_data() );
 	}
 
 	/**
@@ -52,9 +49,9 @@ class Test_Rest_API extends WP_UnitTestCase {
 	 * @throws ExpectationFailedException
 	 */
 	public function test_signin_response() {
-		$request = new WP_REST_Request( 'POST', '/wp-passkey/v1/signin-response' );
+		$request  = new WP_REST_Request( 'POST', '/wp-passkey/v1/signin-response' );
 		$response = rest_get_server()->dispatch( $request );
-		$data = $response->get_data();
+		$data     = $response->get_data();
 
 		$this->assertIsArray( $data );
 	}

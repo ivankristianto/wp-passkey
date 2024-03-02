@@ -9,7 +9,7 @@
 	convertWarningsToExceptions="true"
 	>
 	<testsuites>
-		<testsuite name="WP Passkey Tests">
+		<testsuite name="Biometric Authentication Tests">
 			<directory prefix="test-" suffix=".php">./tests/php/</directory>
 		</testsuite>
 	</testsuites>

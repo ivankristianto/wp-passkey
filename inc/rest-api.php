@@ -262,7 +262,7 @@ function signin_response( WP_REST_Request $request ): WP_REST_Response|WP_Error 
 	return rest_ensure_response(
 		array(
 			'status'  => 'verified',
-			'message' => __( 'Successfully signin with Passkey.', 'wp-passkey' ),
+			'message' => __( 'Successfully signin with Passkey.', 'biometric-authentication' ),
 		)
 	);
 }
@@ -302,7 +302,7 @@ function revoke_request( WP_REST_Request $request ): WP_REST_Response|WP_Error {
 	return rest_ensure_response(
 		array(
 			'status'  => 'success',
-			'message' => __( 'Successfully revoked.', 'wp-passkey' ),
+			'message' => __( 'Successfully revoked.', 'biometric-authentication' ),
 		)
 	);
 }

@@ -46,7 +46,7 @@ use WP_User;
 /**
  * Webauthn Server.
  *
- * @package WP_Passkey
+ * @package BioAuth
  */
 class Webauthn_Server {
 

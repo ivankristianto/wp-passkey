@@ -42,11 +42,11 @@ function enqueue_scripts() {
 	Vite\enqueue_asset(
 		trailingslashit( WP_PASSKEY_DIR ) . 'assets/dist',
 		'assets/src/js/user-profile.js',
-		[
-			'handle' => 'wp-passkeys-user-profile',
-			'dependencies' => [ 'wp-api-fetch', 'wp-dom-ready', 'wp-i18n' ],
-			'in-footer' => true,
-		]
+		array(
+			'handle'       => 'wp-passkeys-user-profile',
+			'dependencies' => array( 'wp-api-fetch', 'wp-dom-ready', 'wp-i18n' ),
+			'in-footer'    => true,
+		)
 	);
 }
 
@@ -68,7 +68,7 @@ function display_user_passkeys( WP_User $user ) {
 	$public_key_credentials = $public_key_credential_source_repository->findAllForUserEntity( $user_entity );
 	?>
 	<div class="wp-passkey-admin">
-		<h2 class="wp-passkey-admin--heading"><?php esc_html_e( 'Passkeys', 'wp-passkey' ) ?></h2>
+		<h2 class="wp-passkey-admin--heading"><?php esc_html_e( 'Passkeys', 'wp-passkey' ); ?></h2>
 		<p class="description">
 			<?php esc_html_e( 'Passkeys are used to authenticate you when you log in to your account.', 'wp-passkey' ); ?>
 		</p>
@@ -94,7 +94,7 @@ function display_user_passkeys( WP_User $user ) {
 				endif;
 
 				foreach ( $public_key_credentials as $public_key_credential ) :
-					$extra_data = $public_key_credential_source_repository->get_extra_data( $public_key_credential );
+					$extra_data  = $public_key_credential_source_repository->get_extra_data( $public_key_credential );
 					$fingerprint = Base64UrlSafe::encodeUnpadded( $public_key_credential->getPublicKeyCredentialId() );
 					?>
 				<tr>
@@ -103,7 +103,7 @@ function display_user_passkeys( WP_User $user ) {
 					</td>
 					<td>
 						<?php
-							echo date_i18n( __( 'F j, Y' ), $extra_data['created'] ?? '' );
+							echo esc_html( date_i18n( 'F j, Y', $extra_data['created'] ?? '' ) );
 						?>
 					</td>
 					<td>
@@ -117,7 +117,7 @@ function display_user_passkeys( WP_User $user ) {
 								esc_attr( $extra_data['name'] ?? '' ),
 								/* translators: %s: the passkey's given name. */
 								esc_attr( sprintf( __( 'Revoke "%s"' ), $extra_data['name'] ?? '' ) ),
-								__( 'Revoke' )
+								esc_html__( 'Revoke', 'wp-passkey' )
 							);
 						?>
 					</td>

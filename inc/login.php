@@ -31,10 +31,10 @@ function enqueue_scripts() {
 	Vite\enqueue_asset(
 		trailingslashit( WP_PASSKEY_DIR ) . 'assets/dist',
 		'assets/src/js/login.js',
-		[
-			'handle' => 'wp-passkeys-login',
-			'dependencies' => [ 'wp-api-fetch', 'wp-dom-ready' ],
-			'in-footer' => true,
-		]
+		array(
+			'handle'       => 'wp-passkeys-login',
+			'dependencies' => array( 'wp-api-fetch', 'wp-dom-ready' ),
+			'in-footer'    => true,
+		)
 	);
 }

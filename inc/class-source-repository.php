@@ -44,7 +44,7 @@ class Source_Repository implements PublicKeyCredentialSourceRepository {
 			return null;
 		}
 
-		$public_key = json_decode( $public_key->meta_value, true );
+		$public_key = (array) json_decode( $public_key->meta_value, true );
 
 		return PublicKeyCredentialSource::createFromArray( $public_key );
 	}

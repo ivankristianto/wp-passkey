@@ -60,6 +60,7 @@ async function makeRelease() {
 		cp( 'readme.md' ),
 		cp( 'readme.txt' ),
 		cp( 'plugin.php' ),
+		cp( 'composer.json' ),
 		cp( 'assets/dist' ),
 		cp( 'inc' ),
 		cp( 'vendor' ),

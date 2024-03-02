@@ -1,4 +1,6 @@
 <?php
+// phpcs:ignoreFile WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
+
 /**
  * Public Key Credential Source Repositoy.
  */
@@ -10,6 +12,7 @@ namespace WP\Passkey;
 use Exception;
 use ParagonIE\ConstantTime\Base64UrlSafe;
 use stdClass;
+use Webauthn\Exception\InvalidDataException;
 use Webauthn\PublicKeyCredentialSource;
 use Webauthn\PublicKeyCredentialSourceRepository;
 use Webauthn\PublicKeyCredentialUserEntity;
@@ -57,7 +60,7 @@ class Source_Repository implements PublicKeyCredentialSourceRepository {
 	 * @throws Exception If the user is not found.
 	 */
 	public function findAllForUserEntity( PublicKeyCredentialUserEntity $public_key_credential_user_entity ): array {
-		$user_handle = $public_key_credential_user_entity->getId();
+		$user_handle = $public_key_credential_user_entity->id;
 
 		$user = get_user_by( 'login', $user_handle );
 
@@ -135,9 +138,9 @@ class Source_Repository implements PublicKeyCredentialSourceRepository {
 	 * @throws Exception If the user is not found.
 	 */
 	public function deleteCredentialSource( PublicKeyCredentialSource $public_key_credential_source ): void {
-		$public_key_credential_id = Base64UrlSafe::encodeUnpadded( $public_key_credential_source->getPublicKeyCredentialId() );
+		$public_key_credential_id = Base64UrlSafe::encodeUnpadded( $public_key_credential_source->publicKeyCredentialId );
 
-		$user_handle = $public_key_credential_source->getUserHandle();
+		$user_handle = $public_key_credential_source->userHandle;
 		$user        = get_user_by( 'login', $user_handle );
 
 		if ( ! $user instanceof WP_User ) {
@@ -160,9 +163,9 @@ class Source_Repository implements PublicKeyCredentialSourceRepository {
 	 * @throws Exception If the user is not found.
 	 */
 	public function get_extra_data( PublicKeyCredentialSource $public_key_credential_source ): array {
-		$meta_key = $this->meta_key . Base64UrlSafe::encodeUnpadded( $public_key_credential_source->getPublicKeyCredentialId() );
+		$meta_key = $this->meta_key . Base64UrlSafe::encodeUnpadded( $public_key_credential_source->publicKeyCredentialId );
 
-		$user_handle = $public_key_credential_source->getUserHandle();
+		$user_handle = $public_key_credential_source->userHandle;
 
 		$user = get_user_by( 'login', $user_handle );
 

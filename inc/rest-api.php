@@ -253,6 +253,7 @@ function signin_response( WP_REST_Request $request ): WP_REST_Response|WP_Error 
 			return new WP_Error( 'user_not_found', 'User not found.', array( 'status' => 404 ) );
 		}
 
+		// If user found and authorized, set the login cookie.
 		wp_set_auth_cookie( $user->ID, true, is_ssl() );
 	} catch ( Exception $error ) {
 		return new WP_Error( 'public_key_validation_failed', $error->getMessage(), array( 'status' => 400 ) );

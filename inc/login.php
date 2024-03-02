@@ -7,6 +7,7 @@ declare( strict_types = 1 );
 
 namespace BioAuth\Login;
 
+use BioAuth;
 use Kucrut\Vite;
 
 /**
@@ -29,7 +30,7 @@ function enqueue_scripts() {
 	}
 
 	Vite\enqueue_asset(
-		trailingslashit( WP_PASSKEY_DIR ) . 'assets/dist',
+		trailingslashit( BioAuth\BASE_DIR ) . 'assets/dist',
 		'assets/src/js/login.js',
 		array(
 			'handle'       => 'wp-passkeys-login',

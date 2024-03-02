@@ -7,6 +7,7 @@ declare( strict_types = 1 );
 
 namespace BioAuth\User_Profile;
 
+use BioAuth;
 use Kucrut\Vite;
 use ParagonIE\ConstantTime\Base64UrlSafe;
 use Webauthn\PublicKeyCredentialUserEntity;
@@ -40,7 +41,7 @@ function enqueue_scripts() {
 	}
 
 	Vite\enqueue_asset(
-		trailingslashit( WP_PASSKEY_DIR ) . 'assets/dist',
+		trailingslashit( BioAuth\BASE_DIR ) . 'assets/dist',
 		'assets/src/js/user-profile.js',
 		array(
 			'handle'       => 'wp-passkeys-user-profile',

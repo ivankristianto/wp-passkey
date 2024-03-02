@@ -8,5 +8,3 @@ parameters:
   excludePaths:
     analyse:
       - wordpress
-  ignoreErrors:
-      - '#Constant WP_PASSKEY_DIR not found.#'

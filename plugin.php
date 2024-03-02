@@ -35,7 +35,7 @@ namespace BioAuth;
 /**
  * Shortcut constant to the path of this file.
  */
-define( 'WP_PASSKEY_DIR', plugin_dir_path( __FILE__ ) );
+const BASE_DIR = __DIR__;
 
 if ( ! file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
 	return;

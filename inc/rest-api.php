@@ -99,11 +99,9 @@ function register_rest_api_endpoints() {
 /**
  * Function to register request.
  *
- * @param WP_REST_Request $request The request object.
- *
  * @return WP_REST_Response|WP_Error
  */
-function register_request( WP_REST_Request $request ): WP_REST_Response|WP_Error {
+function register_request(): WP_REST_Response|WP_Error {
 	$webauthn_server = new Webauthn_Server();
 
 	try {
@@ -188,11 +186,9 @@ function register_response( WP_REST_Request $request ): WP_REST_Response|WP_Erro
 /**
  * Function to signin request.
  *
- * @param WP_REST_Request $request The request object.
- *
  * @return WP_REST_Response|WP_Error
  */
-function signin_request( WP_REST_Request $request ): WP_REST_Response|WP_Error {
+function signin_request(): WP_REST_Response|WP_Error {
 	$webauthn_server = new Webauthn_Server();
 	$request_id      = wp_generate_uuid4();
 

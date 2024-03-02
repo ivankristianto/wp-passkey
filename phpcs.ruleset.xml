@@ -1,19 +1,11 @@
 <?xml version="1.0"?>
-<ruleset name="passwordless-authentication">
-	<description>PHPCS rules for WP Passwordless Authentication</description>
+<ruleset name="biometric-authentication">
+	<description>PHPCS rules for Biometric Authentication for WordPress</description>
 
 	<!-- Check for PHP cross-version compatibility. -->
-	<config name="testVersion" value="8.2-"/>
+	<config name="testVersion" value="8.1-"/>
 
-	<!--
-		Prevent errors caused by WordPress Coding Standards not supporting PHP 8.0+.
-		See https://github.com/WordPress/WordPress-Coding-Standards/issues/2035
-
-		Note that the &#38; is an escaped & (ampersand); the & character must be escaped in XML documents
-	-->
-	<ini name="error_reporting" value="E_ALL &#38; ~E_DEPRECATED" />
-
-	<!-- Check for WP cross-version compatibility. -->
+		<!-- Check for WP cross-version compatibility. -->
 	<config name="minimum_supported_wp_version" value="6.2"/>
 
 	<!-- Only scan PHP files. -->
@@ -29,11 +21,11 @@
 	<ini name="memory_limit" value="256M"/>
 
 	<!-- Don't restrict file and directory names -->
-	<rule ref="vendor/humanmade/coding-standards">
+	<!-- <rule ref="vendor/humanmade/coding-standards">
 		<exclude name="HM.Files.ClassFileName.MismatchedName" />
 		<exclude name="HM.Files.NamespaceDirectoryName" />
 		<exclude name="WordPress.Files.FileName.NotHyphenatedLowercase" />
-	</rule>
+	</rule> -->
 
 	<rule ref="Squiz.Commenting.FunctionComment.EmptyThrows">
 		<severity>0</severity>
@@ -43,6 +35,11 @@
 		<properties>
 			<property name="strict_class_file_names" value="false" />
 		</properties>
+	</rule>
+
+	<!-- Include the WordPress-Extra standard. -->
+	<rule ref="WordPress-Extra">
+		<exclude name="WordPress.PHP.YodaConditions.NotYoda"/>
 	</rule>
 
 	<!-- Use PHPDoc rules -->

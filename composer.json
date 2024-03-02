@@ -1,6 +1,6 @@
 {
-  "name": "ivankristianto/passwordless-authentication",
-  "description": "Provides passwordless authentication for WordPress.",
+  "name": "ivankristianto/biometric-authentication",
+  "description": "Provides biometric authentication for WordPress.",
   "type": "wordpress-plugin",
   "license": "GPL-2.0+",
   "minimum-stability": "dev",
@@ -16,13 +16,13 @@
     "kucrut/vite-for-wp": "dev-main"
   },
   "require-dev": {
-    "humanmade/coding-standards": "^1.1.1",
     "johnpbloch/wordpress": "dev-master",
     "phpstan/phpstan": "1.11.x-dev",
     "phpunit/phpunit": "^8.5",
     "szepeviktor/phpstan-wordpress": "^1.2",
     "wp-phpunit/wp-phpunit": "^5.9",
-    "yoast/phpunit-polyfills": "^2.0@dev"
+    "yoast/phpunit-polyfills": "^2.0@dev",
+    "wp-coding-standards/wpcs": "^3.0"
   },
   "scripts": {
     "format": "./vendor/bin/phpcbf -p --standard=phpcs.ruleset.xml ./inc",

@@ -5,6 +5,3 @@ parameters:
   tmpDir: .config/cache/phpstan/
   paths:
     - inc
-	excludePaths:
-    scan:
-      - wordpress

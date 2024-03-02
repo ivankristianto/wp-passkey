@@ -1,5 +1,5 @@
 {
-  "name": "@ivankristianto/passwordless-authentication",
+  "name": "@ivankristianto/biometric-authentication",
   "version": "0.3.0",
   "type": "module",
   "scripts": {

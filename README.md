@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This plugin is to enable the use of [Passkeys](https://developers.google.com/identity/passkeys#introduction) concept from Google Developers on WordPress.
+This plugin is to enable the use of [Passkeys](https://developers.google.com/identity/passkeys#introduction) on WordPress. This will provide an alternative to the traditional username and password login for users and on top of that it will provide a more secure way to login to the WordPress site.
 
 > Passkeys are a safer and easier alternative to passwords. With passkeys, users can sign in to apps and websites with a biometric sensor (such as a fingerprint or facial recognition), PIN, or pattern, freeing them from having to remember and manage passwords.
 
@@ -10,7 +10,7 @@ Source and Read more about Passkeys: [Google Developers](https://developers.goog
 
 ## Description
 
-This plugin allows you to set a passkey for your WordPress site. If the passkey is not set, the site will be locked down and only users with the passkey will be able to access the site.
+This plugin allows you to use passkeys to login to your WordPress site. You can create your passkey from your profile screen. Once you have created your passkey, you can use it to login to your WordPress site. You can still use your username and password to login to your site as fallback.
 
 ## Screenshots
 

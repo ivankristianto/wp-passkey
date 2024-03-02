@@ -10,7 +10,12 @@ License: GPL v2 or later
 Provides biometric authentication for WordPress
 
 == Description ==
+This plugin allows you to use biometric authentication to login to your WordPress site, the technology is called passkey.
+You can create your passkey from your profile screen. Once you have created your passkey, you can use it to login to your WordPress site.
+You can still use your username and password to login to your site as fallback.
+
 Passkeys are a safer and easier alternative to passwords. With passkeys, users can sign in to apps and websites with a biometric sensor (such as a fingerprint or facial recognition), PIN, or pattern, freeing them from having to remember and manage passwords.
+
 
 == Installation ==
 1. Upload the plugin files to the `/wp-content/plugins/biometric-authentication` directory, or install the plugin through the WordPress plugins screen directly.

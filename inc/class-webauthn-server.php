@@ -1,4 +1,6 @@
 <?php
+// phpcs:ignoreFile WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
+
 /**
  * Webauthn Server.
  */
@@ -214,7 +216,7 @@ class Webauthn_Server {
 		$authenticator_attestation_response = $public_key_credential->getResponse();
 
 		if ( ! $authenticator_attestation_response instanceof AuthenticatorAttestationResponse ) {
-			throw new InvalidDataException( $data, 'Invalid request.' );
+			throw new InvalidDataException( $data, 'Invalid request.' ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- This is not an output.
 		}
 
 		$public_key_credential_source_repository = new Source_Repository();
@@ -270,7 +272,7 @@ class Webauthn_Server {
 		$authenticator_assertion_response = $public_key_credential->getResponse();
 
 		if ( ! $authenticator_assertion_response instanceof AuthenticatorAssertionResponse ) {
-			throw new InvalidDataException( $data, 'Invalid request.' );
+			throw new InvalidDataException( $data, 'Invalid request.' ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- This is not an output.
 		}
 
 		$public_key_credential_source_repository = new Source_Repository();

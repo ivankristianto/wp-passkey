@@ -62,6 +62,7 @@ async function makeRelease() {
 		cp( 'plugin.php' ),
 		cp( 'composer.json' ),
 		cp( 'assets/dist' ),
+		cp( 'assets/src' ),
 		cp( 'inc' ),
 		cp( 'vendor' ),
 	];

@@ -23,6 +23,10 @@ Passkeys are a safer and easier alternative to passwords. With passkeys, users c
 3. To create your first passkey, you can go to your Admin > Profile screen.
 4. Now you can login with your passkey.
 
+== GitHub Repository ==
+
+You can find the source code of this plugin on [GitHub](https://github.com/ivankristianto/wp-passkey/)
+
 == Frequently Asked Questions ==
 
 To be added later, in the meantime file your question through [GitHub Issue](https://github.com/ivankristianto/wp-passkey/issues)

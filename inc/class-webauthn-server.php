@@ -76,7 +76,7 @@ class Webauthn_Server {
 	/**
 	 * Get the public key credential parameters list.
 	 *
-	 * @return array
+	 * @return PublicKeyCredentialParameters[]
 	 */
 	public function get_public_key_credential_parameters_list(): array {
 		return array(
@@ -129,7 +129,6 @@ class Webauthn_Server {
 	 * @param WP_User $user Current User.
 	 * @param string|null $challenge Challenge string.
 	 * @return PublicKeyCredentialCreationOptions
-	 * @throws InvalidDataException If the challenge is invalid.
 	 */
 	public function create_attestation_request( WP_User $user, ?string $challenge = null ): PublicKeyCredentialCreationOptions {
 		$rp_entity                             = $this->get_relying_party();

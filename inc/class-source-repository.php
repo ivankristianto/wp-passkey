@@ -60,7 +60,7 @@ class Source_Repository implements PublicKeyCredentialSourceRepository {
 	 * @throws Exception If the user is not found.
 	 */
 	public function findAllForUserEntity( PublicKeyCredentialUserEntity $public_key_credential_user_entity ): array {
-		$user_handle = $public_key_credential_user_entity->id;
+		$user_handle = $public_key_credential_user_entity->getId();
 
 		$user = get_user_by( 'login', $user_handle );
 
@@ -104,7 +104,7 @@ class Source_Repository implements PublicKeyCredentialSourceRepository {
 	 * Save a new credential source.
 	 *
 	 * @param PublicKeyCredentialSource $public_key_credential_source The credential source to save.
-	 * @param array $extra_data Extra data to store.
+	 * @param string[] $extra_data Extra data to store.
 	 * @return void
 	 * @throws Exception If the user is not found.
 	 */
@@ -138,9 +138,9 @@ class Source_Repository implements PublicKeyCredentialSourceRepository {
 	 * @throws Exception If the user is not found.
 	 */
 	public function deleteCredentialSource( PublicKeyCredentialSource $public_key_credential_source ): void {
-		$public_key_credential_id = Base64UrlSafe::encodeUnpadded( $public_key_credential_source->publicKeyCredentialId );
+		$public_key_credential_id = Base64UrlSafe::encodeUnpadded( $public_key_credential_source->getPublicKeyCredentialId() );
 
-		$user_handle = $public_key_credential_source->userHandle;
+		$user_handle = $public_key_credential_source->getUserHandle();
 		$user        = get_user_by( 'login', $user_handle );
 
 		if ( ! $user instanceof WP_User ) {
@@ -159,13 +159,13 @@ class Source_Repository implements PublicKeyCredentialSourceRepository {
 	 * Get extra data for a credential source.
 	 *
 	 * @param PublicKeyCredentialSource $public_key_credential_source The credential source to get extra data for.
-	 * @return array The extra data.
+	 * @return string[] The extra data.
 	 * @throws Exception If the user is not found.
 	 */
 	public function get_extra_data( PublicKeyCredentialSource $public_key_credential_source ): array {
-		$meta_key = $this->meta_key . Base64UrlSafe::encodeUnpadded( $public_key_credential_source->publicKeyCredentialId );
+		$meta_key = $this->meta_key . Base64UrlSafe::encodeUnpadded( $public_key_credential_source->getPublicKeyCredentialId() );
 
-		$user_handle = $public_key_credential_source->userHandle;
+		$user_handle = $public_key_credential_source->getUserHandle();
 
 		$user = get_user_by( 'login', $user_handle );
 
@@ -181,6 +181,6 @@ class Source_Repository implements PublicKeyCredentialSourceRepository {
 
 		$public_key = json_decode( $public_key, true );
 
-		return $public_key['extra'] ?? array();
+		return $public_key['extra'] ?? [];
 	}
 }

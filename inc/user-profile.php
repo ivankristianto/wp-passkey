@@ -104,7 +104,7 @@ function display_user_passkeys( WP_User $user ) {
 					</td>
 					<td>
 						<?php
-							echo esc_html( date_i18n( 'F j, Y', $extra_data['created'] ?? '' ) );
+							echo esc_html( date_i18n( 'F j, Y', $extra_data['created'] ?? false ) );
 						?>
 					</td>
 					<td>

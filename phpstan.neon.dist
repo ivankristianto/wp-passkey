@@ -1,10 +1,13 @@
 includes:
   - vendor/szepeviktor/phpstan-wordpress/extension.neon
 parameters:
-  level: 5
+  level: 6
   tmpDir: .config/cache/phpstan/
   paths:
+    - plugin.php
     - inc
   excludePaths:
     analyse:
       - wordpress
+  ignoreErrors:
+      - '#Function BioAuth\\Rest_API\\.*\(\) has parameter \$request with generic class WP_REST_Request but does not specify its types: T#'

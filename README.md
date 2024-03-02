@@ -122,9 +122,11 @@ If you would like to contribute to this plugin, please fork the repository and s
 
 ## Changelog
 
-### 0.3.0
+### 0.3.1
 
-- Rename the plugin to Passwordless Authentication for WordPress.
+- Update plugin name
+- Update dependencies
+- Fix code standards
 
 ### 0.2.1
 

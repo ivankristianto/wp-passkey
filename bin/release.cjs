@@ -31,7 +31,7 @@ function getPluginVersion() {
 function generateFilename() {
 	const version = getPluginVersion();
 
-	return sanitizeFilename( `passwordless-authentication.v${ version }.zip` );
+	return sanitizeFilename( `biometric-authentication.v${ version }.zip` );
 }
 
 /**
@@ -42,7 +42,7 @@ function generateFilename() {
 async function makeRelease() {
 	const root = dirname( __dirname );
 	const releaseDir = resolve( root, 'release' );
-	const pluginDir = resolve( releaseDir, 'passwordless-authentication' );
+	const pluginDir = resolve( releaseDir, 'biometric-authentication' );
 	const filename = resolve( root, generateFilename() );
 
 	console.log( `Creating ${ filename }` ); // eslint-disable-line no-console
@@ -69,7 +69,7 @@ async function makeRelease() {
 	// Archive the release directory.
 	const archive = archiver( 'zip', { zlib: { level: 9 } } );
 	archive.pipe( fse.createWriteStream( filename ) );
-	archive.directory( pluginDir, 'passwordless-authentication', {} );
+	archive.directory( pluginDir, 'biometric-authentication', {} );
 	await archive.finalize();
 
 	// Remove release folder at the end.

@@ -21,7 +21,7 @@ jobs:
         with:
           BUILD_COMMAND: 'composer install --no-dev --ignore-platform-reqs && npm ci && npm run build'
           CLEAN_TEST_TAG: true
-          CLEAN_TARGETS: .[!.]*,__tests__,src,package.json,package-lock.json,node_modules,tests,*.xml,vite.config.js,composer.lock,bin,.vscode,phpstan.neon.dist,phpunit.xml.dist,build.json
+          CLEAN_TARGETS: .[!.]*,__tests__,src,package.json,package-lock.json,node_modules,tests,*.xml,vite.config.js,composer.lock,bin,.vscode,phpstan.neon.dist,phpunit.xml.dist,build.json,bun.lockb
           COMMIT_MESSAGE: 'Built release for ${{ steps.get_version.outputs.VERSION }}. For a full change log look at the notes within the original/${{ steps.get_version.outputs.VERSION }} release.'
           CREATE_MAJOR_VERSION_TAG: false
           CREATE_MINOR_VERSION_TAG: false

@@ -9,7 +9,7 @@
  *
  * Plugin Name:  Biometric Authentication
  * Description:  Provides biometric authentication for WordPress
- * Version:      0.3.1
+ * Version:      0.3.2
  * Author:       Ivan Kristianto
  * Author URI:   https://github.com/ivankristianto/
  * Plugin URI:   https://github.com/ivankristianto/wp-passkey/

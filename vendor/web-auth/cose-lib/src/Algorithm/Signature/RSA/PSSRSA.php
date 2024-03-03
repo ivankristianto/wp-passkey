@@ -4,24 +4,24 @@ declare(strict_types=1);
 
 namespace Cose\Algorithm\Signature\RSA;
 
-use function ceil;
-use function chr;
 use Cose\Algorithm\Signature\Signature;
 use Cose\BigInteger;
 use Cose\Hash;
 use Cose\Key\Key;
 use Cose\Key\RsaKey;
-use function hash_equals;
 use InvalidArgumentException;
+use RuntimeException;
+use function ceil;
+use function chr;
+use function hash_equals;
 use function mb_strlen;
 use function mb_substr;
 use function ord;
 use function pack;
 use function random_bytes;
-use RuntimeException;
 use function str_pad;
-use const STR_PAD_LEFT;
 use function str_repeat;
+use const STR_PAD_LEFT;
 
 /**
  * @internal

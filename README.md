@@ -1,8 +1,8 @@
-# WP Passkey
-
-> This plugin still considered as experimental. Use it at your own risk.
+# Biometric Authentication for WordPress
 
 ## Introduction
+
+This plugin is to enable the use of [Passkeys](https://developers.google.com/identity/passkeys#introduction) on WordPress. This will provide an alternative to the traditional username and password login for users and on top of that it will provide a more secure way to login to the WordPress site.
 
 > Passkeys are a safer and easier alternative to passwords. With passkeys, users can sign in to apps and websites with a biometric sensor (such as a fingerprint or facial recognition), PIN, or pattern, freeing them from having to remember and manage passwords.
 
@@ -10,7 +10,7 @@ Source and Read more about Passkeys: [Google Developers](https://developers.goog
 
 ## Description
 
-This plugin allows you to set a passkey for your WordPress site. If the passkey is not set, the site will be locked down and only users with the passkey will be able to access the site.
+This plugin allows you to use passkeys to login to your WordPress site. You can create your passkey from your profile screen. Once you have created your passkey, you can use it to login to your WordPress site. You can still use your username and password to login to your site as fallback.
 
 ## Screenshots
 
@@ -24,7 +24,7 @@ This plugin allows you to set a passkey for your WordPress site. If the passkey 
 
 ## Installation
 
-1. Upload the plugin files to the `/wp-content/plugins/wp-passkey` directory, or install the plugin through the WordPress plugins screen directly.
+1. Upload the plugin files to the `/wp-content/plugins/biometric-authentication` directory, or install the plugin through the WordPress plugins screen directly.
 2. Activate the plugin through the 'Plugins' screen in WordPress
 3. To create your first passkey, you can go to your Admin > Profile screen.
 4. Now you can login with your passkey.
@@ -45,19 +45,19 @@ You need certain pieces of software on your computer before setting up this proj
 
 Whilst newer versions of the above packages may be available, the versions of the these the team is predominately running are:
 
--   PHP v8.1.x or above
--   Composer v2.x
--   Node.js v16.x
--   npm v7.x
--   Docker v20.x
+- PHP v8.1.x or above
+- Composer v2.x
+- Node.js v16.x
+- npm v7.x
+- Docker v20.x
 
 ### Installation
 
 To set up this repository for local development, clone it down onto your computer and run the following steps to install Composer and npm dependencies.
 
 ```bash
-git clone git@github.com:ivankristianto/wp-passkey.git
-cd wp-passkey
+git clone git@github.com:ivankristianto/wp-passkey.git biometric-authentication
+cd biometric-authentication
 composer install
 npm install
 npm run build
@@ -107,6 +107,7 @@ npm run cli wp option get siteurl
 ## Local Development with GitHub Codespace
 
 You can also use GitHub Codespace to develop this plugin. To do so, you can follow the steps below:
+
 1. From GitHub repo screen
 2. Click on the `Code` button
 3. Click on the `Create codespace on main` button
@@ -115,17 +116,21 @@ You can also use GitHub Codespace to develop this plugin. To do so, you can foll
 This will setup the codespace dev environment for you and setup all the dependencies.
 Once the Codespace is ready, you can run the visit the url provided by GitHub Codespace terminal to access the site.
 
-
 ## Contributing
 
 If you would like to contribute to this plugin, please fork the repository and submit a pull request.
 
 ## Changelog
 
+### 0.3.1
+
+- Update plugin name
+- Update dependencies
+- Fix code standards
+
 ### 0.2.1
 
 - Fix release GitHub action.
-
 
 ### 0.2.0
 

@@ -5,12 +5,13 @@
 
 declare( strict_types = 1 );
 
-namespace WP\Passkey\User_Profile;
+namespace BioAuth\User_Profile;
 
+use BioAuth;
 use Kucrut\Vite;
 use ParagonIE\ConstantTime\Base64UrlSafe;
 use Webauthn\PublicKeyCredentialUserEntity;
-use WP\Passkey\Source_Repository;
+use BioAuth\Source_Repository;
 use WP_Screen;
 use WP_User;
 
@@ -40,13 +41,13 @@ function enqueue_scripts() {
 	}
 
 	Vite\enqueue_asset(
-		WP_PASSKEY_DIR . '/assets/dist',
+		trailingslashit( BioAuth\BASE_DIR ) . 'assets/dist',
 		'assets/src/js/user-profile.js',
-		[
-			'handle' => 'wp-passkeys-user-profile',
-			'dependencies' => [ 'wp-api-fetch', 'wp-dom-ready', 'wp-i18n' ],
-			'in-footer' => true,
-		]
+		array(
+			'handle'       => 'wp-passkeys-user-profile',
+			'dependencies' => array( 'wp-api-fetch', 'wp-dom-ready', 'wp-i18n' ),
+			'in-footer'    => true,
+		)
 	);
 }
 
@@ -68,17 +69,17 @@ function display_user_passkeys( WP_User $user ) {
 	$public_key_credentials = $public_key_credential_source_repository->findAllForUserEntity( $user_entity );
 	?>
 	<div class="wp-passkey-admin">
-		<h2 class="wp-passkey-admin--heading"><?php esc_html_e( 'Passkeys', 'wp-passkey' ) ?></h2>
+		<h2 class="wp-passkey-admin--heading"><?php esc_html_e( 'Passkeys', 'biometric-authentication' ); ?></h2>
 		<p class="description">
-			<?php esc_html_e( 'Passkeys are used to authenticate you when you log in to your account.', 'wp-passkey' ); ?>
+			<?php esc_html_e( 'Passkeys are used to authenticate you when you log in to your account.', 'biometric-authentication' ); ?>
 		</p>
 		<table class="wp-list-table wp-passkey-list-table widefat fixed striped table-view-list">
 			<thead>
 				<tr>
-					<th class="manage-column column-name column-primary" scope="col"><?php esc_html_e( 'Name', 'wp-passkey' ); ?></th>
-					<th class="manage-column column-created-date" scope="col"><?php esc_html_e( 'Created Date', 'wp-passkey' ); ?></th>
-					<th class="manage-column column-type" scope="col"><?php esc_html_e( 'Type', 'wp-passkey' ); ?></th>
-					<th class="manage-column column-action" scope="col"><?php esc_html_e( 'Action', 'wp-passkey' ); ?></th>
+					<th class="manage-column column-name column-primary" scope="col"><?php esc_html_e( 'Name', 'biometric-authentication' ); ?></th>
+					<th class="manage-column column-created-date" scope="col"><?php esc_html_e( 'Created Date', 'biometric-authentication' ); ?></th>
+					<th class="manage-column column-type" scope="col"><?php esc_html_e( 'Type', 'biometric-authentication' ); ?></th>
+					<th class="manage-column column-action" scope="col"><?php esc_html_e( 'Action', 'biometric-authentication' ); ?></th>
 				</tr>
 			</thead>
 			<tbody>
@@ -87,14 +88,14 @@ function display_user_passkeys( WP_User $user ) {
 					?>
 					<tr>
 						<td colspan="4">
-							<?php esc_html_e( 'No passkeys found.', 'wp-passkey' ); ?>
+							<?php esc_html_e( 'No passkeys found.', 'biometric-authentication' ); ?>
 						</td>
 					</tr>
 					<?php
 				endif;
 
 				foreach ( $public_key_credentials as $public_key_credential ) :
-					$extra_data = $public_key_credential_source_repository->get_extra_data( $public_key_credential );
+					$extra_data  = $public_key_credential_source_repository->get_extra_data( $public_key_credential );
 					$fingerprint = Base64UrlSafe::encodeUnpadded( $public_key_credential->getPublicKeyCredentialId() );
 					?>
 				<tr>
@@ -103,7 +104,7 @@ function display_user_passkeys( WP_User $user ) {
 					</td>
 					<td>
 						<?php
-							echo date_i18n( __( 'F j, Y' ), $extra_data['created'] ?? '' );
+							echo esc_html( date_i18n( 'F j, Y', $extra_data['created'] ?? false ) );
 						?>
 					</td>
 					<td>
@@ -117,7 +118,7 @@ function display_user_passkeys( WP_User $user ) {
 								esc_attr( $extra_data['name'] ?? '' ),
 								/* translators: %s: the passkey's given name. */
 								esc_attr( sprintf( __( 'Revoke "%s"' ), $extra_data['name'] ?? '' ) ),
-								__( 'Revoke' )
+								esc_html__( 'Revoke', 'biometric-authentication' )
 							);
 						?>
 					</td>
@@ -125,7 +126,7 @@ function display_user_passkeys( WP_User $user ) {
 				<?php endforeach; ?>
 			</tbody>
 		</table>
-		<button type="button" class="button button-secondary wp-register-new-passkey hide-if-no-js" aria-expanded="false"><?php esc_html_e( 'Register New Passkey', 'wp-passkey' ); ?></button>
+		<button type="button" class="button button-secondary wp-register-new-passkey hide-if-no-js" aria-expanded="false"><?php esc_html_e( 'Register New Passkey', 'biometric-authentication' ); ?></button>
 		<div class="wp-register-passkey--message"></div>
 	</div>
 	<?php

@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace SpomkyLabs\Pki\X501\DN;
 
-use function mb_strlen;
 use SpomkyLabs\Pki\ASN1\Element;
 use SpomkyLabs\Pki\ASN1\Exception\DecodeException;
 use SpomkyLabs\Pki\ASN1\Feature\ElementBase;
 use UnexpectedValueException;
+use function mb_strlen;
 
 /**
  * Distinguished Name parsing conforming to RFC 2253 and RFC 1779.
@@ -60,9 +60,9 @@ final class DNParser
         // one of the characters ",", "+", """, "\", "<", ">" or ";"
         $str = preg_replace('/([,\+"\\\<\>;])/u', '\\\\$1', $str);
         // a space character occurring at the end of the string
-        $str = preg_replace('/( )$/u', '\\\\$1', $str);
+        $str = preg_replace('/( )$/u', '\\\\$1', (string) $str);
         // a space or "#" character occurring at the beginning of the string
-        $str = preg_replace('/^([ #])/u', '\\\\$1', $str);
+        $str = preg_replace('/^([ #])/u', '\\\\$1', (string) $str);
         // implementation specific special characters
         $str = preg_replace_callback(
             '/([\pC])/u',
@@ -70,7 +70,7 @@ final class DNParser
                 $octets = mb_str_split(bin2hex($m[1]), 2, '8bit');
                 return implode('', array_map(static fn ($octet) => '\\' . mb_strtoupper($octet, '8bit'), $octets));
             },
-            $str
+            (string) $str
         );
         return $str;
     }

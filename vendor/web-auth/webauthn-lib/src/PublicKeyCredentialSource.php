@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace Webauthn;
 
-use function array_key_exists;
 use JsonSerializable;
 use ParagonIE\ConstantTime\Base64UrlSafe;
-use Symfony\Component\Uid\AbstractUid;
 use Symfony\Component\Uid\Uuid;
 use Throwable;
 use Webauthn\Exception\InvalidDataException;
 use Webauthn\TrustPath\TrustPath;
 use Webauthn\TrustPath\TrustPathLoader;
+use function array_key_exists;
+use function in_array;
 
 /**
  * @see https://www.w3.org/TR/webauthn/#iface-pkcredential
@@ -20,20 +20,24 @@ use Webauthn\TrustPath\TrustPathLoader;
 class PublicKeyCredentialSource implements JsonSerializable
 {
     /**
+     * @private
      * @param string[] $transports
      * @param array<string, mixed>|null $otherUI
      */
     public function __construct(
-        protected string $publicKeyCredentialId,
-        protected string $type,
-        protected array $transports,
-        protected string $attestationType,
-        protected TrustPath $trustPath,
-        protected AbstractUid $aaguid,
-        protected string $credentialPublicKey,
-        protected string $userHandle,
-        protected int $counter,
-        protected ?array $otherUI = null
+        public string $publicKeyCredentialId,
+        public string $type,
+        public array $transports,
+        public string $attestationType,
+        public TrustPath $trustPath,
+        public Uuid $aaguid,
+        public string $credentialPublicKey,
+        public string $userHandle,
+        public int $counter,
+        public ?array $otherUI = null,
+        public ?bool $backupEligible = null,
+        public ?bool $backupStatus = null,
+        public ?bool $uvInitialized = null,
     ) {
     }
 
@@ -47,11 +51,14 @@ class PublicKeyCredentialSource implements JsonSerializable
         array $transports,
         string $attestationType,
         TrustPath $trustPath,
-        AbstractUid $aaguid,
+        Uuid $aaguid,
         string $credentialPublicKey,
         string $userHandle,
         int $counter,
-        ?array $otherUI = null
+        ?array $otherUI = null,
+        ?bool $backupEligible = null,
+        ?bool $backupStatus = null,
+        ?bool $uvInitialized = null,
     ): self {
         return new self(
             $publicKeyCredentialId,
@@ -63,10 +70,17 @@ class PublicKeyCredentialSource implements JsonSerializable
             $credentialPublicKey,
             $userHandle,
             $counter,
-            $otherUI
+            $otherUI,
+            $backupEligible,
+            $backupStatus,
+            $uvInitialized
         );
     }
 
+    /**
+     * @deprecated since 4.7.0. Please use the property directly.
+     * @infection-ignore-all
+     */
     public function getPublicKeyCredentialId(): string
     {
         return $this->publicKeyCredentialId;
@@ -74,14 +88,22 @@ class PublicKeyCredentialSource implements JsonSerializable
 
     public function getPublicKeyCredentialDescriptor(): PublicKeyCredentialDescriptor
     {
-        return new PublicKeyCredentialDescriptor($this->type, $this->publicKeyCredentialId, $this->transports);
+        return PublicKeyCredentialDescriptor::create($this->type, $this->publicKeyCredentialId, $this->transports);
     }
 
+    /**
+     * @deprecated since 4.7.0. Please use the property directly.
+     * @infection-ignore-all
+     */
     public function getAttestationType(): string
     {
         return $this->attestationType;
     }
 
+    /**
+     * @deprecated since 4.7.0. Please use the property directly.
+     * @infection-ignore-all
+     */
     public function getTrustPath(): TrustPath
     {
         return $this->trustPath;
@@ -89,9 +111,13 @@ class PublicKeyCredentialSource implements JsonSerializable
 
     public function getAttestedCredentialData(): AttestedCredentialData
     {
-        return new AttestedCredentialData($this->aaguid, $this->publicKeyCredentialId, $this->credentialPublicKey);
+        return AttestedCredentialData::create($this->aaguid, $this->publicKeyCredentialId, $this->credentialPublicKey);
     }
 
+    /**
+     * @deprecated since 4.7.0. Please use the property directly.
+     * @infection-ignore-all
+     */
     public function getType(): string
     {
         return $this->type;
@@ -99,32 +125,54 @@ class PublicKeyCredentialSource implements JsonSerializable
 
     /**
      * @return string[]
+     * @deprecated since 4.7.0. Please use the property directly.
+     * @infection-ignore-all
      */
     public function getTransports(): array
     {
         return $this->transports;
     }
 
-    public function getAaguid(): AbstractUid
+    /**
+     * @deprecated since 4.7.0. Please use the property directly.
+     * @infection-ignore-all
+     */
+    public function getAaguid(): Uuid
     {
         return $this->aaguid;
     }
 
+    /**
+     * @deprecated since 4.7.0. Please use the property directly.
+     * @infection-ignore-all
+     */
     public function getCredentialPublicKey(): string
     {
         return $this->credentialPublicKey;
     }
 
+    /**
+     * @deprecated since 4.7.0. Please use the property directly.
+     * @infection-ignore-all
+     */
     public function getUserHandle(): string
     {
         return $this->userHandle;
     }
 
+    /**
+     * @deprecated since 4.7.0. Please use the property directly.
+     * @infection-ignore-all
+     */
     public function getCounter(): int
     {
         return $this->counter;
     }
 
+    /**
+     * @deprecated since 4.7.0. Please use the property directly.
+     * @infection-ignore-all
+     */
     public function setCounter(int $counter): void
     {
         $this->counter = $counter;
@@ -132,6 +180,8 @@ class PublicKeyCredentialSource implements JsonSerializable
 
     /**
      * @return array<string, mixed>|null
+     * @deprecated since 4.7.0. Please use the property directly.
+     * @infection-ignore-all
      */
     public function getOtherUI(): ?array
     {
@@ -140,6 +190,8 @@ class PublicKeyCredentialSource implements JsonSerializable
 
     /**
      * @param array<string, mixed>|null $otherUI
+     * @deprecated since 4.7.0. Please use the property directly.
+     * @infection-ignore-all
      */
     public function setOtherUI(?array $otherUI): self
     {
@@ -150,12 +202,14 @@ class PublicKeyCredentialSource implements JsonSerializable
 
     /**
      * @param mixed[] $data
+     * @deprecated since 4.8.0. Please use {Webauthn\Denormalizer\WebauthnSerializerFactory} for converting the object.
+     * @infection-ignore-all
      */
     public static function createFromArray(array $data): self
     {
         $keys = array_keys(get_class_vars(self::class));
         foreach ($keys as $key) {
-            if ($key === 'otherUI') {
+            if (in_array($key, ['otherUI', 'backupEligible', 'backupStatus', 'uvInitialized'], true)) {
                 continue;
             }
             array_key_exists($key, $data) || throw InvalidDataException::create($data, sprintf(
@@ -170,7 +224,7 @@ class PublicKeyCredentialSource implements JsonSerializable
         $uuid = Uuid::fromString($data['aaguid']);
 
         try {
-            return new self(
+            return self::create(
                 Base64UrlSafe::decodeNoPadding($data['publicKeyCredentialId']),
                 $data['type'],
                 $data['transports'],
@@ -180,7 +234,9 @@ class PublicKeyCredentialSource implements JsonSerializable
                 Base64UrlSafe::decodeNoPadding($data['credentialPublicKey']),
                 Base64UrlSafe::decodeNoPadding($data['userHandle']),
                 $data['counter'],
-                $data['otherUI'] ?? null
+                $data['otherUI'] ?? null,
+                $data['backupEligible'] ?? null,
+                $data['backupStatus'] ?? null,
             );
         } catch (Throwable $throwable) {
             throw InvalidDataException::create($data, 'Unable to load the data', $throwable);
@@ -197,12 +253,15 @@ class PublicKeyCredentialSource implements JsonSerializable
             'type' => $this->type,
             'transports' => $this->transports,
             'attestationType' => $this->attestationType,
-            'trustPath' => $this->trustPath->jsonSerialize(),
+            'trustPath' => $this->trustPath,
             'aaguid' => $this->aaguid->__toString(),
             'credentialPublicKey' => Base64UrlSafe::encodeUnpadded($this->credentialPublicKey),
             'userHandle' => Base64UrlSafe::encodeUnpadded($this->userHandle),
             'counter' => $this->counter,
             'otherUI' => $this->otherUI,
+            'backupEligible' => $this->backupEligible,
+            'backupStatus' => $this->backupStatus,
+            'uvInitialized' => $this->uvInitialized,
         ];
     }
 }

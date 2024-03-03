@@ -4,33 +4,51 @@ declare(strict_types=1);
 
 namespace Webauthn\MetadataService\Statement;
 
-use Webauthn\MetadataService\Utils;
+use Webauthn\MetadataService\ValueFilter;
 
-/**
- * @final
- */
 class BiometricAccuracyDescriptor extends AbstractDescriptor
 {
+    use ValueFilter;
+
     public function __construct(
-        private readonly ?float $selfAttestedFRR,
-        private readonly ?float $selfAttestedFAR,
-        private readonly ?float $maxTemplates,
+        public readonly ?float $selfAttestedFRR,
+        public readonly ?float $selfAttestedFAR,
+        public readonly ?float $maxTemplates,
         ?int $maxRetries = null,
         ?int $blockSlowdown = null
     ) {
         parent::__construct($maxRetries, $blockSlowdown);
     }
 
+    public static function create(
+        ?float $selfAttestedFRR,
+        ?float $selfAttestedFAR,
+        ?float $maxTemplates,
+        ?int $maxRetries = null,
+        ?int $blockSlowdown = null
+    ): self {
+        return new self($selfAttestedFRR, $selfAttestedFAR, $maxTemplates, $maxRetries, $blockSlowdown);
+    }
+
+    /**
+     * @deprecated since 4.7.0. Please use the property directly.
+     */
     public function getSelfAttestedFRR(): ?float
     {
         return $this->selfAttestedFRR;
     }
 
+    /**
+     * @deprecated since 4.7.0. Please use the property directly.
+     */
     public function getSelfAttestedFAR(): ?float
     {
         return $this->selfAttestedFAR;
     }
 
+    /**
+     * @deprecated since 4.7.0. Please use the property directly.
+     */
     public function getMaxTemplates(): ?float
     {
         return $this->maxTemplates;
@@ -38,10 +56,11 @@ class BiometricAccuracyDescriptor extends AbstractDescriptor
 
     /**
      * @param array<string, mixed> $data
+     * @deprecated since 4.7.0. Please use the symfony/serializer for converting the object.
      */
     public static function createFromArray(array $data): self
     {
-        return new self(
+        return self::create(
             $data['selfAttestedFRR'] ?? null,
             $data['selfAttestedFAR'] ?? null,
             $data['maxTemplates'] ?? null,
@@ -59,10 +78,10 @@ class BiometricAccuracyDescriptor extends AbstractDescriptor
             'selfAttestedFRR' => $this->selfAttestedFRR,
             'selfAttestedFAR' => $this->selfAttestedFAR,
             'maxTemplates' => $this->maxTemplates,
-            'maxRetries' => $this->getMaxRetries(),
-            'blockSlowdown' => $this->getBlockSlowdown(),
+            'maxRetries' => $this->maxRetries,
+            'blockSlowdown' => $this->blockSlowdown,
         ];
 
-        return Utils::filterNullValues($data);
+        return self::filterNullValues($data);
     }
 }

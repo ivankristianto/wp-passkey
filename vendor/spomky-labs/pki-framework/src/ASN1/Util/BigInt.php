@@ -6,12 +6,13 @@ namespace SpomkyLabs\Pki\ASN1\Util;
 
 use Brick\Math\BigInteger;
 use InvalidArgumentException;
-use function mb_strlen;
 use Stringable;
 use Throwable;
+use function mb_strlen;
 
 /**
  * Class to wrap an integer of arbirtary length.
+ * @see \SpomkyLabs\Pki\Test\ASN1\Util\BigIntTest
  */
 final class BigInt implements Stringable
 {

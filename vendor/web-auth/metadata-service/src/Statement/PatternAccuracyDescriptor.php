@@ -4,27 +4,35 @@ declare(strict_types=1);
 
 namespace Webauthn\MetadataService\Statement;
 
+use Webauthn\MetadataService\Exception\MetadataStatementLoadingException;
+use Webauthn\MetadataService\ValueFilter;
 use function array_key_exists;
 use function is_int;
-use Webauthn\MetadataService\Exception\MetadataStatementLoadingException;
-use Webauthn\MetadataService\Utils;
 
-/**
- * @final
- */
 class PatternAccuracyDescriptor extends AbstractDescriptor
 {
-    private readonly int $minComplexity;
+    use ValueFilter;
 
-    public function __construct(int $minComplexity, ?int $maxRetries = null, ?int $blockSlowdown = null)
-    {
+    public function __construct(
+        public readonly int $minComplexity,
+        ?int $maxRetries = null,
+        ?int $blockSlowdown = null
+    ) {
         $minComplexity >= 0 || throw MetadataStatementLoadingException::create(
             'Invalid data. The value of "minComplexity" must be a positive integer'
         );
-        $this->minComplexity = $minComplexity;
         parent::__construct($maxRetries, $blockSlowdown);
     }
 
+    public static function create(int $minComplexity, ?int $maxRetries = null, ?int $blockSlowdown = null): self
+    {
+        return new self($minComplexity, $maxRetries, $blockSlowdown);
+    }
+
+    /**
+     * @deprecated since 4.7.0. Please use the property directly.
+     * @infection-ignore-all
+     */
     public function getMinComplexity(): int
     {
         return $this->minComplexity;
@@ -32,10 +40,12 @@ class PatternAccuracyDescriptor extends AbstractDescriptor
 
     /**
      * @param array<string, mixed> $data
+     * @deprecated since 4.7.0. Please use the symfony/serializer for converting the object.
+     * @infection-ignore-all
      */
     public static function createFromArray(array $data): self
     {
-        $data = Utils::filterNullValues($data);
+        $data = self::filterNullValues($data);
         array_key_exists('minComplexity', $data) || throw MetadataStatementLoadingException::create(
             'The key "minComplexity" is missing'
         );
@@ -47,7 +57,7 @@ class PatternAccuracyDescriptor extends AbstractDescriptor
             }
         }
 
-        return new self($data['minComplexity'], $data['maxRetries'] ?? null, $data['blockSlowdown'] ?? null);
+        return self::create($data['minComplexity'], $data['maxRetries'] ?? null, $data['blockSlowdown'] ?? null);
     }
 
     /**
@@ -57,10 +67,10 @@ class PatternAccuracyDescriptor extends AbstractDescriptor
     {
         $data = [
             'minComplexity' => $this->minComplexity,
-            'maxRetries' => $this->getMaxRetries(),
-            'blockSlowdown' => $this->getBlockSlowdown(),
+            'maxRetries' => $this->maxRetries,
+            'blockSlowdown' => $this->blockSlowdown,
         ];
 
-        return Utils::filterNullValues($data);
+        return self::filterNullValues($data);
     }
 }

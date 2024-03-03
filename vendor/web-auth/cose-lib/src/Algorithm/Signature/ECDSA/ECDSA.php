@@ -11,6 +11,9 @@ use InvalidArgumentException;
 use function openssl_sign;
 use function openssl_verify;
 
+/**
+ * @see \Cose\Tests\Algorithm\Signature\ECDSA\ECDSATest
+ */
 abstract class ECDSA implements Signature
 {
     public function sign(string $data, Key $key): string

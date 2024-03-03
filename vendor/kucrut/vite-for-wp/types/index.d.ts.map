@@ -1,0 +1,22 @@
+{
+	"version": 3,
+	"file": "index.d.ts",
+	"names": [
+		"UserConfig",
+		"Input",
+		"OutDir",
+		"Plugin",
+		"WPScriptsOptions"
+	],
+	"sources": [
+		"../src/exports/index.js",
+		"../src/exports/plugins/wp-scripts.js",
+		"../src/exports/plugins/wp-scripts.d.ts"
+	],
+	"sourcesContent": [
+		null,
+		null,
+		null
+	],
+	"mappings": ";;;aAG6BA,UAAUA;aACyCC,KAAKA;aACrBC,MAAMA;aAC3BC,MAAMA;;;;;;;;;;;;;;;;;;;;;;;;;;;;MCJNA,MAAMA;;;;MCGrCC,gBAAgBA"
+}

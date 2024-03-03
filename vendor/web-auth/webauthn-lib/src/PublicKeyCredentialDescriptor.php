@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Webauthn;
 
-use function array_key_exists;
-use function count;
-use const JSON_THROW_ON_ERROR;
 use JsonSerializable;
 use ParagonIE\ConstantTime\Base64UrlSafe;
 use Webauthn\Exception\InvalidDataException;
+use function array_key_exists;
+use function count;
+use const JSON_THROW_ON_ERROR;
 
 class PublicKeyCredentialDescriptor implements JsonSerializable
 {
@@ -25,13 +25,21 @@ class PublicKeyCredentialDescriptor implements JsonSerializable
 
     final public const AUTHENTICATOR_TRANSPORT_INTERNAL = 'internal';
 
+    final public const AUTHENTICATOR_TRANSPORTS = [
+        self::AUTHENTICATOR_TRANSPORT_USB,
+        self::AUTHENTICATOR_TRANSPORT_NFC,
+        self::AUTHENTICATOR_TRANSPORT_BLE,
+        self::AUTHENTICATOR_TRANSPORT_CABLE,
+        self::AUTHENTICATOR_TRANSPORT_INTERNAL,
+    ];
+
     /**
      * @param string[] $transports
      */
     public function __construct(
-        protected string $type,
-        protected string $id,
-        protected array $transports = []
+        public readonly string $type,
+        public readonly string $id,
+        public readonly array $transports = []
     ) {
     }
 
@@ -43,11 +51,19 @@ class PublicKeyCredentialDescriptor implements JsonSerializable
         return new self($type, $id, $transports);
     }
 
+    /**
+     * @deprecated since 4.7.0. Please use the property directly.
+     * @infection-ignore-all
+     */
     public function getType(): string
     {
         return $this->type;
     }
 
+    /**
+     * @deprecated since 4.7.0. Please use the property directly.
+     * @infection-ignore-all
+     */
     public function getId(): string
     {
         return $this->id;
@@ -55,6 +71,8 @@ class PublicKeyCredentialDescriptor implements JsonSerializable
 
     /**
      * @return string[]
+     * @deprecated since 4.7.0. Please use the property directly.
+     * @infection-ignore-all
      */
     public function getTransports(): array
     {
@@ -63,7 +81,7 @@ class PublicKeyCredentialDescriptor implements JsonSerializable
 
     public static function createFromString(string $data): self
     {
-        $data = json_decode($data, true, 512, JSON_THROW_ON_ERROR);
+        $data = json_decode($data, true, flags: JSON_THROW_ON_ERROR);
 
         return self::createFromArray($data);
     }
@@ -81,7 +99,7 @@ class PublicKeyCredentialDescriptor implements JsonSerializable
 
         $id = Base64UrlSafe::decodeNoPadding($json['id']);
 
-        return new self($json['type'], $id, $json['transports'] ?? []);
+        return self::create($json['type'], $id, $json['transports'] ?? []);
     }
 
     /**

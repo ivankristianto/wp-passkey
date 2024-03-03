@@ -1,11 +1,13 @@
 <?php
+// phpcs:ignoreFile WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
+
 /**
  * Webauthn Server.
  */
 
 declare( strict_types = 1 );
 
-namespace WP\Passkey;
+namespace BioAuth;
 
 use Cose\Algorithms;
 use Cose\Algorithm\Manager;
@@ -44,7 +46,7 @@ use WP_User;
 /**
  * Webauthn Server.
  *
- * @package WP_Passkey
+ * @package BioAuth
  */
 class Webauthn_Server {
 
@@ -61,7 +63,7 @@ class Webauthn_Server {
 	 *
 	 * @return PublicKeyCredentialRpEntity
 	 */
-	public function get_relying_party() : PublicKeyCredentialRpEntity {
+	public function get_relying_party(): PublicKeyCredentialRpEntity {
 		// RP Entity i.e. the application.
 		$rp_entity = PublicKeyCredentialRpEntity::create(
 			get_bloginfo( 'name' ),      // Name.
@@ -74,10 +76,10 @@ class Webauthn_Server {
 	/**
 	 * Get the public key credential parameters list.
 	 *
-	 * @return array
+	 * @return PublicKeyCredentialParameters[]
 	 */
-	public function get_public_key_credential_parameters_list() : array {
-		return [
+	public function get_public_key_credential_parameters_list(): array {
+		return array(
 			PublicKeyCredentialParameters::create( 'public-key', Algorithms::COSE_ALGORITHM_ES256 ),  // ECDSA w/ SHA-256.
 			PublicKeyCredentialParameters::create( 'public-key', Algorithms::COSE_ALGORITHM_ES256K ), // ECDSA w/ SHA-256K.
 			PublicKeyCredentialParameters::create( 'public-key', Algorithms::COSE_ALGORITHM_ES384 ),  // ECDSA w/ SHA-384.
@@ -90,7 +92,7 @@ class Webauthn_Server {
 			PublicKeyCredentialParameters::create( 'public-key', Algorithms::COSE_ALGORITHM_PS512 ),  // RSASSA-PSS w/ SHA-512.
 			PublicKeyCredentialParameters::create( 'public-key', Algorithms::COSE_ALGORITHM_ED256 ),  // EdDSA w/ SHA-256.
 			PublicKeyCredentialParameters::create( 'public-key', Algorithms::COSE_ALGORITHM_ED512 ),  // EdDSA w/ SHA-512.
-		];
+		);
 	}
 
 	/**
@@ -98,7 +100,7 @@ class Webauthn_Server {
 	 *
 	 * @return AuthenticatorSelectionCriteria
 	 */
-	public function get_authenticator_selection() : AuthenticatorSelectionCriteria {
+	public function get_authenticator_selection(): AuthenticatorSelectionCriteria {
 		return AuthenticatorSelectionCriteria::create()
 		->setResidentKey( AuthenticatorSelectionCriteria::RESIDENT_KEY_REQUIREMENT_REQUIRED )
 		->setAuthenticatorAttachment( AuthenticatorSelectionCriteria::AUTHENTICATOR_ATTACHMENT_PLATFORM );
@@ -110,7 +112,7 @@ class Webauthn_Server {
 	 * @param WP_User $user Current User.
 	 * @return PublicKeyCredentialUserEntity
 	 */
-	public function create_public_key_credential_user_entity( WP_User $user ) : PublicKeyCredentialUserEntity {
+	public function create_public_key_credential_user_entity( WP_User $user ): PublicKeyCredentialUserEntity {
 		// User Entity.
 		$user_entity = PublicKeyCredentialUserEntity::create(
 			$user->user_login,   // Name.
@@ -127,20 +129,19 @@ class Webauthn_Server {
 	 * @param WP_User $user Current User.
 	 * @param string|null $challenge Challenge string.
 	 * @return PublicKeyCredentialCreationOptions
-	 * @throws InvalidDataException If the challenge is invalid.
 	 */
-	public function create_attestation_request( WP_User $user, ?string $challenge = null ) : PublicKeyCredentialCreationOptions {
-		$rp_entity = $this->get_relying_party();
-		$user_entity = $this->create_public_key_credential_user_entity( $user );
+	public function create_attestation_request( WP_User $user, ?string $challenge = null ): PublicKeyCredentialCreationOptions {
+		$rp_entity                             = $this->get_relying_party();
+		$user_entity                           = $this->create_public_key_credential_user_entity( $user );
 		$public_key_credential_parameters_list = $this->get_public_key_credential_parameters_list();
-		$authenticator_selection = $this->get_authenticator_selection();
+		$authenticator_selection               = $this->get_authenticator_selection();
 
 		if ( ! $challenge ) {
 			$challenge = wp_generate_uuid4();
 		}
 
 		$public_key_credential_source_repository = new Source_Repository();
-		$excluded_credentials = $public_key_credential_source_repository->findAllForUserEntity( $user_entity );
+		$excluded_credentials                    = $public_key_credential_source_repository->findAllForUserEntity( $user_entity );
 
 		$excluded_public_key_descriptors = array_map(
 			function ( PublicKeyCredentialSource $credential ) {
@@ -172,12 +173,12 @@ class Webauthn_Server {
 	 * @param null|string $challenge Challenge string.
 	 * @return PublicKeyCredentialRequestOptions
 	 */
-	public function create_assertion_request( ?string $challenge = null ) : PublicKeyCredentialRequestOptions {
+	public function create_assertion_request( ?string $challenge = null ): PublicKeyCredentialRequestOptions {
 		if ( ! $challenge ) {
 			$challenge = wp_generate_uuid4();
 		}
 
-		$rp_entity = $this->get_relying_party();
+		$rp_entity                             = $this->get_relying_party();
 		$public_key_credential_request_options = PublicKeyCredentialRequestOptions::create(
 			$challenge,
 		)
@@ -198,7 +199,7 @@ class Webauthn_Server {
 	 * @return PublicKeyCredentialSource
 	 * @throws InvalidDataException If the request is invalid.
 	 */
-	public function validate_attestation_response( string $data, WP_User $user ) : PublicKeyCredentialSource {
+	public function validate_attestation_response( string $data, WP_User $user ): PublicKeyCredentialSource {
 		$attestation_statement_support_manager = AttestationStatementSupportManager::create();
 		$attestation_statement_support_manager->add( NoneAttestationStatementSupport::create() );
 
@@ -210,11 +211,11 @@ class Webauthn_Server {
 			$attestation_object_loader
 		);
 
-		$public_key_credential = $public_key_credential_loader->load( $data );
+		$public_key_credential              = $public_key_credential_loader->load( $data );
 		$authenticator_attestation_response = $public_key_credential->getResponse();
 
 		if ( ! $authenticator_attestation_response instanceof AuthenticatorAttestationResponse ) {
-			throw new InvalidDataException( $data, 'Invalid request.' );
+			throw new InvalidDataException( $data, 'Invalid request.' ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- This is not an output.
 		}
 
 		$public_key_credential_source_repository = new Source_Repository();
@@ -236,7 +237,7 @@ class Webauthn_Server {
 			$authenticator_attestation_response,
 			$public_key_credential_creation_options,
 			$this->get_current_domain(),
-			[ 'localhost' ] // Secure RelyingParty, to make localhost enable.
+			array( 'localhost' ) // Secure RelyingParty, to make localhost enable.
 		);
 
 		// Delete the challenge from user meta.
@@ -254,7 +255,7 @@ class Webauthn_Server {
 	 * @throws InvalidDataException If the request is invalid.
 	 * @throws Exception If the credential id is not found.
 	 */
-	public function validate_assertion_response( string $data, string $challenge ) : PublicKeyCredentialSource {
+	public function validate_assertion_response( string $data, string $challenge ): PublicKeyCredentialSource {
 		$attestation_statement_support_manager = AttestationStatementSupportManager::create();
 		$attestation_statement_support_manager->add( NoneAttestationStatementSupport::create() );
 
@@ -266,11 +267,11 @@ class Webauthn_Server {
 			$attestation_object_loader
 		);
 
-		$public_key_credential = $public_key_credential_loader->load( $data );
+		$public_key_credential            = $public_key_credential_loader->load( $data );
 		$authenticator_assertion_response = $public_key_credential->getResponse();
 
 		if ( ! $authenticator_assertion_response instanceof AuthenticatorAssertionResponse ) {
-			throw new InvalidDataException( $data, 'Invalid request.' );
+			throw new InvalidDataException( $data, 'Invalid request.' ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- This is not an output.
 		}
 
 		$public_key_credential_source_repository = new Source_Repository();
@@ -283,7 +284,7 @@ class Webauthn_Server {
 		);
 
 		$public_key_credential_request_options = $this->create_assertion_request( $challenge );
-		$public_key_credential_source = $public_key_credential_source_repository->findOneByCredentialId( $public_key_credential->getId() );
+		$public_key_credential_source          = $public_key_credential_source_repository->findOneByCredentialId( $public_key_credential->getId() );
 
 		if ( ! $public_key_credential_source instanceof PublicKeyCredentialSource ) {
 			throw new Exception( 'credential_not_found', 404 );
@@ -295,7 +296,7 @@ class Webauthn_Server {
 			$public_key_credential_request_options,
 			$this->get_current_domain(),
 			null,
-			[ 'localhost' ] // Secure RelyingParty, to make localhost enable.
+			array( 'localhost' ) // Secure RelyingParty, to make localhost enable.
 		);
 
 		return $public_key_credential_source;
@@ -306,7 +307,7 @@ class Webauthn_Server {
 	 *
 	 * @return Manager
 	 */
-	private function get_algorithm_manager() : Manager {
+	private function get_algorithm_manager(): Manager {
 		$algorithm_manager = Manager::create()
 		->add(
 			ES256::create(),
@@ -329,9 +330,9 @@ class Webauthn_Server {
 	/**
 	 * Get the current domain.
 	 */
-	private function get_current_domain() : string {
+	private function get_current_domain(): string {
 		// Only get the domain frm the site url.
-		$domain = parse_url( get_site_url(), PHP_URL_HOST );
+		$domain = wp_parse_url( get_site_url(), PHP_URL_HOST );
 
 		return $domain;
 	}

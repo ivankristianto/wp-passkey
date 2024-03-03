@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace SpomkyLabs\Pki\X509\GeneralName;
 
+use UnexpectedValueException;
 use function array_slice;
 use function count;
-use UnexpectedValueException;
 
 final class IPv6Address extends IPAddress
 {

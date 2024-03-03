@@ -10,13 +10,15 @@ declare( strict_types=1 );
 namespace Kucrut\Vite;
 
 use Exception;
+use WP_HTML_Tag_Processor;
 
 const VITE_CLIENT_SCRIPT_HANDLE = 'vite-client';
 
 /**
  * Get manifest data
  *
- * @since 1.0.0
+ * @since 0.1.0
+ * @since 0.8.0 Use wp_json_file_decode().
  *
  * @param string $manifest_dir Path to manifest directory.
  *
@@ -25,20 +27,21 @@ const VITE_CLIENT_SCRIPT_HANDLE = 'vite-client';
  * @return object Object containing manifest type and data.
  */
 function get_manifest( string $manifest_dir ): object {
+	$dev_manifest = 'vite-dev-server';
 	// Avoid repeatedly opening & decoding the same file.
 	static $manifests = [];
 
-	$file_names = [ 'manifest', 'vite-dev-server' ];
+	$file_names = [ $dev_manifest, 'manifest' ];
 
 	foreach ( $file_names as $file_name ) {
-		$is_dev = $file_name === 'vite-dev-server';
+		$is_dev = $file_name === $dev_manifest;
 		$manifest_path = "{$manifest_dir}/{$file_name}.json";
 
 		if ( isset( $manifests[ $manifest_path ] ) ) {
 			return $manifests[ $manifest_path ];
 		}
 
-		if ( is_readable( $manifest_path ) ) {
+		if ( is_file( $manifest_path ) && is_readable( $manifest_path ) ) {
 			break;
 		}
 
@@ -46,20 +49,13 @@ function get_manifest( string $manifest_dir ): object {
 	}
 
 	if ( ! isset( $manifest_path ) ) {
-		throw new Exception( sprintf( '[Vite] No manifest found in %s.', $manifest_dir ) );
+		throw new Exception( esc_html( sprintf( '[Vite] No manifest found in %s.', $manifest_dir ) ) );
 	}
 
-	// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
-	$manifest_content = file_get_contents( $manifest_path );
+	$manifest = wp_json_file_decode( $manifest_path );
 
-	if ( ! $manifest_content ) {
-		throw new Exception( sprintf( '[Vite] Failed to read manifest %s.', $manifest_path ) );
-	}
-
-	$manifest = json_decode( $manifest_content );
-
-	if ( json_last_error() ) {
-		throw new Exception( sprintf( '[Vite] Manifest %s contains invalid data.', $manifest_path ) );
+	if ( ! $manifest ) {
+		throw new Exception( esc_html( sprintf( '[Vite] Failed to read manifest file %s.', $manifest_path ) ) );
 	}
 
 	/**
@@ -87,7 +83,7 @@ function get_manifest( string $manifest_dir ): object {
  * This creates a function to be used as callback for the `script_loader` filter
  * which adds `type="module"` attribute to the script tag.
  *
- * @since 1.0.0
+ * @since 0.1.0
  *
  * @param string $handle Script handle.
  *
@@ -100,7 +96,8 @@ function filter_script_tag( string $handle ): void {
 /**
  * Add `type="module"` to a script tag
  *
- * @since 1.0.0
+ * @since 0.1.0
+ * @since 0.8.0 Use WP_HTML_Tag_Processor.
  *
  * @param string $target_handle Handle of the script being targeted by the filter callback.
  * @param string $tag           Original script tag.
@@ -113,26 +110,19 @@ function set_script_type_attribute( string $target_handle, string $tag, string $
 		return $tag;
 	}
 
-	$attribute = 'type="module"';
-	$script_type_regex = '/type=(["\'])([\w\/]+)(["\'])/';
+	$processor = new WP_HTML_Tag_Processor( $tag );
 
-	if ( preg_match( $script_type_regex, $tag ) ) {
-		// Pre-HTML5.
-		$tag = preg_replace( $script_type_regex, $attribute, $tag );
-	} else {
-		$pattern = $handle === VITE_CLIENT_SCRIPT_HANDLE
-			? '#(<script)(.*)#'
-			: '#(<script)(.*></script>)#';
-		$tag = preg_replace( $pattern, sprintf( '$1 %s$2', $attribute ), $tag );
+	if ( $processor->next_tag( 'script' ) ) {
+		$processor->set_attribute( 'type', 'module' );
 	}
 
-	return $tag;
+	return $processor->get_updated_html();
 }
 
 /**
  * Generate development asset src
  *
- * @since 1.0.0
+ * @since 0.1.0
  *
  * @param object $manifest Asset manifest.
  * @param string $entry    Asset entry name.
@@ -150,7 +140,7 @@ function generate_development_asset_src( object $manifest, string $entry ): stri
 /**
  * Register vite client script
  *
- * @since 1.0.0
+ * @since 0.1.0
  *
  * @param object $manifest Asset manifest.
  *
@@ -169,28 +159,53 @@ function register_vite_client_script( object $manifest ): void {
 }
 
 /**
- * Get react refresh script preamble
+ * Inject react-refresh preamble script once, if needed
  *
- * @param string $src React refresh script source URL.
- * @return string
+ * @since 0.8.0
+ *
+ * @param object $manifest Asset manifest.
+ * @return void
  */
-function get_react_refresh_script_preamble( string $src ): string {
+function inject_react_refresh_preamble_script( object $manifest ): void {
+	static $is_react_refresh_preamble_printed = false;
+
+	if ( $is_react_refresh_preamble_printed ) {
+		return;
+	}
+
+	if ( ! in_array( 'vite:react-refresh', $manifest->data->plugins, true ) ) {
+		return;
+	}
+
+	$react_refresh_script_src = generate_development_asset_src( $manifest, '@react-refresh' );
+	$script_position = 'after';
 	$script = <<< EOS
-import RefreshRuntime from "{$src}";
+import RefreshRuntime from "{$react_refresh_script_src}";
 RefreshRuntime.injectIntoGlobalHook(window);
-window.__VITE_IS_MODERN__ = true;
 window.\$RefreshReg$ = () => {};
 window.\$RefreshSig$ = () => (type) => type;
 window.__vite_plugin_react_preamble_installed__ = true;
 EOS;
 
-	return $script;
+	wp_add_inline_script( VITE_CLIENT_SCRIPT_HANDLE, $script, $script_position );
+	add_filter(
+		'wp_inline_script_attributes',
+		function ( array $attributes ) use ( $script_position ): array {
+			if ( isset( $attributes['id'] ) && $attributes['id'] === VITE_CLIENT_SCRIPT_HANDLE . "-js-{$script_position}" ) {
+				$attributes['type'] = 'module';
+			}
+
+			return $attributes;
+		}
+	);
+
+	$is_react_refresh_preamble_printed = true;
 }
 
 /**
  * Load development asset
  *
- * @since 1.0.0
+ * @since 0.1.0
  *
  * @param object $manifest Asset manifest.
  * @param string $entry    Entrypoint to enqueue.
@@ -200,20 +215,12 @@ EOS;
  */
 function load_development_asset( object $manifest, string $entry, array $options ): ?array {
 	register_vite_client_script( $manifest );
+	inject_react_refresh_preamble_script( $manifest );
 
 	$dependencies = array_merge(
 		[ VITE_CLIENT_SCRIPT_HANDLE ],
 		$options['dependencies']
 	);
-
-	if ( in_array( 'vite:react-refresh', $manifest->data->plugins, true ) ) {
-		$react_refresh_script_src = generate_development_asset_src( $manifest, '@react-refresh' );
-		wp_add_inline_script(
-			VITE_CLIENT_SCRIPT_HANDLE,
-			get_react_refresh_script_preamble( $react_refresh_script_src ),
-			'after'
-		);
-	}
 
 	$src = generate_development_asset_src( $manifest, $entry );
 
@@ -246,7 +253,7 @@ function load_development_asset( object $manifest, string $entry, array $options
 /**
  * Load production asset
  *
- * @since 1.0.0
+ * @since 0.1.0
  *
  * @param object $manifest Asset manifest.
  * @param string $entry    Entrypoint to enqueue.
@@ -310,7 +317,7 @@ function load_production_asset( object $manifest, string $entry, array $options 
 /**
  * Parse register/enqueue options
  *
- * @since 1.0.0
+ * @since 0.1.0
  *
  * @param array $options Array of options.
  *
@@ -333,13 +340,17 @@ function parse_options( array $options ): array {
  * Prepare asset url
  *
  * @author Justin Slamka <jslamka5685@gmail.com>
+ * @since 0.4.0
+ * @since 0.6.1 Normalize paths so they work on Windows as well.
  *
  * @param string $dir Asset directory.
  *
  * @return string
  */
 function prepare_asset_url( string $dir ) {
-	$url = content_url( str_replace( WP_CONTENT_DIR, '', $dir ) );
+	$content_dir = wp_normalize_path( WP_CONTENT_DIR );
+	$manifest_dir = wp_normalize_path( $dir );
+	$url = content_url( str_replace( $content_dir, '', $manifest_dir ) );
 	$url_matches_pattern = preg_match( '/(?<address>http(?:s?):\/\/.*\/)(?<fullPath>wp-content(?<removablePath>\/.*)\/(?:plugins|themes)\/.*)/', $url, $url_parts );
 
 	if ( $url_matches_pattern === 0 ) {
@@ -354,7 +365,7 @@ function prepare_asset_url( string $dir ) {
 /**
  * Register asset
  *
- * @since 1.0.0
+ * @since 0.1.0
  *
  * @see load_development_asset
  * @see load_production_asset
@@ -387,7 +398,7 @@ function register_asset( string $manifest_dir, string $entry, array $options ): 
 /**
  * Enqueue asset
  *
- * @since 1.0.0
+ * @since 0.1.0
  *
  * @see register_asset
  *

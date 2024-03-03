@@ -8,10 +8,13 @@ use Cose\Algorithm\Signature\Signature;
 use Cose\Key\Key;
 use Cose\Key\RsaKey;
 use InvalidArgumentException;
+use Throwable;
 use function openssl_sign;
 use function openssl_verify;
-use Throwable;
 
+/**
+ * @see \Cose\Tests\Algorithm\Signature\RSA\RSATest
+ */
 abstract class RSA implements Signature
 {
     public function sign(string $data, Key $key): string

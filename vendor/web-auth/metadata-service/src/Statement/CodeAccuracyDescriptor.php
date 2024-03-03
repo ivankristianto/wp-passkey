@@ -4,37 +4,47 @@ declare(strict_types=1);
 
 namespace Webauthn\MetadataService\Statement;
 
-use function array_key_exists;
 use Webauthn\MetadataService\Exception\MetadataStatementLoadingException;
-use Webauthn\MetadataService\Utils;
+use Webauthn\MetadataService\ValueFilter;
+use function array_key_exists;
 
-/**
- * @final
- */
 class CodeAccuracyDescriptor extends AbstractDescriptor
 {
-    private readonly int $base;
+    use ValueFilter;
 
-    private readonly int $minLength;
-
-    public function __construct(int $base, int $minLength, ?int $maxRetries = null, ?int $blockSlowdown = null)
-    {
+    public function __construct(
+        public readonly int $base,
+        public readonly int $minLength,
+        ?int $maxRetries = null,
+        ?int $blockSlowdown = null
+    ) {
         $base >= 0 || throw MetadataStatementLoadingException::create(
             'Invalid data. The value of "base" must be a positive integer'
         );
         $minLength >= 0 || throw MetadataStatementLoadingException::create(
             'Invalid data. The value of "minLength" must be a positive integer'
         );
-        $this->base = $base;
-        $this->minLength = $minLength;
         parent::__construct($maxRetries, $blockSlowdown);
     }
 
+    public static function create(int $base, int $minLength, ?int $maxRetries = null, ?int $blockSlowdown = null): self
+    {
+        return new self($base, $minLength, $maxRetries, $blockSlowdown);
+    }
+
+    /**
+     * @deprecated since 4.7.0. Please use the property directly.
+     * @infection-ignore-all
+     */
     public function getBase(): int
     {
         return $this->base;
     }
 
+    /**
+     * @deprecated since 4.7.0. Please use the property directly.
+     * @infection-ignore-all
+     */
     public function getMinLength(): int
     {
         return $this->minLength;
@@ -42,6 +52,8 @@ class CodeAccuracyDescriptor extends AbstractDescriptor
 
     /**
      * @param array<string, mixed> $data
+     * @deprecated since 4.7.0. Please use the symfony/serializer for converting the object.
+     * @infection-ignore-all
      */
     public static function createFromArray(array $data): self
     {
@@ -52,7 +64,7 @@ class CodeAccuracyDescriptor extends AbstractDescriptor
             'The parameter "minLength" is missing'
         );
 
-        return new self(
+        return self::create(
             $data['base'],
             $data['minLength'],
             $data['maxRetries'] ?? null,
@@ -68,10 +80,10 @@ class CodeAccuracyDescriptor extends AbstractDescriptor
         $data = [
             'base' => $this->base,
             'minLength' => $this->minLength,
-            'maxRetries' => $this->getMaxRetries(),
-            'blockSlowdown' => $this->getBlockSlowdown(),
+            'maxRetries' => $this->maxRetries,
+            'blockSlowdown' => $this->blockSlowdown,
         ];
 
-        return Utils::filterNullValues($data);
+        return self::filterNullValues($data);
     }
 }

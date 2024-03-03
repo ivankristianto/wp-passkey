@@ -4,13 +4,12 @@ declare(strict_types=1);
 
 namespace Webauthn;
 
-use function array_key_exists;
-use function is_string;
 use JsonSerializable;
 use ParagonIE\ConstantTime\Base64;
-use Symfony\Component\Uid\AbstractUid;
 use Symfony\Component\Uid\Uuid;
 use Webauthn\Exception\InvalidDataException;
+use function array_key_exists;
+use function is_string;
 
 /**
  * @see https://www.w3.org/TR/webauthn/#sec-attested-credential-data
@@ -18,27 +17,48 @@ use Webauthn\Exception\InvalidDataException;
 class AttestedCredentialData implements JsonSerializable
 {
     public function __construct(
-        private AbstractUid $aaguid,
-        private readonly string $credentialId,
-        private readonly ?string $credentialPublicKey
+        public Uuid $aaguid,
+        public readonly string $credentialId,
+        public readonly ?string $credentialPublicKey
     ) {
     }
 
-    public function getAaguid(): AbstractUid
+    public static function create(Uuid $aaguid, string $credentialId, ?string $credentialPublicKey = null): self
+    {
+        return new self($aaguid, $credentialId, $credentialPublicKey);
+    }
+
+    /**
+     * @deprecated since 4.7.0. Please use the property directly.
+     * @infection-ignore-all
+     */
+    public function getAaguid(): Uuid
     {
         return $this->aaguid;
     }
 
-    public function setAaguid(AbstractUid $aaguid): void
+    /**
+     * @deprecated since 4.7.0. Please use the property directly.
+     * @infection-ignore-all
+     */
+    public function setAaguid(Uuid $aaguid): void
     {
         $this->aaguid = $aaguid;
     }
 
+    /**
+     * @deprecated since 4.7.0. Please use the property directly.
+     * @infection-ignore-all
+     */
     public function getCredentialId(): string
     {
         return $this->credentialId;
     }
 
+    /**
+     * @deprecated since 4.7.0. Please use the property directly.
+     * @infection-ignore-all
+     */
     public function getCredentialPublicKey(): ?string
     {
         return $this->credentialPublicKey;
@@ -80,7 +100,7 @@ class AttestedCredentialData implements JsonSerializable
             $credentialPublicKey = Base64::decode($json['credentialPublicKey'], true);
         }
 
-        return new self($uuid, $credentialId, $credentialPublicKey);
+        return self::create($uuid, $credentialId, $credentialPublicKey);
     }
 
     /**

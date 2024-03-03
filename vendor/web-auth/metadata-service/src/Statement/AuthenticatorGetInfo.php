@@ -6,29 +6,28 @@ namespace Webauthn\MetadataService\Statement;
 
 use JsonSerializable;
 
-/**
- * @final
- */
 class AuthenticatorGetInfo implements JsonSerializable
 {
     /**
-     * @var string[]
+     * @param array<string|int, mixed> $info
      */
-    private array $info = [];
-
-    /**
-     * @param array<string|int, mixed> $data
-     */
-    public static function create(array $data = []): self
-    {
-        $object = new self();
-        foreach ($data as $k => $v) {
-            $object->add($k, $v);
-        }
-
-        return $object;
+    public function __construct(
+        public array $info = []
+    ) {
     }
 
+    /**
+     * @param array<string|int, mixed> $info
+     */
+    public static function create(array $info = []): self
+    {
+        return new self($info);
+    }
+
+    /**
+     * @deprecated since 4.7.0. Please use the constructor directly.
+     * @infection-ignore-all
+     */
     public function add(string|int $key, mixed $value): self
     {
         $this->info[$key] = $value;

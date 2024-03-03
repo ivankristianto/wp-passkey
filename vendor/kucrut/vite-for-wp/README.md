@@ -27,37 +27,49 @@ npm add -D vite @kucrut/vite-for-wp
 Create `vite.config.js`:
 
 ```js
-import create_config from '@kucrut/vite-for-wp';
+import { v4wp } from '@kucrut/vite-for-wp';
 
-export default create_config( 'js/src/main.ts', 'js/dist' );
+export default {
+	plugins: [
+		v4wp( {
+			input: 'js/src/main.ts', // Optional, defaults to 'src/main.js'.
+			outDir: 'js/dist', // Optional, defaults to 'dist'.
+		} ),
+	],
+};
 ```
 
-If you have multiple entrypoints to build, pass an object as the first parameter:
+For multiple entrypoints, pass an object as the first parameter:
 
 ```js
 // vite.config.js
-import create_config from '@kucrut/vite-for-wp';
+import { v4wp } from '@kucrut/vite-for-wp';
 
-export default create_config(
-	{
-		main: 'js/src/main.ts',
-		extra: 'js/src/extra.ts',
-	},
-	'js/dist',
-);
+export default {
+	plugins: [
+		v4wp( {
+			input: {
+				main: 'js/src/main.ts',
+				extra: 'js/src/extra.ts',
+			},
+			outDir: 'js/dist',
+		} ),
+	],
+};
 ```
 
-Pass a [configuration object](https://vitejs.dev/config/) as the third parameter if you need to add plugins, use https, etc:
+Refer to Rollup documentation on how to set entrypoints: https://rollupjs.org/configuration-options/#input
+
+Feel free to [customise the configuration](https://vitejs.dev/config/) to add plugins, use https, etc:
 
 ```js
 // vite.config.js
 import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
-import create_config from '@kucrut/vite-for-wp';
+import { v4wp } from '@kucrut/vite-for-wp';
 import react from '@vitejs/plugin-react';
 
-export default create_config( 'js/src/main.ts', 'js/dist', {
-	plugins: [ react() ],
+export default {
+	plugins: [ v4wp( { input: 'js/src/main.ts', outDir: 'js/dist' } ), react() ],
 	server: {
 		host: 'mydomain.com',
 		https: {
@@ -65,7 +77,7 @@ export default create_config( 'js/src/main.ts', 'js/dist', {
 			key: readFileSync( 'path/to/key.pem' ),
 		},
 	},
-} );
+};
 ```
 
 Lastly, add `dev` and `build` scripts to your `package.json`:
@@ -98,7 +110,7 @@ use Kucrut\Vite;
 
 add_action( 'wp_enqueue_scripts', function (): void {
 	Vite\enqueue_asset(
-		__DIR__ . 'js/dist',
+		__DIR__ . '/js/dist',
 		'js/src/main.ts',
 		[
 			'handle' => 'my-script-handle',
@@ -122,34 +134,45 @@ You can now run `npm run dev` when developing your plugin/theme and run `npm run
 
 ### External Dependencies
 
-If your JS package depends on one or more WordPress modules (eg. `@wordpress/i18n`), you can define them as externals with the help of `rollup-plugin-external-globals`.
+If your package depends on one or more scripts registered by WordPress (eg. `jquery`, `react`, `@wordpress/i18n`, etc.) and you want to exclude them from the final build, add `wp_scripts()` to the list of Vite's plugins. But first, install the required dependencies:
 
 ```sh
-npm add -D rollup-plugin-external-globals
+npm add -D rollup-plugin-external-globals vite-plugin-external
 ```
+
+For example, to externalise `react` and `react-dom` packages:
 
 ```js
 // vite.config.js
-import { wp_globals } from '@kucrut/vite-for-wp/utils';
-import create_config from '@kucrut/vite-for-wp';
-import external_globals from 'rollup-plugin-external-globals';
+import { v4wp } from '@kucrut/vite-for-wp';
+import { wp_scripts } from '@kucrut/vite-for-wp/plugins';
+import react from '@vitejs/plugin-react';
 
-export default create_config( 'js/src/main.ts', 'js/dist', {
+export default {
 	plugins: [
-		external_globals( {
-			...wp_globals(),
-			'some-registered-script-handle': 'GlobalVar',
+		v4wp( {
+			input: 'js/src/main.jsx',
+			outDir: 'js/dist',
+		} ),
+		wp_scripts(),
+		react( {
+			jsxRuntime: 'classic',
 		} ),
 	],
-} );
+};
 ```
 
-Note that you will need to add them to the `dependencies` array when enqueueing the script (see example above).
+**Special Notes for React**
+
+-   `react` and `react-dom` packages still need to be installed as your package's dev dependencies as they're used by `@vitejs/plugin-react`.
+-   `react` and `react-dom` should be added to the `dependencies` array when enqueueing the script (see example above).
 
 ## Example plugins
 
 -   React: https://github.com/kucrut/vite-for-wp-example-react
--   Svelte: https://github.com/kucrut/catatan
+-   Svelte: https://github.com/kucrut/vite-for-wp-example-svelte
+-   Vanilla JS: https://github.com/kucrut/vite-for-wp-example-vanilla-js
+-   Vue: https://github.com/kucrut/vite-for-wp-example-vue
 
 ## Limitations
 

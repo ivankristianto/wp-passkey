@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Webauthn;
 
-use function array_key_exists;
 use Webauthn\Exception\InvalidDataException;
+use function array_key_exists;
 
 class PublicKeyCredentialRpEntity extends PublicKeyCredentialEntity
 {
     public function __construct(
         string $name,
-        protected ?string $id = null,
+        public readonly ?string $id = null,
         ?string $icon = null
     ) {
         parent::__construct($name, $icon);
@@ -22,6 +22,10 @@ class PublicKeyCredentialRpEntity extends PublicKeyCredentialEntity
         return new self($name, $id, $icon);
     }
 
+    /**
+     * @deprecated since 4.7.0. Please use the property directly.
+     * @infection-ignore-all
+     */
     public function getId(): ?string
     {
         return $this->id;
@@ -29,6 +33,8 @@ class PublicKeyCredentialRpEntity extends PublicKeyCredentialEntity
 
     /**
      * @param mixed[] $json
+     * @deprecated since 4.8.0. Please use {Webauthn\Denormalizer\WebauthnSerializerFactory} for converting the object.
+     * @infection-ignore-all
      */
     public static function createFromArray(array $json): self
     {
@@ -37,7 +43,7 @@ class PublicKeyCredentialRpEntity extends PublicKeyCredentialEntity
             'Invalid input. "name" is missing.'
         );
 
-        return new self($json['name'], $json['id'] ?? null, $json['icon'] ?? null);
+        return self::create($json['name'], $json['id'] ?? null, $json['icon'] ?? null);
     }
 
     /**

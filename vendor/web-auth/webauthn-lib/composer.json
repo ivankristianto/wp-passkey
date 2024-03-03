@@ -30,8 +30,8 @@
         "psr/http-factory": "^1.0",
         "psr/log": "^1.0|^2.0|^3.0",
         "spomky-labs/cbor-php": "^3.0",
-        "symfony/uid": "^6.1",
-        "web-auth/cose-lib": "^4.0.12",
+        "symfony/uid": "^6.1|^7.0",
+        "web-auth/cose-lib": "^4.2.3",
         "web-auth/metadata-service": "self.version"
     },
     "autoload": {
@@ -46,14 +46,12 @@
         }
     },
     "suggest": {
+        "symfony/serializer": "As of 4.5.x, the symfony/serializer component will become mandatory for converting objects such as the Metadata Statement",
+        "symfony/property-access": "As of 4.5.x, the symfony/serializer component will become mandatory for converting objects such as the Metadata Statement",
+        "symfony/property-info": "As of 4.5.x, the symfony/serializer component will become mandatory for converting objects such as the Metadata Statement",
+        "phpdocumentor/reflection-docblock": "As of 4.5.x, the phpdocumentor/reflection-docblock component will become mandatory for converting objects such as the Metadata Statement",
         "psr/log-implementation": "Recommended to receive logs from the library",
-        "web-token/jwt-key-mgmt": "Mandatory for the AndroidSafetyNet Attestation Statement support",
-        "web-token/jwt-signature-algorithm-rsa": "Mandatory for the AndroidSafetyNet Attestation Statement support",
-        "web-token/jwt-signature-algorithm-ecdsa": "Recommended for the AndroidSafetyNet Attestation Statement support",
-        "web-token/jwt-signature-algorithm-eddsa": "Recommended for the AndroidSafetyNet Attestation Statement support",
+        "web-token/jwt-library": "Mandatory for the AndroidSafetyNet Attestation Statement support",
         "symfony/event-dispatcher": "Recommended to use dispatched events"
-    },
-    "require-dev": {
-        "symfony/event-dispatcher": "^6.1"
     }
 }

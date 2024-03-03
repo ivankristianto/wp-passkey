@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace SpomkyLabs\Pki\CryptoTypes\Asymmetric\EC;
 
 use Brick\Math\BigInteger;
-use function mb_strlen;
 use RangeException;
 use RuntimeException;
 use SpomkyLabs\Pki\ASN1\Type\Primitive\BitString;
 use SpomkyLabs\Pki\ASN1\Type\Primitive\Integer;
 use SpomkyLabs\Pki\ASN1\Type\Primitive\OctetString;
+use function mb_strlen;
 
 /**
  * Implements data type conversions from SEC 1: Elliptic Curve Cryptography.

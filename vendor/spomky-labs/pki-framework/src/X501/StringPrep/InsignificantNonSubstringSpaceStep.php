@@ -24,9 +24,9 @@ final class InsignificantNonSubstringSpaceStep implements PrepareStep
         }
         // trim leading and trailing spaces
         $string = preg_replace('/^\p{Zs}+/u', '', $string);
-        $string = preg_replace('/\p{Zs}+$/u', '', $string);
+        $string = preg_replace('/\p{Zs}+$/u', '', (string) $string);
         // convert inner space sequences to two U+0020 characters
-        $string = preg_replace('/\p{Zs}+/u', '  ', $string);
+        $string = preg_replace('/\p{Zs}+/u', '  ', (string) $string);
         return " {$string} ";
     }
 }

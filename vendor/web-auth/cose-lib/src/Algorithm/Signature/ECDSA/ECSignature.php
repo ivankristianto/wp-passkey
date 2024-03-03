@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Cose\Algorithm\Signature\ECDSA;
 
+use InvalidArgumentException;
 use function bin2hex;
 use function dechex;
 use function hex2bin;
 use function hexdec;
-use InvalidArgumentException;
 use function mb_strlen;
 use function mb_substr;
 use function str_pad;

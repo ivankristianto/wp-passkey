@@ -1,5 +1,57 @@
 # @kucrut/vite-for-wp
 
+## 0.8.0
+
+### Minor Changes
+
+-   da9b6e1: wp_scripts: Import dependencies dynamically.
+-   bafb3cb: Use WP_HTML_Tag_Processor to update script type attribute.
+-   28a3eb6: Accept options in dev_server, prioritise dev manifest over build one in PHP helper.
+
+### Patch Changes
+
+-   77a7da8: Use wp_json_file_decode() to read manifest file.
+-   3296971: Only print react-refresh preamble script once.
+
+## 0.7.1
+
+### Patch Changes
+
+-   461687b: Merge dev server plugins
+-   ad81a04: Make v4wp options optional
+-   c755432: Ensure dev server manifest is created when the server (re)starts and deleted when it's stopped.
+-   e2212e3: Improve JS doc blocks.
+-   dc71bde: Dev server manifest plugin: Improve files-related operation
+
+## 0.7.0
+
+### Minor Changes
+
+-   56bce53: Introduce wp_scripts() plugin to externalise scripts already registered by WP core.
+-   08ceb4f: Provide v4wp plugin, deprecate create_config()
+
+### Patch Changes
+
+-   961d00b: Update prettier
+
+## 0.6.2
+
+### Patch Changes
+
+-   a4cd144: Improve manifest file finder
+
+## 0.6.1
+
+### Patch Changes
+
+-   f221454: Fix production asset paths on Windows
+
+## 0.6.0
+
+### Minor Changes
+
+-   89d341b: Vite 4.4 & Typings with JSDoc
+
 ## 0.5.2
 
 ### Patch Changes

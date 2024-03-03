@@ -4,20 +4,31 @@ declare(strict_types=1);
 
 namespace Webauthn\MetadataService\Statement;
 
-use function is_array;
 use JsonSerializable;
-use Webauthn\MetadataService\Exception\MetadataStatementLoadingException;
 
-/**
- * @final
- */
 class VerificationMethodANDCombinations implements JsonSerializable
 {
     /**
-     * @var VerificationMethodDescriptor[]
+     * @param VerificationMethodDescriptor[] $verificationMethods
      */
-    private array $verificationMethods = [];
+    public function __construct(
+        /** @readonly */
+        public array $verificationMethods = []
+    ) {
+    }
 
+    /**
+     * @param VerificationMethodDescriptor[] $verificationMethods
+     */
+    public static function create(array $verificationMethods): self
+    {
+        return new self($verificationMethods);
+    }
+
+    /**
+     * @deprecated since 4.7.0. Please use the {self::create} directly.
+     * @infection-ignore-all
+     */
     public function addVerificationMethodDescriptor(VerificationMethodDescriptor $verificationMethodDescriptor): self
     {
         $this->verificationMethods[] = $verificationMethodDescriptor;
@@ -27,6 +38,8 @@ class VerificationMethodANDCombinations implements JsonSerializable
 
     /**
      * @return VerificationMethodDescriptor[]
+     * @deprecated since 4.7.0. Please use the property directly.
+     * @infection-ignore-all
      */
     public function getVerificationMethods(): array
     {
@@ -35,27 +48,26 @@ class VerificationMethodANDCombinations implements JsonSerializable
 
     /**
      * @param array<string, mixed> $data
+     * @deprecated since 4.7.0. Please use the symfony/serializer for converting the object.
+     * @infection-ignore-all
      */
     public static function createFromArray(array $data): self
     {
-        $object = new self();
-
-        foreach ($data as $datum) {
-            is_array($datum) || throw MetadataStatementLoadingException::create('Invalid data');
-            $object->addVerificationMethodDescriptor(VerificationMethodDescriptor::createFromArray($datum));
-        }
-
-        return $object;
+        return self::create(
+            array_map(
+                static fn (array $datum): VerificationMethodDescriptor => VerificationMethodDescriptor::createFromArray(
+                    $datum
+                ),
+                $data
+            )
+        );
     }
 
     /**
-     * @return array<array<mixed>>
+     * @return array<VerificationMethodDescriptor>
      */
     public function jsonSerialize(): array
     {
-        return array_map(
-            static fn (VerificationMethodDescriptor $object): array => $object->jsonSerialize(),
-            $this->verificationMethods
-        );
+        return $this->verificationMethods;
     }
 }

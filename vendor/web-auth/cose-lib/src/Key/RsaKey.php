@@ -4,16 +4,17 @@ declare(strict_types=1);
 
 namespace Cose\Key;
 
-use function array_key_exists;
 use Brick\Math\BigInteger;
-use function in_array;
 use InvalidArgumentException;
 use SpomkyLabs\Pki\CryptoTypes\Asymmetric\PublicKeyInfo;
 use SpomkyLabs\Pki\CryptoTypes\Asymmetric\RSA\RSAPrivateKey;
 use SpomkyLabs\Pki\CryptoTypes\Asymmetric\RSA\RSAPublicKey;
+use function array_key_exists;
+use function in_array;
 
 /**
  * @final
+ * @see \Cose\Tests\Key\RsaKeyTest
  */
 class RsaKey extends Key
 {
@@ -46,8 +47,13 @@ class RsaKey extends Key
      */
     public function __construct(array $data)
     {
+        foreach ([self::TYPE] as $key) {
+            if (is_numeric($data[$key])) {
+                $data[$key] = (int) $data[$key];
+            }
+        }
         parent::__construct($data);
-        if (! isset($data[self::TYPE]) || (int) $data[self::TYPE] !== self::TYPE_RSA) {
+        if ($data[self::TYPE] !== self::TYPE_RSA && $data[self::TYPE] !== self::TYPE_NAME_RSA) {
             throw new InvalidArgumentException('Invalid RSA key. The key type does not correspond to a RSA key');
         }
         if (! isset($data[self::DATA_N], $data[self::DATA_E])) {

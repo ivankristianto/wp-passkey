@@ -42,6 +42,7 @@ use UnexpectedValueException;
  * Decorator class to wrap an element without already knowing the specific underlying type.
  *
  * Provides accessor methods to test the underlying type and return a type hinted instance of the concrete element.
+ * @see \SpomkyLabs\Pki\Test\ASN1\Type\UnspecifiedTypeTest
  */
 final class UnspecifiedType implements ElementBase
 {

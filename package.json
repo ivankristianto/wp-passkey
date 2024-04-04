@@ -1,6 +1,6 @@
 {
   "name": "@ivankristianto/biometric-authentication",
-  "version": "0.3.3",
+  "version": "0.3.5",
   "type": "module",
   "scripts": {
     "build": "npm run clean && vite build",

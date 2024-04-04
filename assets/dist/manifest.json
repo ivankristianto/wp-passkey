@@ -1,11 +1,11 @@
 {
-  "_index-5360b657.js": {
-    "file": "assets/index-5360b657.js"
+  "_index-4a4b01c0.js": {
+    "file": "assets/index-4a4b01c0.js"
   },
   "assets/src/js/login.js": {
-    "file": "assets/login-9dd589b0.js",
+    "file": "assets/login-469c2d44.js",
     "imports": [
-      "_index-5360b657.js"
+      "_index-4a4b01c0.js"
     ],
     "isEntry": true,
     "src": "assets/src/js/login.js"
@@ -18,9 +18,9 @@
     "css": [
       "assets/user-profile-51461069.css"
     ],
-    "file": "assets/user-profile-ff970371.js",
+    "file": "assets/user-profile-1dc68691.js",
     "imports": [
-      "_index-5360b657.js"
+      "_index-4a4b01c0.js"
     ],
     "isEntry": true,
     "src": "assets/src/js/user-profile.js"

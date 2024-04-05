@@ -181,8 +181,9 @@ class OneAsymmetricKey
     {
         $algo = $this->algorithmIdentifier();
         switch ($algo->oid()) {
-            // RSA
+            // RSA (including RSASSA-PSS)
             case AlgorithmIdentifier::OID_RSA_ENCRYPTION:
+            case AlgorithmIdentifier::OID_RSASSA_PSS_ENCRYPTION:
                 return RSAPrivateKey::fromDER($this->privateKeyData);
                 // elliptic curve
             case AlgorithmIdentifier::OID_EC_PUBLIC_KEY:
@@ -225,8 +226,9 @@ class OneAsymmetricKey
                 return X448PrivateKey::fromOctetString(OctetString::fromDER($this->privateKeyData), $pubkey)
                     ->withVersion($this->version)
                     ->withAttributes($this->attributes);
+            default:
+                throw new RuntimeException('Private key ' . $algo->name() . ' not supported.');
         }
-        throw new RuntimeException('Private key ' . $algo->name() . ' not supported.');
     }
 
     /**

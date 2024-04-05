@@ -12,7 +12,6 @@ class VerificationMethodANDCombinations implements JsonSerializable
      * @param VerificationMethodDescriptor[] $verificationMethods
      */
     public function __construct(
-        /** @readonly */
         public array $verificationMethods = []
     ) {
     }
@@ -26,8 +25,7 @@ class VerificationMethodANDCombinations implements JsonSerializable
     }
 
     /**
-     * @deprecated since 4.7.0. Please use the {self::create} directly.
-     * @infection-ignore-all
+     * @deprecated since 4.7.0. Please use the property directly.
      */
     public function addVerificationMethodDescriptor(VerificationMethodDescriptor $verificationMethodDescriptor): self
     {
@@ -39,7 +37,6 @@ class VerificationMethodANDCombinations implements JsonSerializable
     /**
      * @return VerificationMethodDescriptor[]
      * @deprecated since 4.7.0. Please use the property directly.
-     * @infection-ignore-all
      */
     public function getVerificationMethods(): array
     {
@@ -48,8 +45,6 @@ class VerificationMethodANDCombinations implements JsonSerializable
 
     /**
      * @param array<string, mixed> $data
-     * @deprecated since 4.7.0. Please use the symfony/serializer for converting the object.
-     * @infection-ignore-all
      */
     public static function createFromArray(array $data): self
     {

@@ -25,14 +25,11 @@ class CollectedClientData
 
     public readonly string $origin;
 
-    public readonly null|string $topOrigin;
-
     public readonly bool $crossOrigin;
 
     /**
      * @var mixed[]|null
      * @deprecated Since 4.3.0 and will be removed in 5.0.0
-     * @infection-ignore-all
      */
     public readonly ?array $tokenBinding;
 
@@ -69,7 +66,6 @@ class CollectedClientData
         );
         $this->origin = $origin;
 
-        $this->topOrigin = $data['topOrigin'] ?? null;
         $this->crossOrigin = $data['crossOrigin'] ?? false;
 
         $tokenBinding = $data['tokenBinding'] ?? null;
@@ -101,7 +97,6 @@ class CollectedClientData
 
     /**
      * @deprecated since 4.7.0. Please use the property directly.
-     * @infection-ignore-all
      */
     public function getType(): string
     {
@@ -110,7 +105,6 @@ class CollectedClientData
 
     /**
      * @deprecated since 4.7.0. Please use the property directly.
-     * @infection-ignore-all
      */
     public function getChallenge(): string
     {
@@ -119,7 +113,6 @@ class CollectedClientData
 
     /**
      * @deprecated since 4.7.0. Please use the property directly.
-     * @infection-ignore-all
      */
     public function getOrigin(): string
     {
@@ -128,7 +121,6 @@ class CollectedClientData
 
     /**
      * @deprecated since 4.7.0. Please use the property directly.
-     * @infection-ignore-all
      */
     public function getCrossOrigin(): bool
     {
@@ -137,7 +129,6 @@ class CollectedClientData
 
     /**
      * @deprecated Since 4.3.0 and will be removed in 5.0.0
-     * @infection-ignore-all
      */
     public function getTokenBinding(): ?TokenBinding
     {
@@ -146,7 +137,6 @@ class CollectedClientData
 
     /**
      * @deprecated since 4.7.0. Please use the property directly.
-     * @infection-ignore-all
      */
     public function getRawData(): string
     {

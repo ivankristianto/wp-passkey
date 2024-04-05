@@ -6,6 +6,7 @@ namespace Webauthn\Counter;
 
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
+use Throwable;
 use Webauthn\Exception\CounterException;
 use Webauthn\MetadataService\CanLogData;
 use Webauthn\PublicKeyCredentialSource;
@@ -30,7 +31,7 @@ final class ThrowExceptionIfInvalid implements CounterChecker, CanLogData
                 $publicKeyCredentialSource->counter,
                 'Invalid counter.'
             );
-        } catch (CounterException $throwable) {
+        } catch (Throwable $throwable) {
             $this->logger->error('The counter is invalid', [
                 'current' => $currentCounter,
                 'new' => $publicKeyCredentialSource->counter,

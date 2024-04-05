@@ -37,7 +37,6 @@ class CertificateToolbox
 
     /**
      * @deprecated since 4.7.0 and will be removed in 5.0.0. No replacement as not used internally.
-     * @infection-ignore-all
      */
     public static function convertPEMToDER(string $data): string
     {
@@ -45,9 +44,9 @@ class CertificateToolbox
             return $data;
         }
         $data = preg_replace('/\-{5}.*\-{5}[\r\n]*/', '', $data);
-        $data = preg_replace("/[\r\n]*/", '', (string) $data);
+        $data = preg_replace("/[\r\n]*/", '', $data);
 
-        return Base64::decode(trim((string) $data), true);
+        return Base64::decode(trim($data), true);
     }
 
     public static function convertDERToPEM(string $data, string $type = 'CERTIFICATE'): string

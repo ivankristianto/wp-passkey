@@ -126,7 +126,7 @@ class PhpCertificateChainValidator implements CertificateChainValidator, CanDisp
         $uniqueCertificates = array_map(
             static fn (Certificate $cert): string => $cert->toPEM()
                 ->string(),
-            [...$untrustedCertificates, $trustedCertificate]
+            array_merge($untrustedCertificates, [$trustedCertificate])
         );
         count(array_unique($uniqueCertificates)) === count(
             $uniqueCertificates
@@ -140,7 +140,7 @@ class PhpCertificateChainValidator implements CertificateChainValidator, CanDisp
             return false;
         }
 
-        $certificates = [$trustedCertificate, ...$untrustedCertificates];
+        $certificates = array_merge([$trustedCertificate], $untrustedCertificates);
         $numCerts = count($certificates);
         for ($i = 1; $i < $numCerts; $i++) {
             if ($this->isRevoked($certificates[$i])) {

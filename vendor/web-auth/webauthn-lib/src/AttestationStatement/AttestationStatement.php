@@ -22,7 +22,6 @@ class AttestationStatement implements JsonSerializable
 
     /**
      * @deprecated since 4.2.0 and will be removed in 5.0.0. The ECDAA Trust Anchor does no longer exist in Webauthn specification.
-     * @infection-ignore-all
      */
     final public const TYPE_ECDAA = 'ecdaa';
 
@@ -80,7 +79,6 @@ class AttestationStatement implements JsonSerializable
      * @param array<string, mixed> $attStmt
      *
      * @deprecated since 4.2.0 and will be removed in 5.0.0. The ECDAA Trust Anchor does no longer exist in Webauthn specification.
-     * @infection-ignore-all
      */
     public static function createEcdaa(string $fmt, array $attStmt, TrustPath $trustPath): self
     {
@@ -97,7 +95,6 @@ class AttestationStatement implements JsonSerializable
 
     /**
      * @deprecated since 4.7.0. Please use the property directly.
-     * @infection-ignore-all
      */
     public function getFmt(): string
     {
@@ -107,7 +104,6 @@ class AttestationStatement implements JsonSerializable
     /**
      * @return mixed[]
      * @deprecated since 4.7.0. Please use the property directly.
-     * @infection-ignore-all
      */
     public function getAttStmt(): array
     {
@@ -131,7 +127,6 @@ class AttestationStatement implements JsonSerializable
 
     /**
      * @deprecated since 4.7.0. Please use the property directly.
-     * @infection-ignore-all
      */
     public function getTrustPath(): TrustPath
     {
@@ -140,7 +135,6 @@ class AttestationStatement implements JsonSerializable
 
     /**
      * @deprecated since 4.7.0. Please use the property directly.
-     * @infection-ignore-all
      */
     public function getType(): string
     {
@@ -149,8 +143,6 @@ class AttestationStatement implements JsonSerializable
 
     /**
      * @param mixed[] $data
-     * @deprecated since 4.8.0. Please use {Webauthn\Denormalizer\WebauthnSerializerFactory} for converting the object.
-     * @infection-ignore-all
      */
     public static function createFromArray(array $data): self
     {

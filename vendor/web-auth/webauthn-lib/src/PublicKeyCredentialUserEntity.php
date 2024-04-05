@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Webauthn;
 
-use ParagonIE\ConstantTime\Base64;
 use ParagonIE\ConstantTime\Base64UrlSafe;
 use Webauthn\Exception\InvalidDataException;
 use function array_key_exists;
@@ -33,7 +32,6 @@ class PublicKeyCredentialUserEntity extends PublicKeyCredentialEntity
 
     /**
      * @deprecated since 4.7.0. Please use the property directly.
-     * @infection-ignore-all
      */
     public function getId(): string
     {
@@ -42,17 +40,12 @@ class PublicKeyCredentialUserEntity extends PublicKeyCredentialEntity
 
     /**
      * @deprecated since 4.7.0. Please use the property directly.
-     * @infection-ignore-all
      */
     public function getDisplayName(): string
     {
         return $this->displayName;
     }
 
-    /**
-     * @deprecated since 4.8.0. Please use {Webauthn\Denormalizer\WebauthnSerializerFactory} for converting the object.
-     * @infection-ignore-all
-     */
     public static function createFromString(string $data): self
     {
         $data = json_decode($data, true, flags: JSON_THROW_ON_ERROR);
@@ -63,8 +56,6 @@ class PublicKeyCredentialUserEntity extends PublicKeyCredentialEntity
 
     /**
      * @param mixed[] $json
-     * @deprecated since 4.8.0. Please use {Webauthn\Denormalizer\WebauthnSerializerFactory} for converting the object.
-     * @infection-ignore-all
      */
     public static function createFromArray(array $json): self
     {
@@ -77,7 +68,7 @@ class PublicKeyCredentialUserEntity extends PublicKeyCredentialEntity
             $json,
             'Invalid input. "displayName" is missing.'
         );
-        $id = Base64::decode($json['id'], true);
+        $id = Base64UrlSafe::decodeNoPadding($json['id']);
 
         return self::create($json['name'], $id, $json['displayName'], $json['icon'] ?? null);
     }

@@ -6,7 +6,6 @@ namespace Webauthn;
 
 /**
  * @deprecated
- * @infection-ignore-all
  */
 interface PublicKeyCredentialSourceRepository
 {

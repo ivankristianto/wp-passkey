@@ -4,11 +4,9 @@ declare(strict_types=1);
 
 namespace Webauthn;
 
-use InvalidArgumentException;
 use ParagonIE\ConstantTime\Base64UrlSafe;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
-use Symfony\Component\Serializer\SerializerInterface;
 use Throwable;
 use Webauthn\AttestationStatement\AttestationObjectLoader;
 use Webauthn\Exception\InvalidDataException;
@@ -19,35 +17,19 @@ use function is_array;
 use function is_string;
 use const JSON_THROW_ON_ERROR;
 
-/**
- * @deprecated since 4.8.0 and will be removed in 5.0.0. Please use the Symfony serializer instead
- */
 class PublicKeyCredentialLoader implements CanLogData
 {
     private LoggerInterface $logger;
 
     public function __construct(
-        private readonly null|AttestationObjectLoader $attestationObjectLoader,
-        private readonly null|SerializerInterface $serializer = null,
+        private readonly AttestationObjectLoader $attestationObjectLoader
     ) {
-        if ($this->attestationObjectLoader === null && $this->serializer === null) {
-            throw new InvalidArgumentException('You must provide an attestation object loader or a serializer');
-        }
-        if ($this->attestationObjectLoader !== null) {
-            trigger_deprecation(
-                'web-auth/metadata-service',
-                '4.8.0',
-                'The argument "$attestationObjectLoader" is deprecated since 4.8.0 and will be removed in 5.0.0. Please set null instead and inject a serializer as second argument.'
-            );
-        }
         $this->logger = new NullLogger();
     }
 
-    public static function create(
-        null|AttestationObjectLoader $attestationObjectLoader,
-        null|SerializerInterface $serializer = null
-    ): self {
-        return new self($attestationObjectLoader, $serializer);
+    public static function create(AttestationObjectLoader $attestationObjectLoader): self
+    {
+        return new self($attestationObjectLoader);
     }
 
     public function setLogger(LoggerInterface $logger): void
@@ -57,8 +39,6 @@ class PublicKeyCredentialLoader implements CanLogData
 
     /**
      * @param mixed[] $json
-     * @deprecated since 4.8.0 and will be removed in 5.0.0. Please use {self::load} instead
-     * @infection-ignore-all
      */
     public function loadArray(array $json): PublicKeyCredential
     {
@@ -119,9 +99,6 @@ class PublicKeyCredentialLoader implements CanLogData
             'data' => $data,
         ]);
         try {
-            if ($this->serializer !== null) {
-                return $this->serializer->deserialize($data, PublicKeyCredential::class, 'json');
-            }
             $json = json_decode($data, true, flags: JSON_THROW_ON_ERROR);
 
             return $this->loadArray($json);
@@ -157,11 +134,12 @@ class PublicKeyCredentialLoader implements CanLogData
             $response,
             'Invalid data. The parameter "transports" is invalid'
         );
-        if ($this->serializer !== null) {
-            return $this->serializer->deserialize($response, AuthenticatorResponse::class, 'json');
-        }
         switch (true) {
-            case ! array_key_exists('authenticatorData', $response) && ! array_key_exists('signature', $response):
+            case array_key_exists('attestationObject', $response):
+                is_string($response['attestationObject']) || throw InvalidDataException::create(
+                    $response,
+                    'Invalid data. The parameter "attestationObject" is invalid'
+                );
                 $attestationObject = $this->attestationObjectLoader->load($response['attestationObject']);
 
                 return AuthenticatorAttestationResponse::create(CollectedClientData::createFormJson(

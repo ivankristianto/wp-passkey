@@ -12,10 +12,10 @@ use Webauthn\PublicKeyCredentialSource;
 class AuthenticatorAttestationResponseValidationSucceededEvent
 {
     public function __construct(
-        public readonly AuthenticatorAttestationResponse $authenticatorAttestationResponse,
-        public readonly PublicKeyCredentialCreationOptions $publicKeyCredentialCreationOptions,
+        private readonly AuthenticatorAttestationResponse $authenticatorAttestationResponse,
+        private readonly PublicKeyCredentialCreationOptions $publicKeyCredentialCreationOptions,
         public readonly ServerRequestInterface|string $host,
-        public readonly PublicKeyCredentialSource $publicKeyCredentialSource
+        private readonly PublicKeyCredentialSource $publicKeyCredentialSource
     ) {
         if ($host instanceof ServerRequestInterface) {
             trigger_deprecation(
@@ -30,17 +30,11 @@ class AuthenticatorAttestationResponseValidationSucceededEvent
         }
     }
 
-    /**
-     * @deprecated since 4.8.0. Will be removed in 5.0.0. Please use the property instead.
-     */
     public function getAuthenticatorAttestationResponse(): AuthenticatorAttestationResponse
     {
         return $this->authenticatorAttestationResponse;
     }
 
-    /**
-     * @deprecated since 4.8.0. Will be removed in 5.0.0. Please use the property instead.
-     */
     public function getPublicKeyCredentialCreationOptions(): PublicKeyCredentialCreationOptions
     {
         return $this->publicKeyCredentialCreationOptions;
@@ -48,16 +42,12 @@ class AuthenticatorAttestationResponseValidationSucceededEvent
 
     /**
      * @deprecated since 4.5.0 and will be removed in 5.0.0. Please use the `host` property instead
-     * @infection-ignore-all
      */
     public function getRequest(): ServerRequestInterface|string
     {
         return $this->host;
     }
 
-    /**
-     * @deprecated since 4.8.0. Will be removed in 5.0.0. Please use the property instead.
-     */
     public function getPublicKeyCredentialSource(): PublicKeyCredentialSource
     {
         return $this->publicKeyCredentialSource;

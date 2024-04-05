@@ -21,8 +21,10 @@ class ExtensionOutputCheckerHandler
         $this->checkers[] = $checker;
     }
 
-    public function check(AuthenticationExtensions $inputs, AuthenticationExtensions $outputs): void
-    {
+    public function check(
+        AuthenticationExtensionsClientInputs $inputs,
+        AuthenticationExtensionsClientOutputs $outputs
+    ): void {
         foreach ($this->checkers as $checker) {
             $checker->check($inputs, $outputs);
         }

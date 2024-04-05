@@ -4,7 +4,7 @@ Requires at least: 6.1
 Tags: authentication, biometric, passwordless, passkey, security
 Tested up to: 6.4
 Requires PHP: 8.1
-Stable tag: 0.3.5
+Stable tag: 0.3.6
 License: GPLv2 or later
 
 Provides biometric authentication for WordPress

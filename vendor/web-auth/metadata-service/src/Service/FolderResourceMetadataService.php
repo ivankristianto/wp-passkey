@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Webauthn\MetadataService\Service;
 
 use InvalidArgumentException;
-use Symfony\Component\Serializer\SerializerInterface;
-use Webauthn\MetadataService\Denormalizer\MetadataStatementSerializerFactory;
 use Webauthn\MetadataService\Exception\MetadataStatementLoadingException;
 use Webauthn\MetadataService\Statement\MetadataStatement;
 use function file_get_contents;
@@ -16,23 +14,15 @@ use const DIRECTORY_SEPARATOR;
 
 final class FolderResourceMetadataService implements MetadataService
 {
-    private readonly ?SerializerInterface $serializer;
+    private readonly string $rootPath;
 
-    public function __construct(
-        private string $rootPath,
-        ?SerializerInterface $serializer = null,
-    ) {
-        $this->serializer = $serializer ?? MetadataStatementSerializerFactory::create();
+    public function __construct(string $rootPath)
+    {
         $this->rootPath = rtrim($rootPath, DIRECTORY_SEPARATOR);
         is_dir($this->rootPath) || throw new InvalidArgumentException('The given parameter is not a valid folder.');
         is_readable($this->rootPath) || throw new InvalidArgumentException(
             'The given parameter is not a valid folder.'
         );
-    }
-
-    public static function create(string $rootPath, ?SerializerInterface $serializer = null): self
-    {
-        return new self($rootPath, $serializer);
     }
 
     public function list(): iterable
@@ -63,12 +53,7 @@ final class FolderResourceMetadataService implements MetadataService
         ));
         $filename = $this->rootPath . DIRECTORY_SEPARATOR . $aaguid;
         $data = trim(file_get_contents($filename));
-        if ($this->serializer !== null) {
-            $mds = $this->serializer->deserialize($data, MetadataStatement::class, 'json');
-        } else {
-            $mds = MetadataStatement::createFromString($data);
-        }
-
+        $mds = MetadataStatement::createFromString($data);
         $mds->aaguid !== null || throw MetadataStatementLoadingException::create('Invalid Metadata Statement.');
 
         return $mds;

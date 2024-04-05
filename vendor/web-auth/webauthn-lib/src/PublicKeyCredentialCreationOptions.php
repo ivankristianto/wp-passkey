@@ -6,7 +6,6 @@ namespace Webauthn;
 
 use InvalidArgumentException;
 use ParagonIE\ConstantTime\Base64UrlSafe;
-use Webauthn\AuthenticationExtensions\AuthenticationExtensions;
 use Webauthn\AuthenticationExtensions\AuthenticationExtensionsClientInputs;
 use Webauthn\Exception\InvalidDataException;
 use Webauthn\Util\Base64;
@@ -40,18 +39,22 @@ final class PublicKeyCredentialCreationOptions extends PublicKeyCredentialOption
      * @private
      * @param PublicKeyCredentialParameters[] $pubKeyCredParams
      * @param PublicKeyCredentialDescriptor[] $excludeCredentials
-     * @param null|positive-int $timeout
+     * @param positive-int $timeout
      */
     public function __construct(
         public readonly PublicKeyCredentialRpEntity $rp,
         public readonly PublicKeyCredentialUserEntity $user,
         string $challenge,
+        /** @readonly  */
         public array $pubKeyCredParams = [],
+        /** @readonly  */
         public null|AuthenticatorSelectionCriteria $authenticatorSelection = null,
+        /** @readonly  */
         public null|string $attestation = null,
+        /** @readonly  */
         public array $excludeCredentials = [],
         null|int $timeout = null,
-        null|AuthenticationExtensions $extensions = null,
+        null|AuthenticationExtensionsClientInputs $extensions = null,
     ) {
         foreach ($pubKeyCredParams as $pubKeyCredParam) {
             $pubKeyCredParam instanceof PublicKeyCredentialParameters || throw new InvalidArgumentException(
@@ -74,18 +77,21 @@ final class PublicKeyCredentialCreationOptions extends PublicKeyCredentialOption
     /**
      * @param PublicKeyCredentialParameters[] $pubKeyCredParams
      * @param PublicKeyCredentialDescriptor[] $excludeCredentials
-     * @param null|positive-int $timeout
+     * @param positive-int $timeout
      */
     public static function create(
         PublicKeyCredentialRpEntity $rp,
         PublicKeyCredentialUserEntity $user,
         string $challenge,
         array $pubKeyCredParams = [],
+        /** @readonly  */
         null|AuthenticatorSelectionCriteria $authenticatorSelection = null,
+        /** @readonly  */
         null|string $attestation = null,
+        /** @readonly  */
         array $excludeCredentials = [],
         null|int $timeout = null,
-        null|AuthenticationExtensions $extensions = null,
+        null|AuthenticationExtensionsClientInputs $extensions = null,
     ): self {
         return new self(
             $rp,
@@ -102,7 +108,6 @@ final class PublicKeyCredentialCreationOptions extends PublicKeyCredentialOption
 
     /**
      * @deprecated since 4.7.0. Please use the {self::create} instead.
-     * @infection-ignore-all
      */
     public function addPubKeyCredParam(PublicKeyCredentialParameters $pubKeyCredParam): self
     {
@@ -113,7 +118,6 @@ final class PublicKeyCredentialCreationOptions extends PublicKeyCredentialOption
 
     /**
      * @deprecated since 4.7.0. No replacement. Please use the {self::create} instead.
-     * @infection-ignore-all
      */
     public function addPubKeyCredParams(PublicKeyCredentialParameters ...$pubKeyCredParams): self
     {
@@ -126,7 +130,6 @@ final class PublicKeyCredentialCreationOptions extends PublicKeyCredentialOption
 
     /**
      * @deprecated since 4.7.0. Please use the {self::create} instead.
-     * @infection-ignore-all
      */
     public function excludeCredential(PublicKeyCredentialDescriptor $excludeCredential): self
     {
@@ -137,7 +140,6 @@ final class PublicKeyCredentialCreationOptions extends PublicKeyCredentialOption
 
     /**
      * @deprecated since 4.7.0. No replacement. Please use the {self::create} instead.
-     * @infection-ignore-all
      */
     public function excludeCredentials(PublicKeyCredentialDescriptor ...$excludeCredentials): self
     {
@@ -150,7 +152,6 @@ final class PublicKeyCredentialCreationOptions extends PublicKeyCredentialOption
 
     /**
      * @deprecated since 4.7.0. Please use the {self::create} instead.
-     * @infection-ignore-all
      */
     public function setAuthenticatorSelection(?AuthenticatorSelectionCriteria $authenticatorSelection): self
     {
@@ -161,7 +162,6 @@ final class PublicKeyCredentialCreationOptions extends PublicKeyCredentialOption
 
     /**
      * @deprecated since 4.7.0. Please use the {self::create} instead.
-     * @infection-ignore-all
      */
     public function setAttestation(string $attestation): self
     {
@@ -176,7 +176,6 @@ final class PublicKeyCredentialCreationOptions extends PublicKeyCredentialOption
 
     /**
      * @deprecated since 4.7.0. Please use the property directly.
-     * @infection-ignore-all
      */
     public function getRp(): PublicKeyCredentialRpEntity
     {
@@ -185,7 +184,6 @@ final class PublicKeyCredentialCreationOptions extends PublicKeyCredentialOption
 
     /**
      * @deprecated since 4.7.0. Please use the property directly.
-     * @infection-ignore-all
      */
     public function getUser(): PublicKeyCredentialUserEntity
     {
@@ -195,7 +193,6 @@ final class PublicKeyCredentialCreationOptions extends PublicKeyCredentialOption
     /**
      * @return PublicKeyCredentialParameters[]
      * @deprecated since 4.7.0. Please use the property directly.
-     * @infection-ignore-all
      */
     public function getPubKeyCredParams(): array
     {
@@ -205,7 +202,6 @@ final class PublicKeyCredentialCreationOptions extends PublicKeyCredentialOption
     /**
      * @return PublicKeyCredentialDescriptor[]
      * @deprecated since 4.7.0. Please use the property directly.
-     * @infection-ignore-all
      */
     public function getExcludeCredentials(): array
     {
@@ -214,7 +210,6 @@ final class PublicKeyCredentialCreationOptions extends PublicKeyCredentialOption
 
     /**
      * @deprecated since 4.7.0. Please use the property directly.
-     * @infection-ignore-all
      */
     public function getAuthenticatorSelection(): ?AuthenticatorSelectionCriteria
     {
@@ -223,17 +218,12 @@ final class PublicKeyCredentialCreationOptions extends PublicKeyCredentialOption
 
     /**
      * @deprecated since 4.7.0. Please use the property directly.
-     * @infection-ignore-all
      */
     public function getAttestation(): ?string
     {
         return $this->attestation;
     }
 
-    /**
-     * @deprecated since 4.8.0. Please use {Webauthn\Denormalizer\WebauthnSerializerFactory} for converting the object.
-     * @infection-ignore-all
-     */
     public static function createFromString(string $data): static
     {
         $data = json_decode($data, true, flags: JSON_THROW_ON_ERROR);
@@ -241,10 +231,6 @@ final class PublicKeyCredentialCreationOptions extends PublicKeyCredentialOption
         return self::createFromArray($data);
     }
 
-    /**
-     * @deprecated since 4.8.0. Please use {Webauthn\Denormalizer\WebauthnSerializerFactory} for converting the object.
-     * @infection-ignore-all
-     */
     public static function createFromArray(array $json): static
     {
         array_key_exists('rp', $json) || throw InvalidDataException::create($json, 'Invalid input. "rp" is missing.');

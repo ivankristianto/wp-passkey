@@ -9,13 +9,13 @@
  *
  * Plugin Name:  Biometric Authentication
  * Description:  Provides biometric authentication for WordPress
- * Version:      0.3.1
+ * Version:      0.3.6
  * Author:       Ivan Kristianto
  * Author URI:   https://github.com/ivankristianto/
  * Plugin URI:   https://github.com/ivankristianto/wp-passkey/
  * Text Domain:  biometric-authentication
  * Requires PHP: 8.1
- * Tested up to: 6.4
+ * Tested up to: 6.5
  * License:      GPLv2 or later
  *
  * This program is free software; you can redistribute it and/or modify

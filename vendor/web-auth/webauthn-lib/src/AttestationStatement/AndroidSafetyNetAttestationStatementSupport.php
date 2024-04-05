@@ -20,7 +20,6 @@ use Jose\Component\Signature\Algorithm\RS512;
 use Jose\Component\Signature\JWS;
 use Jose\Component\Signature\JWSVerifier;
 use Jose\Component\Signature\Serializer\CompactSerializer;
-use Psr\Clock\ClockInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
@@ -61,19 +60,16 @@ final class AndroidSafetyNetAttestationStatementSupport implements AttestationSt
 
     private EventDispatcherInterface $dispatcher;
 
-    public function __construct(
-        private readonly null|ClockInterface $clock = null
-    ) {
-        if ($this->clock === null) {
-            trigger_deprecation(
-                'web-auth/webauthn-lib',
-                '4.8.0',
-                'The parameter "$clock" will be required in 5.0.0. Please set a clock instance.'
+    public function __construct()
+    {
+        if (! class_exists(RS256::class)) {
+            throw UnsupportedFeatureException::create(
+                'The algorithm RS256 is missing. Did you forget to install the package web-token/jwt-signature-algorithm-rsa?'
             );
         }
-        if (! class_exists(RS256::class) || ! class_exists(JWKFactory::class)) {
+        if (! class_exists(JWKFactory::class)) {
             throw UnsupportedFeatureException::create(
-                'The algorithm RS256 is missing. Did you forget to install the package web-token/jwt-library?'
+                'The class Jose\Component\KeyManagement\JWKFactory is missing. Did you forget to install the package web-token/jwt-key-mgmt?'
             );
         }
         $this->jwsSerializer = new CompactSerializer();
@@ -86,9 +82,9 @@ final class AndroidSafetyNetAttestationStatementSupport implements AttestationSt
         $this->dispatcher = $eventDispatcher;
     }
 
-    public static function create(null|ClockInterface $clock = null): self
+    public static function create(): self
     {
-        return new self($clock);
+        return new self();
     }
 
     public function enableApiVerification(
@@ -135,7 +131,8 @@ final class AndroidSafetyNetAttestationStatementSupport implements AttestationSt
     public function load(array $attestation): AttestationStatement
     {
         array_key_exists('attStmt', $attestation) || throw AttestationStatementLoadingException::create(
-            $attestation
+            $attestation,
+            'Invalid attestation object'
         );
         foreach (['ver', 'response'] as $key) {
             array_key_exists($key, $attestation['attStmt']) || throw AttestationStatementLoadingException::create(
@@ -247,8 +244,7 @@ final class AndroidSafetyNetAttestationStatementSupport implements AttestationSt
         is_int($payload['timestampMs']) || throw AttestationStatementVerificationException::create(
             'Invalid attestation object. Timestamp shall be an integer.'
         );
-
-        $currentTime = ($this->clock?->now()->getTimestamp() ?? time()) * 1000;
+        $currentTime = time() * 1000;
         $payload['timestampMs'] <= $currentTime + $this->leeway || throw AttestationStatementVerificationException::create(
             sprintf(
                 'Invalid attestation object. Issued in the future. Current time: %d. Response time: %d',

@@ -6,7 +6,7 @@ namespace Webauthn\Exception;
 
 use Throwable;
 
-class AuthenticatorResponseVerificationException extends WebauthnException
+final class AuthenticatorResponseVerificationException extends WebauthnException
 {
     public static function create(string $message, ?Throwable $previous = null): self
     {

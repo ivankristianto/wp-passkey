@@ -10,7 +10,7 @@ use Webauthn\Exception\AuthenticationExtensionException;
 
 abstract class AuthenticationExtensionsClientOutputsLoader
 {
-    public static function load(CBORObject $object): AuthenticationExtensions
+    public static function load(CBORObject $object): AuthenticationExtensionsClientOutputs
     {
         $object instanceof MapObject || throw AuthenticationExtensionException::create('Invalid extension object');
         $data = $object->normalize();

@@ -18,7 +18,6 @@ use const JSON_THROW_ON_ERROR;
 /**
  * @implements IteratorAggregate<PublicKeyCredentialDescriptor>
  * @deprecated since 4.8.0 and will be removed in 5.0.0.
- * @infection-ignore-all
  */
 class PublicKeyCredentialDescriptorCollection implements JsonSerializable, Countable, IteratorAggregate
 {
@@ -54,7 +53,6 @@ class PublicKeyCredentialDescriptorCollection implements JsonSerializable, Count
 
     /**
      * @deprecated since 4.7.0. Please use the {self::create} instead.
-     * @infection-ignore-all
      */
     public function add(PublicKeyCredentialDescriptor ...$publicKeyCredentialDescriptors): void
     {
@@ -65,7 +63,6 @@ class PublicKeyCredentialDescriptorCollection implements JsonSerializable, Count
 
     /**
      * @deprecated since 4.7.0. Please use the property directly.
-     * @infection-ignore-all
      */
     public function has(string $id): bool
     {
@@ -74,7 +71,6 @@ class PublicKeyCredentialDescriptorCollection implements JsonSerializable, Count
 
     /**
      * @deprecated since 4.7.0. No replacement.
-     * @infection-ignore-all
      */
     public function remove(string $id): void
     {
@@ -106,10 +102,6 @@ class PublicKeyCredentialDescriptorCollection implements JsonSerializable, Count
         return $this->publicKeyCredentialDescriptors;
     }
 
-    /**
-     * @deprecated since 4.8.0. Please use {Webauthn\Denormalizer\WebauthnSerializerFactory} for converting the object.
-     * @infection-ignore-all
-     */
     public static function createFromString(string $data): self
     {
         $data = json_decode($data, true, flags: JSON_THROW_ON_ERROR);
@@ -119,8 +111,6 @@ class PublicKeyCredentialDescriptorCollection implements JsonSerializable, Count
 
     /**
      * @param mixed[] $json
-     * @deprecated since 4.8.0. Please use {Webauthn\Denormalizer\WebauthnSerializerFactory} for converting the object.
-     * @infection-ignore-all
      */
     public static function createFromArray(array $json): self
     {

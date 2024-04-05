@@ -7,17 +7,14 @@ namespace Webauthn\MetadataService\Statement;
 use JsonSerializable;
 use ParagonIE\ConstantTime\Base64UrlSafe;
 use Webauthn\MetadataService\Exception\MetadataStatementLoadingException;
-use Webauthn\MetadataService\ValueFilter;
+use Webauthn\MetadataService\Utils;
 use function array_key_exists;
 
 /**
  * @deprecated since 4.2.0 and will be removed in 5.0.0. The ECDAA Trust Anchor does no longer exist in Webauthn specification.
- * @infection-ignore-all
  */
 class EcdaaTrustAnchor implements JsonSerializable
 {
-    use ValueFilter;
-
     public function __construct(
         private readonly string $X,
         private readonly string $Y,
@@ -60,11 +57,10 @@ class EcdaaTrustAnchor implements JsonSerializable
 
     /**
      * @param array<string, mixed> $data
-     * @deprecated since 4.7.0. Please use the symfony/serializer for converting the object.
      */
     public static function createFromArray(array $data): self
     {
-        $data = self::filterNullValues($data);
+        $data = Utils::filterNullValues($data);
         foreach (['X', 'Y', 'c', 'sx', 'sy', 'G1Curve'] as $key) {
             array_key_exists($key, $data) || throw MetadataStatementLoadingException::create(sprintf(
                 'Invalid data. The key "%s" is missing',
@@ -96,6 +92,6 @@ class EcdaaTrustAnchor implements JsonSerializable
             'G1Curve' => $this->G1Curve,
         ];
 
-        return self::filterNullValues($data);
+        return Utils::filterNullValues($data);
     }
 }

@@ -17,16 +17,15 @@ class AuthenticatorGetInfo implements JsonSerializable
     }
 
     /**
-     * @param array<string|int, mixed> $info
+     * @param array<string|int, mixed> $data
      */
-    public static function create(array $info = []): self
+    public static function create(array $data = []): self
     {
-        return new self($info);
+        return new self($data);
     }
 
     /**
-     * @deprecated since 4.7.0. Please use the constructor directly.
-     * @infection-ignore-all
+     * @deprecated since 4.7.0. Please use the property directly.
      */
     public function add(string|int $key, mixed $value): self
     {

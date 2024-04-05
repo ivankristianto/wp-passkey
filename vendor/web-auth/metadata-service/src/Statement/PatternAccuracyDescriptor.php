@@ -5,14 +5,12 @@ declare(strict_types=1);
 namespace Webauthn\MetadataService\Statement;
 
 use Webauthn\MetadataService\Exception\MetadataStatementLoadingException;
-use Webauthn\MetadataService\ValueFilter;
+use Webauthn\MetadataService\Utils;
 use function array_key_exists;
 use function is_int;
 
 class PatternAccuracyDescriptor extends AbstractDescriptor
 {
-    use ValueFilter;
-
     public function __construct(
         public readonly int $minComplexity,
         ?int $maxRetries = null,
@@ -31,7 +29,6 @@ class PatternAccuracyDescriptor extends AbstractDescriptor
 
     /**
      * @deprecated since 4.7.0. Please use the property directly.
-     * @infection-ignore-all
      */
     public function getMinComplexity(): int
     {
@@ -40,12 +37,10 @@ class PatternAccuracyDescriptor extends AbstractDescriptor
 
     /**
      * @param array<string, mixed> $data
-     * @deprecated since 4.7.0. Please use the symfony/serializer for converting the object.
-     * @infection-ignore-all
      */
     public static function createFromArray(array $data): self
     {
-        $data = self::filterNullValues($data);
+        $data = Utils::filterNullValues($data);
         array_key_exists('minComplexity', $data) || throw MetadataStatementLoadingException::create(
             'The key "minComplexity" is missing'
         );
@@ -71,6 +66,6 @@ class PatternAccuracyDescriptor extends AbstractDescriptor
             'blockSlowdown' => $this->blockSlowdown,
         ];
 
-        return self::filterNullValues($data);
+        return Utils::filterNullValues($data);
     }
 }

@@ -7,14 +7,14 @@ namespace Webauthn\MetadataService;
 /**
  * @internal
  */
-trait ValueFilter
+abstract class Utils
 {
     /**
      * @param array<mixed> $data
      *
      * @return array<mixed>
      */
-    private static function filterNullValues(array $data): array
+    public static function filterNullValues(array $data): array
     {
         return array_filter($data, static fn ($var): bool => $var !== null);
     }

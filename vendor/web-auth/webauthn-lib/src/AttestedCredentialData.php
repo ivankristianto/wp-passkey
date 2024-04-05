@@ -6,6 +6,7 @@ namespace Webauthn;
 
 use JsonSerializable;
 use ParagonIE\ConstantTime\Base64;
+use Symfony\Component\Uid\AbstractUid;
 use Symfony\Component\Uid\Uuid;
 use Webauthn\Exception\InvalidDataException;
 use function array_key_exists;
@@ -17,38 +18,38 @@ use function is_string;
 class AttestedCredentialData implements JsonSerializable
 {
     public function __construct(
-        public Uuid $aaguid,
+        public AbstractUid $aaguid,
         public readonly string $credentialId,
         public readonly ?string $credentialPublicKey
     ) {
     }
 
-    public static function create(Uuid $aaguid, string $credentialId, ?string $credentialPublicKey = null): self
-    {
+    public static function create(
+        AbstractUid $aaguid,
+        string $credentialId,
+        ?string $credentialPublicKey = null
+    ): self {
         return new self($aaguid, $credentialId, $credentialPublicKey);
     }
 
     /**
      * @deprecated since 4.7.0. Please use the property directly.
-     * @infection-ignore-all
      */
-    public function getAaguid(): Uuid
+    public function getAaguid(): AbstractUid
     {
         return $this->aaguid;
     }
 
     /**
      * @deprecated since 4.7.0. Please use the property directly.
-     * @infection-ignore-all
      */
-    public function setAaguid(Uuid $aaguid): void
+    public function setAaguid(AbstractUid $aaguid): void
     {
         $this->aaguid = $aaguid;
     }
 
     /**
      * @deprecated since 4.7.0. Please use the property directly.
-     * @infection-ignore-all
      */
     public function getCredentialId(): string
     {
@@ -57,7 +58,6 @@ class AttestedCredentialData implements JsonSerializable
 
     /**
      * @deprecated since 4.7.0. Please use the property directly.
-     * @infection-ignore-all
      */
     public function getCredentialPublicKey(): ?string
     {

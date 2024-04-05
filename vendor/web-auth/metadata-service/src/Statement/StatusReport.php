@@ -6,15 +6,13 @@ namespace Webauthn\MetadataService\Statement;
 
 use JsonSerializable;
 use Webauthn\MetadataService\Exception\MetadataStatementLoadingException;
-use Webauthn\MetadataService\ValueFilter;
+use Webauthn\MetadataService\Utils;
 use function array_key_exists;
 use function in_array;
 use function is_string;
 
 class StatusReport implements JsonSerializable
 {
-    use ValueFilter;
-
     /**
      * @see AuthenticatorStatus
      */
@@ -67,7 +65,6 @@ class StatusReport implements JsonSerializable
 
     /**
      * @deprecated since 4.7.0. Please use the property directly.
-     * @infection-ignore-all
      */
     public function getStatus(): string
     {
@@ -76,7 +73,6 @@ class StatusReport implements JsonSerializable
 
     /**
      * @deprecated since 4.7.0. Please use the property directly.
-     * @infection-ignore-all
      */
     public function getEffectiveDate(): ?string
     {
@@ -85,7 +81,6 @@ class StatusReport implements JsonSerializable
 
     /**
      * @deprecated since 4.7.0. Please use the property directly.
-     * @infection-ignore-all
      */
     public function getCertificate(): ?string
     {
@@ -94,7 +89,6 @@ class StatusReport implements JsonSerializable
 
     /**
      * @deprecated since 4.7.0. Please use the property directly.
-     * @infection-ignore-all
      */
     public function getUrl(): ?string
     {
@@ -103,7 +97,6 @@ class StatusReport implements JsonSerializable
 
     /**
      * @deprecated since 4.7.0. Please use the property directly.
-     * @infection-ignore-all
      */
     public function getCertificationDescriptor(): ?string
     {
@@ -112,7 +105,6 @@ class StatusReport implements JsonSerializable
 
     /**
      * @deprecated since 4.7.0. Please use the property directly.
-     * @infection-ignore-all
      */
     public function getCertificateNumber(): ?string
     {
@@ -121,7 +113,6 @@ class StatusReport implements JsonSerializable
 
     /**
      * @deprecated since 4.7.0. Please use the property directly.
-     * @infection-ignore-all
      */
     public function getCertificationPolicyVersion(): ?string
     {
@@ -130,7 +121,6 @@ class StatusReport implements JsonSerializable
 
     /**
      * @deprecated since 4.7.0. Please use the property directly.
-     * @infection-ignore-all
      */
     public function getCertificationRequirementsVersion(): ?string
     {
@@ -139,12 +129,10 @@ class StatusReport implements JsonSerializable
 
     /**
      * @param array<string, mixed> $data
-     * @deprecated since 4.7.0. Please use the symfony/serializer for converting the object.
-     * @infection-ignore-all
      */
     public static function createFromArray(array $data): self
     {
-        $data = self::filterNullValues($data);
+        $data = Utils::filterNullValues($data);
         array_key_exists('status', $data) || throw MetadataStatementLoadingException::create(
             'The key "status" is missing'
         );
@@ -194,6 +182,6 @@ class StatusReport implements JsonSerializable
             'certificationRequirementsVersion' => $this->certificationRequirementsVersion,
         ];
 
-        return self::filterNullValues($data);
+        return Utils::filterNullValues($data);
     }
 }

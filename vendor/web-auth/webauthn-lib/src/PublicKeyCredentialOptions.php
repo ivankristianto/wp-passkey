@@ -7,36 +7,29 @@ namespace Webauthn;
 use InvalidArgumentException;
 use JsonSerializable;
 use Webauthn\AuthenticationExtensions\AuthenticationExtension;
-use Webauthn\AuthenticationExtensions\AuthenticationExtensions;
 use Webauthn\AuthenticationExtensions\AuthenticationExtensionsClientInputs;
 
 abstract class PublicKeyCredentialOptions implements JsonSerializable
 {
-    public AuthenticationExtensions $extensions;
+    public AuthenticationExtensionsClientInputs $extensions;
 
     /**
      * @param positive-int|null $timeout
-     * @param null|AuthenticationExtensions|array<string|int, mixed|AuthenticationExtensions> $extensions
      * @protected
      */
     public function __construct(
         public readonly string $challenge,
+        /** @readonly  */
         public null|int $timeout = null,
-        null|array|AuthenticationExtensions $extensions = null,
+        /** @readonly  */
+        null|AuthenticationExtensionsClientInputs $extensions = null,
     ) {
         ($this->timeout === null || $this->timeout > 0) || throw new InvalidArgumentException('Invalid timeout');
-        if ($extensions === null) {
-            $this->extensions = AuthenticationExtensionsClientInputs::create();
-        } elseif ($extensions instanceof AuthenticationExtensions) {
-            $this->extensions = $extensions;
-        } else {
-            $this->extensions = AuthenticationExtensions::create($extensions);
-        }
+        $this->extensions = $extensions ?? AuthenticationExtensionsClientInputs::create();
     }
 
     /**
      * @deprecated since 4.7.0. Please use the {self::create} instead.
-     * @infection-ignore-all
      */
     public function setTimeout(?int $timeout): static
     {
@@ -47,7 +40,6 @@ abstract class PublicKeyCredentialOptions implements JsonSerializable
 
     /**
      * @deprecated since 4.7.0. Please use the {self::create} instead.
-     * @infection-ignore-all
      */
     public function addExtension(AuthenticationExtension $extension): static
     {
@@ -59,7 +51,6 @@ abstract class PublicKeyCredentialOptions implements JsonSerializable
     /**
      * @param AuthenticationExtension[] $extensions
      * @deprecated since 4.7.0. No replacement. Please use the {self::create} instead.
-     * @infection-ignore-all
      */
     public function addExtensions(array $extensions): static
     {
@@ -72,9 +63,8 @@ abstract class PublicKeyCredentialOptions implements JsonSerializable
 
     /**
      * @deprecated since 4.7.0. Please use the {self::create} instead.
-     * @infection-ignore-all
      */
-    public function setExtensions(AuthenticationExtensions $extensions): static
+    public function setExtensions(AuthenticationExtensionsClientInputs $extensions): static
     {
         $this->extensions = $extensions;
 
@@ -83,7 +73,6 @@ abstract class PublicKeyCredentialOptions implements JsonSerializable
 
     /**
      * @deprecated since 4.7.0. Please use the property directly.
-     * @infection-ignore-all
      */
     public function getChallenge(): string
     {
@@ -92,7 +81,6 @@ abstract class PublicKeyCredentialOptions implements JsonSerializable
 
     /**
      * @deprecated since 4.7.0. Please use the property directly.
-     * @infection-ignore-all
      */
     public function getTimeout(): ?int
     {
@@ -101,23 +89,16 @@ abstract class PublicKeyCredentialOptions implements JsonSerializable
 
     /**
      * @deprecated since 4.7.0. Please use the property directly.
-     * @infection-ignore-all
      */
-    public function getExtensions(): AuthenticationExtensions
+    public function getExtensions(): AuthenticationExtensionsClientInputs
     {
         return $this->extensions;
     }
 
-    /**
-     * @deprecated since 4.8.0. Please use {Webauthn\Denormalizer\WebauthnSerializerFactory} for converting the object.
-     * @infection-ignore-all
-     */
     abstract public static function createFromString(string $data): static;
 
     /**
      * @param mixed[] $json
-     * @deprecated since 4.8.0. Please use {Webauthn\Denormalizer\WebauthnSerializerFactory} for converting the object.
-     * @infection-ignore-all
      */
     abstract public static function createFromArray(array $json): static;
 }

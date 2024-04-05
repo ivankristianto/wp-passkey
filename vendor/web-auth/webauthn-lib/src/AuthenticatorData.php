@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Webauthn;
 
-use Webauthn\AuthenticationExtensions\AuthenticationExtensions;
+use Webauthn\AuthenticationExtensions\AuthenticationExtensionsClientOutputs;
 use function ord;
 
 /**
@@ -37,8 +37,8 @@ class AuthenticatorData
         public readonly string $rpIdHash,
         public readonly string $flags,
         public readonly int $signCount,
-        public readonly null|AttestedCredentialData $attestedCredentialData,
-        public readonly null|AuthenticationExtensions $extensions
+        public readonly ?AttestedCredentialData $attestedCredentialData,
+        public readonly ?AuthenticationExtensionsClientOutputs $extensions
     ) {
     }
 
@@ -47,15 +47,14 @@ class AuthenticatorData
         string $rpIdHash,
         string $flags,
         int $signCount,
-        null|AttestedCredentialData $attestedCredentialData = null,
-        null|AuthenticationExtensions $extensions = null
+        ?AttestedCredentialData $attestedCredentialData = null,
+        ?AuthenticationExtensionsClientOutputs $extensions = null
     ): self {
         return new self($authData, $rpIdHash, $flags, $signCount, $attestedCredentialData, $extensions);
     }
 
     /**
      * @deprecated since 4.7.0. Please use the property directly.
-     * @infection-ignore-all
      */
     public function getAuthData(): string
     {
@@ -64,7 +63,6 @@ class AuthenticatorData
 
     /**
      * @deprecated since 4.7.0. Please use the property directly.
-     * @infection-ignore-all
      */
     public function getRpIdHash(): string
     {
@@ -113,7 +111,6 @@ class AuthenticatorData
 
     /**
      * @deprecated since 4.7.0. Please use the property directly.
-     * @infection-ignore-all
      */
     public function getSignCount(): int
     {
@@ -122,7 +119,6 @@ class AuthenticatorData
 
     /**
      * @deprecated since 4.7.0. Please use the property directly.
-     * @infection-ignore-all
      */
     public function getAttestedCredentialData(): ?AttestedCredentialData
     {
@@ -131,9 +127,8 @@ class AuthenticatorData
 
     /**
      * @deprecated since 4.7.0. Please use the property directly.
-     * @infection-ignore-all
      */
-    public function getExtensions(): ?AuthenticationExtensions
+    public function getExtensions(): ?AuthenticationExtensionsClientOutputs
     {
         return $this->extensions !== null && $this->hasExtensions() ? $this->extensions : null;
     }

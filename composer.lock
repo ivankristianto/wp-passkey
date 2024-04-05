@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4f37f8191c122e8219cd40dba175487f",
+    "content-hash": "a68e6b7db1751c5c3b51bedc7e795faa",
     "packages": [
         {
             "name": "brick/math",
@@ -292,12 +292,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-fig/event-dispatcher.git",
-                "reference": "977ffcf551e3bfb73d90aac3e8e1583fd8d2f89a"
+                "reference": "bbd9eacc080d33861e5b5c75b3b8c4d7e6d01874"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-fig/event-dispatcher/zipball/977ffcf551e3bfb73d90aac3e8e1583fd8d2f89a",
-                "reference": "977ffcf551e3bfb73d90aac3e8e1583fd8d2f89a",
+                "url": "https://api.github.com/repos/php-fig/event-dispatcher/zipball/bbd9eacc080d33861e5b5c75b3b8c4d7e6d01874",
+                "reference": "bbd9eacc080d33861e5b5c75b3b8c4d7e6d01874",
                 "shasum": ""
             },
             "require": {
@@ -337,7 +337,7 @@
             "support": {
                 "source": "https://github.com/php-fig/event-dispatcher"
             },
-            "time": "2023-09-22T11:10:57+00:00"
+            "time": "2024-03-17T21:29:03+00:00"
         },
         {
             "name": "psr/http-client",
@@ -639,16 +639,16 @@
         },
         {
             "name": "spomky-labs/pki-framework",
-            "version": "1.2.x-dev",
+            "version": "1.3.x-dev",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Spomky-Labs/pki-framework.git",
-                "reference": "ac80fe2e5c63c2965a456fa8278d319874452efe"
+                "reference": "2547e6827a2057fde2922a5059e7c2555810bb07"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Spomky-Labs/pki-framework/zipball/ac80fe2e5c63c2965a456fa8278d319874452efe",
-                "reference": "ac80fe2e5c63c2965a456fa8278d319874452efe",
+                "url": "https://api.github.com/repos/Spomky-Labs/pki-framework/zipball/2547e6827a2057fde2922a5059e7c2555810bb07",
+                "reference": "2547e6827a2057fde2922a5059e7c2555810bb07",
                 "shasum": ""
             },
             "require": {
@@ -660,7 +660,7 @@
                 "ekino/phpstan-banned-code": "^1.0",
                 "ext-gmp": "*",
                 "ext-openssl": "*",
-                "infection/infection": "^0.27",
+                "infection/infection": "^0.28",
                 "php-parallel-lint/php-parallel-lint": "^1.3",
                 "phpstan/extension-installer": "^1.3",
                 "phpstan/phpstan": "^1.8",
@@ -668,8 +668,8 @@
                 "phpstan/phpstan-deprecation-rules": "^1.0",
                 "phpstan/phpstan-phpunit": "^1.1",
                 "phpstan/phpstan-strict-rules": "^1.3",
-                "phpunit/phpunit": "^10.1",
-                "rector/rector": "^0.19",
+                "phpunit/phpunit": "^10.1|^11.0",
+                "rector/rector": "^1.0",
                 "roave/security-advisories": "dev-latest",
                 "symfony/phpunit-bridge": "^6.4|^7.0",
                 "symfony/string": "^6.4|^7.0",
@@ -735,7 +735,7 @@
             ],
             "support": {
                 "issues": "https://github.com/Spomky-Labs/pki-framework/issues",
-                "source": "https://github.com/Spomky-Labs/pki-framework/tree/1.2.x"
+                "source": "https://github.com/Spomky-Labs/pki-framework/tree/1.2.0"
             },
             "funding": [
                 {
@@ -747,7 +747,7 @@
                     "type": "patreon"
                 }
             ],
-            "time": "2024-02-05T20:43:10+00:00"
+            "time": "2024-03-30T16:53:25+00:00"
         },
         {
             "name": "symfony/deprecation-contracts",
@@ -977,12 +977,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/web-auth/cose-lib.git",
-                "reference": "e5c417b3b90e06c84638a18d350e438d760cb955"
+                "reference": "7a8552cb6764d17ec987db2991c26a7c90be0688"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/web-auth/cose-lib/zipball/e5c417b3b90e06c84638a18d350e438d760cb955",
-                "reference": "e5c417b3b90e06c84638a18d350e438d760cb955",
+                "url": "https://api.github.com/repos/web-auth/cose-lib/zipball/7a8552cb6764d17ec987db2991c26a7c90be0688",
+                "reference": "7a8552cb6764d17ec987db2991c26a7c90be0688",
                 "shasum": ""
             },
             "require": {
@@ -1041,7 +1041,7 @@
             ],
             "support": {
                 "issues": "https://github.com/web-auth/cose-lib/issues",
-                "source": "https://github.com/web-auth/cose-lib/tree/4.3.0"
+                "source": "https://github.com/web-auth/cose-lib/tree/4.4.x"
             },
             "funding": [
                 {
@@ -1053,20 +1053,20 @@
                     "type": "patreon"
                 }
             ],
-            "time": "2024-02-05T21:00:39+00:00"
+            "time": "2024-03-11T06:58:36+00:00"
         },
         {
             "name": "web-auth/metadata-service",
-            "version": "4.8.x-dev",
+            "version": "4.7.9",
             "source": {
                 "type": "git",
                 "url": "https://github.com/web-auth/webauthn-metadata-service.git",
-                "reference": "024df5fb26166adf388dea697d2826ae5a6001cf"
+                "reference": "1da1fc6d8055c75af4e46cde169d7b920b8af90a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/web-auth/webauthn-metadata-service/zipball/024df5fb26166adf388dea697d2826ae5a6001cf",
-                "reference": "024df5fb26166adf388dea697d2826ae5a6001cf",
+                "url": "https://api.github.com/repos/web-auth/webauthn-metadata-service/zipball/1da1fc6d8055c75af4e46cde169d7b920b8af90a",
+                "reference": "1da1fc6d8055c75af4e46cde169d7b920b8af90a",
                 "shasum": ""
             },
             "require": {
@@ -1083,13 +1083,10 @@
                 "symfony/deprecation-contracts": "^3.2"
             },
             "suggest": {
-                "phpdocumentor/reflection-docblock": "As of 4.5.x, the phpdocumentor/reflection-docblock component will become mandatory for converting objects such as the Metadata Statement",
                 "psr/clock-implementation": "As of 4.5.x, the PSR Clock implementation will replace lcobucci/clock",
                 "psr/log-implementation": "Recommended to receive logs from the library",
-                "symfony/property-access": "As of 4.5.x, the symfony/serializer component will become mandatory for converting objects such as the Metadata Statement",
-                "symfony/property-info": "As of 4.5.x, the symfony/serializer component will become mandatory for converting objects such as the Metadata Statement",
-                "symfony/serializer": "As of 4.5.x, the symfony/serializer component will become mandatory for converting objects such as the Metadata Statement",
-                "web-token/jwt-library": "Mandatory for fetching Metadata Statement from distant sources"
+                "web-token/jwt-key-mgmt": "Mandatory for fetching Metadata Statement from distant sources",
+                "web-token/jwt-signature-algorithm-ecdsa": "Mandatory for fetching Metadata Statement from distant sources"
             },
             "type": "library",
             "extra": {
@@ -1125,7 +1122,7 @@
                 "webauthn"
             ],
             "support": {
-                "source": "https://github.com/web-auth/webauthn-metadata-service/tree/4.8.1"
+                "source": "https://github.com/web-auth/webauthn-metadata-service/tree/4.7.9"
             },
             "funding": [
                 {
@@ -1137,20 +1134,20 @@
                     "type": "patreon"
                 }
             ],
-            "time": "2024-02-26T07:58:15+00:00"
+            "time": "2023-10-07T13:59:48+00:00"
         },
         {
             "name": "web-auth/webauthn-lib",
-            "version": "4.8.x-dev",
+            "version": "4.7.9",
             "source": {
                 "type": "git",
                 "url": "https://github.com/web-auth/webauthn-lib.git",
-                "reference": "abac08104bbbbdef01ace704c90ff8290696e47f"
+                "reference": "03a652042d7b5e919e449954d729ced26ee3c3c2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/web-auth/webauthn-lib/zipball/abac08104bbbbdef01ace704c90ff8290696e47f",
-                "reference": "abac08104bbbbdef01ace704c90ff8290696e47f",
+                "url": "https://api.github.com/repos/web-auth/webauthn-lib/zipball/03a652042d7b5e919e449954d729ced26ee3c3c2",
+                "reference": "03a652042d7b5e919e449954d729ced26ee3c3c2",
                 "shasum": ""
             },
             "require": {
@@ -1169,13 +1166,12 @@
                 "web-auth/metadata-service": "self.version"
             },
             "suggest": {
-                "phpdocumentor/reflection-docblock": "As of 4.5.x, the phpdocumentor/reflection-docblock component will become mandatory for converting objects such as the Metadata Statement",
                 "psr/log-implementation": "Recommended to receive logs from the library",
                 "symfony/event-dispatcher": "Recommended to use dispatched events",
-                "symfony/property-access": "As of 4.5.x, the symfony/serializer component will become mandatory for converting objects such as the Metadata Statement",
-                "symfony/property-info": "As of 4.5.x, the symfony/serializer component will become mandatory for converting objects such as the Metadata Statement",
-                "symfony/serializer": "As of 4.5.x, the symfony/serializer component will become mandatory for converting objects such as the Metadata Statement",
-                "web-token/jwt-library": "Mandatory for the AndroidSafetyNet Attestation Statement support"
+                "web-token/jwt-key-mgmt": "Mandatory for the AndroidSafetyNet Attestation Statement support",
+                "web-token/jwt-signature-algorithm-ecdsa": "Recommended for the AndroidSafetyNet Attestation Statement support",
+                "web-token/jwt-signature-algorithm-eddsa": "Recommended for the AndroidSafetyNet Attestation Statement support",
+                "web-token/jwt-signature-algorithm-rsa": "Mandatory for the AndroidSafetyNet Attestation Statement support"
             },
             "type": "library",
             "extra": {
@@ -1211,7 +1207,7 @@
                 "webauthn"
             ],
             "support": {
-                "source": "https://github.com/web-auth/webauthn-lib/tree/4.8.x"
+                "source": "https://github.com/web-auth/webauthn-lib/tree/4.7.9"
             },
             "funding": [
                 {
@@ -1223,7 +1219,7 @@
                     "type": "patreon"
                 }
             ],
-            "time": "2024-02-26T19:17:26+00:00"
+            "time": "2024-02-05T17:20:58+00:00"
         }
     ],
     "packages-dev": [
@@ -1428,12 +1424,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/johnpbloch/wordpress-core.git",
-                "reference": "a2494883c710cc8560b31ea776c1981358843fb9"
+                "reference": "e29f3669c60bfc7ebf17955b50143157e7c31139"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/johnpbloch/wordpress-core/zipball/a2494883c710cc8560b31ea776c1981358843fb9",
-                "reference": "a2494883c710cc8560b31ea776c1981358843fb9",
+                "url": "https://api.github.com/repos/johnpbloch/wordpress-core/zipball/e29f3669c60bfc7ebf17955b50143157e7c31139",
+                "reference": "e29f3669c60bfc7ebf17955b50143157e7c31139",
                 "shasum": ""
             },
             "require": {
@@ -1469,7 +1465,7 @@
                 "source": "https://core.trac.wordpress.org/browser",
                 "wiki": "https://codex.wordpress.org/"
             },
-            "time": "2024-03-02T14:22:09+00:00"
+            "time": "2024-04-04T19:01:56+00:00"
         },
         {
             "name": "johnpbloch/wordpress-core-installer",
@@ -1592,12 +1588,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/phar-io/manifest.git",
-                "reference": "67729272c564ab9f953c81f48db44e8b1cb1e1c3"
+                "reference": "54750ef60c58e43759730615a392c31c80e23176"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phar-io/manifest/zipball/67729272c564ab9f953c81f48db44e8b1cb1e1c3",
-                "reference": "67729272c564ab9f953c81f48db44e8b1cb1e1c3",
+                "url": "https://api.github.com/repos/phar-io/manifest/zipball/54750ef60c58e43759730615a392c31c80e23176",
+                "reference": "54750ef60c58e43759730615a392c31c80e23176",
                 "shasum": ""
             },
             "require": {
@@ -1606,7 +1602,7 @@
                 "ext-phar": "*",
                 "ext-xmlwriter": "*",
                 "phar-io/version": "^3.0.1",
-                "php": "^7.3 || ^8.0"
+                "php": "^7.2 || ^8.0"
             },
             "default-branch": true,
             "type": "library",
@@ -1644,7 +1640,7 @@
             "description": "Component for reading phar.io manifest information from a PHP Archive (PHAR)",
             "support": {
                 "issues": "https://github.com/phar-io/manifest/issues",
-                "source": "https://github.com/phar-io/manifest/tree/master"
+                "source": "https://github.com/phar-io/manifest/tree/2.0.4"
             },
             "funding": [
                 {
@@ -1652,7 +1648,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-06-01T14:19:47+00:00"
+            "time": "2024-03-03T12:33:53+00:00"
         },
         {
             "name": "phar-io/version",
@@ -1758,12 +1754,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHPCSStandards/PHPCSExtra.git",
-                "reference": "71ce087b11b12bf1f1b6fff0bf9b911a2fcb494c"
+                "reference": "253d01850056b24a0bc2eeab1b18697a98960bc0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHPCSStandards/PHPCSExtra/zipball/71ce087b11b12bf1f1b6fff0bf9b911a2fcb494c",
-                "reference": "71ce087b11b12bf1f1b6fff0bf9b911a2fcb494c",
+                "url": "https://api.github.com/repos/PHPCSStandards/PHPCSExtra/zipball/253d01850056b24a0bc2eeab1b18697a98960bc0",
+                "reference": "253d01850056b24a0bc2eeab1b18697a98960bc0",
                 "shasum": ""
             },
             "require": {
@@ -1829,7 +1825,7 @@
                     "type": "open_collective"
                 }
             ],
-            "time": "2024-02-16T03:41:33+00:00"
+            "time": "2024-03-18T03:02:00+00:00"
         },
         {
             "name": "phpcsstandards/phpcsutils",
@@ -1837,12 +1833,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHPCSStandards/PHPCSUtils.git",
-                "reference": "1513597ce755d15ae803138b0a2d9319fe62367a"
+                "reference": "57f948b571cd8308a16da801706fe4a9cf60745c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHPCSStandards/PHPCSUtils/zipball/1513597ce755d15ae803138b0a2d9319fe62367a",
-                "reference": "1513597ce755d15ae803138b0a2d9319fe62367a",
+                "url": "https://api.github.com/repos/PHPCSStandards/PHPCSUtils/zipball/57f948b571cd8308a16da801706fe4a9cf60745c",
+                "reference": "57f948b571cd8308a16da801706fe4a9cf60745c",
                 "shasum": ""
             },
             "require": {
@@ -1918,7 +1914,7 @@
                     "type": "open_collective"
                 }
             ],
-            "time": "2024-02-26T09:55:55+00:00"
+            "time": "2024-04-04T02:16:25+00:00"
         },
         {
             "name": "phpstan/phpstan",
@@ -1926,12 +1922,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan.git",
-                "reference": "d9430ff06660959d9fd659b65acc2236e02cd850"
+                "reference": "df0007478b121e50404abab3393b2f38697672c6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/d9430ff06660959d9fd659b65acc2236e02cd850",
-                "reference": "d9430ff06660959d9fd659b65acc2236e02cd850",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/df0007478b121e50404abab3393b2f38697672c6",
+                "reference": "df0007478b121e50404abab3393b2f38697672c6",
                 "shasum": ""
             },
             "require": {
@@ -1975,13 +1971,9 @@
                 {
                     "url": "https://github.com/phpstan",
                     "type": "github"
-                },
-                {
-                    "url": "https://tidelift.com/funding/github/packagist/phpstan/phpstan",
-                    "type": "tidelift"
                 }
             ],
-            "time": "2024-03-01T14:22:19+00:00"
+            "time": "2024-04-04T12:49:45+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",
@@ -1989,12 +1981,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/php-code-coverage.git",
-                "reference": "40a4ed114a4aea5afd6df8d0f0c9cd3033097f66"
+                "reference": "24607cb75e65299f4a9388dc9341a2e30ee3a7c5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/40a4ed114a4aea5afd6df8d0f0c9cd3033097f66",
-                "reference": "40a4ed114a4aea5afd6df8d0f0c9cd3033097f66",
+                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/24607cb75e65299f4a9388dc9341a2e30ee3a7c5",
+                "reference": "24607cb75e65299f4a9388dc9341a2e30ee3a7c5",
                 "shasum": ""
             },
             "require": {
@@ -2046,7 +2038,7 @@
             ],
             "support": {
                 "issues": "https://github.com/sebastianbergmann/php-code-coverage/issues",
-                "source": "https://github.com/sebastianbergmann/php-code-coverage/tree/7.0.17"
+                "source": "https://github.com/sebastianbergmann/php-code-coverage/tree/7.0"
             },
             "funding": [
                 {
@@ -2054,7 +2046,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2024-03-02T06:09:37+00:00"
+            "time": "2024-03-22T05:13:28+00:00"
         },
         {
             "name": "phpunit/php-file-iterator",
@@ -2287,12 +2279,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "62022b6f8c552cd143eb0cac73c4d982c80e2ce0"
+                "reference": "4d829e0740db0cbcbcd39ec5656161b4326004a4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/62022b6f8c552cd143eb0cac73c4d982c80e2ce0",
-                "reference": "62022b6f8c552cd143eb0cac73c4d982c80e2ce0",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/4d829e0740db0cbcbcd39ec5656161b4326004a4",
+                "reference": "4d829e0740db0cbcbcd39ec5656161b4326004a4",
                 "shasum": ""
             },
             "require": {
@@ -2377,7 +2369,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-03-02T12:49:22+00:00"
+            "time": "2024-04-04T07:40:10+00:00"
         },
         {
             "name": "sebastian/code-unit-reverse-lookup",
@@ -3113,12 +3105,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHPCSStandards/PHP_CodeSniffer.git",
-                "reference": "19cb50e3761b738bf0132f8bbbc787c922f6b980"
+                "reference": "82ad715a370d9e0fbcfd428896f615d9ce3a17c5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHPCSStandards/PHP_CodeSniffer/zipball/19cb50e3761b738bf0132f8bbbc787c922f6b980",
-                "reference": "19cb50e3761b738bf0132f8bbbc787c922f6b980",
+                "url": "https://api.github.com/repos/PHPCSStandards/PHP_CodeSniffer/zipball/82ad715a370d9e0fbcfd428896f615d9ce3a17c5",
+                "reference": "82ad715a370d9e0fbcfd428896f615d9ce3a17c5",
                 "shasum": ""
             },
             "require": {
@@ -3186,7 +3178,7 @@
                     "type": "open_collective"
                 }
             ],
-            "time": "2024-03-01T16:30:37+00:00"
+            "time": "2024-04-03T01:56:19+00:00"
         },
         {
             "name": "symfony/polyfill-php73",
@@ -3267,16 +3259,16 @@
         },
         {
             "name": "szepeviktor/phpstan-wordpress",
-            "version": "v1.3.3",
+            "version": "v1.3.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/szepeviktor/phpstan-wordpress.git",
-                "reference": "f7ff091331bc00c5688fe4ce0c4d51d06fa61553"
+                "reference": "891d0767855a32c886a439efae090408cc1fa156"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/szepeviktor/phpstan-wordpress/zipball/f7ff091331bc00c5688fe4ce0c4d51d06fa61553",
-                "reference": "f7ff091331bc00c5688fe4ce0c4d51d06fa61553",
+                "url": "https://api.github.com/repos/szepeviktor/phpstan-wordpress/zipball/891d0767855a32c886a439efae090408cc1fa156",
+                "reference": "891d0767855a32c886a439efae090408cc1fa156",
                 "shasum": ""
             },
             "require": {
@@ -3323,22 +3315,22 @@
             ],
             "support": {
                 "issues": "https://github.com/szepeviktor/phpstan-wordpress/issues",
-                "source": "https://github.com/szepeviktor/phpstan-wordpress/tree/v1.3.3"
+                "source": "https://github.com/szepeviktor/phpstan-wordpress/tree/v1.3.4"
             },
-            "time": "2024-02-26T13:55:50+00:00"
+            "time": "2024-03-21T16:32:59+00:00"
         },
         {
             "name": "theseer/tokenizer",
-            "version": "1.2.2",
+            "version": "1.2.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/theseer/tokenizer.git",
-                "reference": "b2ad5003ca10d4ee50a12da31de12a5774ba6b96"
+                "reference": "737eda637ed5e28c3413cb1ebe8bb52cbf1ca7a2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/theseer/tokenizer/zipball/b2ad5003ca10d4ee50a12da31de12a5774ba6b96",
-                "reference": "b2ad5003ca10d4ee50a12da31de12a5774ba6b96",
+                "url": "https://api.github.com/repos/theseer/tokenizer/zipball/737eda637ed5e28c3413cb1ebe8bb52cbf1ca7a2",
+                "reference": "737eda637ed5e28c3413cb1ebe8bb52cbf1ca7a2",
                 "shasum": ""
             },
             "require": {
@@ -3367,7 +3359,7 @@
             "description": "A small library for converting tokenized PHP source code into XML and potentially other formats",
             "support": {
                 "issues": "https://github.com/theseer/tokenizer/issues",
-                "source": "https://github.com/theseer/tokenizer/tree/1.2.2"
+                "source": "https://github.com/theseer/tokenizer/tree/1.2.3"
             },
             "funding": [
                 {
@@ -3375,20 +3367,20 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-11-20T00:12:19+00:00"
+            "time": "2024-03-03T12:36:25+00:00"
         },
         {
             "name": "wp-coding-standards/wpcs",
-            "version": "3.0.1",
+            "version": "3.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/WordPress/WordPress-Coding-Standards.git",
-                "reference": "b4caf9689f1a0e4a4c632679a44e638c1c67aff1"
+                "reference": "9333efcbff231f10dfd9c56bb7b65818b4733ca7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/WordPress/WordPress-Coding-Standards/zipball/b4caf9689f1a0e4a4c632679a44e638c1c67aff1",
-                "reference": "b4caf9689f1a0e4a4c632679a44e638c1c67aff1",
+                "url": "https://api.github.com/repos/WordPress/WordPress-Coding-Standards/zipball/9333efcbff231f10dfd9c56bb7b65818b4733ca7",
+                "reference": "9333efcbff231f10dfd9c56bb7b65818b4733ca7",
                 "shasum": ""
             },
             "require": {
@@ -3397,16 +3389,16 @@
                 "ext-tokenizer": "*",
                 "ext-xmlreader": "*",
                 "php": ">=5.4",
-                "phpcsstandards/phpcsextra": "^1.1.0",
-                "phpcsstandards/phpcsutils": "^1.0.8",
-                "squizlabs/php_codesniffer": "^3.7.2"
+                "phpcsstandards/phpcsextra": "^1.2.1",
+                "phpcsstandards/phpcsutils": "^1.0.10",
+                "squizlabs/php_codesniffer": "^3.9.0"
             },
             "require-dev": {
                 "php-parallel-lint/php-console-highlighter": "^1.0.0",
                 "php-parallel-lint/php-parallel-lint": "^1.3.2",
                 "phpcompatibility/php-compatibility": "^9.0",
                 "phpcsstandards/phpcsdevtools": "^1.2.0",
-                "phpunit/phpunit": "^4.0 || ^5.0 || ^6.0 || ^7.0"
+                "phpunit/phpunit": "^4.0 || ^5.0 || ^6.0 || ^7.0 || ^8.0 || ^9.0"
             },
             "suggest": {
                 "ext-iconv": "For improved results",
@@ -3437,15 +3429,15 @@
             },
             "funding": [
                 {
-                    "url": "https://opencollective.com/thewpcc/contribute/wp-php-63406",
+                    "url": "https://opencollective.com/php_codesniffer",
                     "type": "custom"
                 }
             ],
-            "time": "2023-09-14T07:06:09+00:00"
+            "time": "2024-03-25T16:39:00+00:00"
         },
         {
             "name": "wp-phpunit/wp-phpunit",
-            "version": "5.9.8",
+            "version": "5.9.9",
             "source": {
                 "type": "git",
                 "url": "https://github.com/wp-phpunit/wp-phpunit.git",

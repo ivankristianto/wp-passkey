@@ -1,4 +1,4 @@
-# Biometric Authentication for WordPress
+# Biometric Authentication - Login with Passkey
 
 ## Introduction
 
@@ -10,7 +10,16 @@ Source and Read more about Passkeys: [Google Developers](https://developers.goog
 
 ## Description
 
-This plugin allows you to use passkeys to login to your WordPress site. You can create your passkey from your profile screen. Once you have created your passkey, you can use it to login to your WordPress site. You can still use your username and password to login to your site as fallback.
+Passkeys are a safer and easier alternative to passwords. Simply use your fingerprint or face ID to log in with ease.
+
+This innovative plugin introduces passkey login to your WordPress experience. No more struggling to remember complex passwords.
+Simply use your fingerprint, face ID, or a secure PIN to log in with ease. You can still use your username and password to login to your site as fallback.
+
+### Enhanced Security, Frictionless Access
+
+1. Effortless Login: Unlock the power of passkeys for a smooth and secure login experience.
+2. Superior Security: Passkeys offer enhanced protection against breaches compared to traditional passwords.
+3. Convenience at Your Fingertips: Enjoy the freedom of logging in with your biometrics or a secure PIN.
 
 ## Screenshots
 

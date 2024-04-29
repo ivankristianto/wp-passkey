@@ -1,9 +1,9 @@
 <?php return array(
     'root' => array(
         'name' => 'ivankristianto/biometric-authentication',
-        'pretty_version' => '0.3.6',
-        'version' => '0.3.6.0',
-        'reference' => '8c245a8bafd1af3f3d9e97bf4f2725651c136ca0',
+        'pretty_version' => '0.3.7',
+        'version' => '0.3.7.0',
+        'reference' => 'eeeb4f7942c780831fc6e82899a22a89035b551f',
         'type' => 'wordpress-plugin',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -20,9 +20,9 @@
             'dev_requirement' => false,
         ),
         'ivankristianto/biometric-authentication' => array(
-            'pretty_version' => '0.3.6',
-            'version' => '0.3.6.0',
-            'reference' => '8c245a8bafd1af3f3d9e97bf4f2725651c136ca0',
+            'pretty_version' => '0.3.7',
+            'version' => '0.3.7.0',
+            'reference' => 'eeeb4f7942c780831fc6e82899a22a89035b551f',
             'type' => 'wordpress-plugin',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

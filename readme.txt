@@ -7,7 +7,9 @@ Requires PHP: 8.1
 Stable tag: 0.3.6
 License: GPLv2 or later
 
-Passkeys are a safer and easier alternative to passwords. Simply use your fingerprint or face ID to log in with ease. No more struggling to remember complex passwords.
+Passkeys are a safer and easier alternative to passwords. Simply use your fingerprint or face ID to log in with ease.
+
+== Description ==
 
 This innovative plugin introduces passkey login to your WordPress experience. No more struggling to remember complex passwords.
 Simply use your fingerprint, face ID, or a secure PIN to log in with ease. You can still use your username and password to login to your site as fallback.

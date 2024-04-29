@@ -10,7 +10,7 @@ Source and Read more about Passkeys: [Google Developers](https://developers.goog
 
 ## Description
 
-Passkeys are a safer and easier alternative to passwords. Simply use your fingerprint or face ID to log in with ease. No more struggling to remember complex passwords.
+Passkeys are a safer and easier alternative to passwords. Simply use your fingerprint or face ID to log in with ease.
 
 This innovative plugin introduces passkey login to your WordPress experience. No more struggling to remember complex passwords.
 Simply use your fingerprint, face ID, or a secure PIN to log in with ease. You can still use your username and password to login to your site as fallback.

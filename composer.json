@@ -1,6 +1,6 @@
 {
   "name": "ivankristianto/biometric-authentication",
-  "description": "Provides biometric authentication for WordPress.",
+  "description": "Passkeys are a safer and easier alternative to passwords. Simply use your fingerprint or face ID to log in with ease.",
   "type": "wordpress-plugin",
   "license": "GPL-2.0+",
   "minimum-stability": "dev",

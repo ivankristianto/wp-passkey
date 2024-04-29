@@ -1,6 +1,6 @@
 <?php
 /**
- * Provides biometric authentication for WordPress
+ * Biometric Authentication - Login with Passkey
  *
  * @package   biometric-authentication
  * @author    Ivan Kristianto <ivan@ivankristianto.com>
@@ -8,7 +8,7 @@
  * @license   GPL v2 or later
  *
  * Plugin Name:  Biometric Authentication
- * Description:  Provides biometric authentication for WordPress
+ * Description:  Passkeys are a safer and easier alternative to passwords. Simply use your fingerprint or face ID to log in with ease. No more struggling to remember complex passwords.
  * Version:      0.3.6
  * Author:       Ivan Kristianto
  * Author URI:   https://github.com/ivankristianto/

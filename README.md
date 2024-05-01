@@ -131,6 +131,10 @@ If you would like to contribute to this plugin, please fork the repository and s
 
 ## Changelog
 
+### 0.3.8
+
+- Update plugin description
+
 ### 0.3.1
 
 - Update plugin name

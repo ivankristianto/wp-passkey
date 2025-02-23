@@ -1,0 +1,61 @@
+name: Coding Standards
+on:
+  push:
+    branches:
+      - 'main'
+  pull_request:
+    branches:
+      - '**'
+
+jobs:
+  build:
+    name: Coding Standards
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v1
+
+      - name: Install PHP
+        uses: shivammathur/setup-php@2.32.0
+        with:
+          php-version: '8.1'
+          coverage: none
+          tools: composer:v2
+
+      - name: Get Composer cache directory
+        id: composer-cache-dir
+        run: |
+          echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+      - name: Get npm cache directory
+        id: npm-cache-dir
+        run: |
+          echo "dir=$(npm config get cache)" >> $GITHUB_OUTPUT
+          echo "npm-version=$(npm -v)" >> $GITHUB_OUTPUT
+          echo "node-version=$(node -v)" >> $GITHUB_OUTPUT
+
+      - name: Cache PHP dependencies
+        id: composer-cache
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.composer-cache-dir.outputs.dir }}
+          key: ${{ runner.os }}-composer-8.1-${{ hashFiles('composer.lock') }}
+
+      - name: Cache Node dependencies
+        id: npm-cache
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.npm-cache-dir.outputs.dir }}
+          key: ${{ runner.os }}-npm-${{ steps.npm-cache-dir.outputs.node-version }}-${{ steps.npm-cache-dir.outputs.npm-version }}-${{ hashFiles('package-lock.json') }}
+
+      - name: Install PHP dependencies
+        run: |
+          composer install --prefer-dist --no-progress --no-suggest --no-interaction
+
+      - name: Install Node dependencies
+        run: npm ci --legacy-peer-deps
+
+      # Test the coding standards.
+      - name: Run the tests
+        run: |
+          npm run lint

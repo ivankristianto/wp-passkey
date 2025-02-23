@@ -8,7 +8,7 @@ declare( strict_types = 1 );
 namespace BioAuth\Login;
 
 use BioAuth;
-use Kucrut\Vite;
+use BioAuth\Helpers;
 
 /**
  * Connect namespace methods to hooks and filters.
@@ -29,13 +29,17 @@ function enqueue_scripts() {
 		return;
 	}
 
-	Vite\enqueue_asset(
-		trailingslashit( BioAuth\BASE_DIR ) . 'assets/dist',
-		'assets/src/js/login.js',
-		array(
-			'handle'       => 'wp-passkeys-login',
-			'dependencies' => array( 'wp-api-fetch', 'wp-dom-ready' ),
-			'in-footer'    => true,
-		)
+	// Enqueue runtime script for development.
+	Helpers\enqueue_runtime();
+
+	// Get the assets file detail.
+	$asset_file = require_once BioAuth\BASE_DIR . '/assets/dist/login.asset.php';
+
+	wp_enqueue_script(
+		'wp-passkeys-login',
+		trailingslashit( plugin_dir_url( BioAuth\BASE_FILE ) ) . 'assets/dist/login.js',
+		$asset_file['dependencies'],
+		$asset_file['version'],
+		true
 	);
 }

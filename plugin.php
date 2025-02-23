@@ -36,7 +36,8 @@ namespace BioAuth;
 /**
  * Shortcut constant to the path of this file.
  */
-const BASE_DIR = __DIR__;
+const BASE_DIR  = __DIR__;
+const BASE_FILE = __FILE__;
 
 if ( ! file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
 	return;
@@ -46,6 +47,7 @@ require_once __DIR__ . '/vendor/autoload.php';
 
 require_once __DIR__ . '/inc/class-source-repository.php';
 require_once __DIR__ . '/inc/class-webauthn-server.php';
+require_once __DIR__ . '/inc/helpers.php';
 require_once __DIR__ . '/inc/rest-api.php';
 require_once __DIR__ . '/inc/login.php';
 require_once __DIR__ . '/inc/user-profile.php';

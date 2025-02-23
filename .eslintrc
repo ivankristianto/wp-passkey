@@ -1,0 +1,23 @@
+{
+	"extends": [ "plugin:@wordpress/eslint-plugin/recommended", "prettier" ],
+	"parserOptions": {
+		"requireConfigFile": false
+	},
+	"rules": {
+		"comma-dangle": [ "error", "always-multiline" ],
+		"camelcase": "off",
+		"jsdoc/require-jsdoc": [
+			"error",
+			{
+				"require": {
+					"FunctionDeclaration": true
+				}
+			}
+		]
+	},
+	"settings": {
+		"jsdoc": {
+			"mode": "typescript"
+		}
+	}
+}

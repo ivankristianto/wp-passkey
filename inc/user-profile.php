@@ -8,7 +8,7 @@ declare( strict_types = 1 );
 namespace BioAuth\User_Profile;
 
 use BioAuth;
-use Kucrut\Vite;
+use BioAuth\Helpers;
 use ParagonIE\ConstantTime\Base64UrlSafe;
 use Webauthn\PublicKeyCredentialUserEntity;
 use BioAuth\Source_Repository;
@@ -40,14 +40,25 @@ function enqueue_scripts() {
 		return;
 	}
 
-	Vite\enqueue_asset(
-		trailingslashit( BioAuth\BASE_DIR ) . 'assets/dist',
-		'assets/src/js/user-profile.js',
-		array(
-			'handle'       => 'wp-passkeys-user-profile',
-			'dependencies' => array( 'wp-api-fetch', 'wp-dom-ready', 'wp-i18n' ),
-			'in-footer'    => true,
-		)
+	// Enqueue runtime script for development.
+	Helpers\enqueue_runtime();
+
+	// Get the assets file detail.
+	$asset_file = require_once BioAuth\BASE_DIR . '/assets/dist/user-profile.asset.php';
+
+	wp_enqueue_script(
+		'wp-passkeys-user-profile',
+		trailingslashit( plugin_dir_url( BioAuth\BASE_FILE ) ) . 'assets/dist/user-profile.js',
+		$asset_file['dependencies'],
+		$asset_file['version'],
+		true
+	);
+
+	wp_enqueue_style(
+		'wp-passkeys-user-profile',
+		trailingslashit( plugin_dir_url( BioAuth\BASE_FILE ) ) . 'assets/dist/user-profile.css',
+		array(),
+		$asset_file['version']
 	);
 }
 

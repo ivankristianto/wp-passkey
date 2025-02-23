@@ -68,6 +68,9 @@ jobs:
         run: |
           composer install --no-progress --no-suggest --no-interaction
 
+      - name: Install Node dependencies
+        run: npm ci --legacy-peer-deps
+
       - name: Run the tests
         if: ${{ toJSON( steps.paths.outputs.changes ) != '"[]"' }}
         run: |

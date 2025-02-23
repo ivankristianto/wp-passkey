@@ -1,4 +1,7 @@
-import { browserSupportsWebAuthn, browserSupportsWebAuthnAutofill, startAuthentication } from '@simplewebauthn/browser';
+import {
+	browserSupportsWebAuthn,
+	startAuthentication,
+} from '@simplewebauthn/browser';
 import apiFetch from '@wordpress/api-fetch';
 import domReady from '@wordpress/dom-ready';
 
@@ -82,7 +85,7 @@ domReady( async () => {
 		return;
 	}
 
-	loginButton.addEventListener( 'click', async event => {
+	loginButton.addEventListener( 'click', async ( event ) => {
 		event.preventDefault();
 
 		try {

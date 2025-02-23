@@ -17,6 +17,7 @@ use BioAuth\Helpers;
  */
 function bootstrap(): void {
 	add_action( 'login_enqueue_scripts', __NAMESPACE__ . '\\enqueue_scripts' );
+	add_action( 'login_form', __NAMESPACE__ . '\\output_passkey_buttons', 15 );
 }
 
 /**
@@ -41,5 +42,34 @@ function enqueue_scripts() {
 		$asset_file['dependencies'],
 		$asset_file['version'],
 		true
+	);
+
+	wp_enqueue_style(
+		'wp-passkeys-login',
+		trailingslashit( plugin_dir_url( BioAuth\BASE_FILE ) ) . 'assets/dist/login.css',
+		array(),
+		$asset_file['version']
+	);
+}
+
+/**
+ * Output Passkey Buttons.
+ *
+ * @return void
+ */
+function output_passkey_buttons() {
+	printf(
+		'<div class="wp-passkeys-options">
+			<div class="wp-passkeys-sep">%s</div>
+			<p class="wp-passkeys"><a class="button button-hero" id="login-via-passkeys">%s</a></p>
+		</div>',
+		// translators: Separator text between login options.
+		esc_html( apply_filters( 'wp_passkeys_login_separator_text', __( 'or', 'biometric-authentication' ) ) ),
+		/**
+		 * Filters the SSO login button text
+		 *
+		 * @param string $login_button_text Text to be used for the login button.
+		 */
+		esc_html( apply_filters( 'wp_passkeys_log_in_text', __( 'Log in with Passkeys', 'biometric-authentication' ) ) )
 	);
 }

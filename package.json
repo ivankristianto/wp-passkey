@@ -7,29 +7,29 @@
     "cli": "wp-env run cli",
     "dev": "wp-scripts start --hot",
     "start": "npm run dev",
-    "lint:js": "eslint './assets/src/' --ext .js",
+    "lint:js": "wp-scripts lint-js './assets/src/**/*.js'",
     "lint:php": "composer lint",
-    "lint": "npm run lint:js && npm run lint:php",
+    "lint:css": "wp-scripts lint-style './assets/src/**/*.scss'",
+    "lint": "npm run lint:js && npm run lint:css && npm run lint:php",
     "test-unit-php": "wp-env run tests-cli --env-cwd=wp-content/plugins/wp-passkey vendor/bin/phpunit",
     "release": "composer install --no-dev --ignore-platform-reqs && npm run build && ./bin/release.cjs && composer install",
     "server": "wp-env"
   },
   "devDependencies": {
-    "@babel/core": "^7.21.8",
-    "@babel/eslint-parser": "^7.21.8",
-    "@wordpress/babel-preset-default": "^7.20.0",
-    "@wordpress/env": "^8.2.0",
-    "@wordpress/eslint-plugin": "^14.5.0",
+    "@babel/core": "^7.26.9",
+    "@babel/eslint-parser": "^7.26.8",
+    "@wordpress/babel-preset-default": "^8.18.0",
+    "@wordpress/env": "^10.18.0",
+    "@wordpress/eslint-plugin": "^22.4.0",
     "@wordpress/scripts": "^30.11.0",
-    "archiver": "^5.3.0",
-    "eslint": "^8.39.0",
-    "fs-extra": "^11.1.0",
+    "archiver": "^7.0.1",
+    "fs-extra": "^11.3.0",
     "prettier": "npm:wp-prettier@^3.0.3",
-    "rimraf": "^5.0.0",
+    "rimraf": "^6.0.1",
     "sanitize-filename": "^1.6.3",
-    "sass": "^1.63.6"
+    "sass": "^1.85.0"
   },
   "dependencies": {
-    "@simplewebauthn/browser": "^7.2.0"
+    "@simplewebauthn/browser": "^13.1.0"
   }
 }

@@ -1,4 +1,7 @@
-import { browserSupportsWebAuthn, startRegistration } from '@simplewebauthn/browser';
+import {
+	browserSupportsWebAuthn,
+	startRegistration,
+} from '@simplewebauthn/browser';
 import apiFetch from '@wordpress/api-fetch';
 import domReady from '@wordpress/dom-ready';
 import { __ } from '@wordpress/i18n';
@@ -43,7 +46,9 @@ async function createRegistration() {
  */
 domReady( () => {
 	const registerButton = document.querySelector( '.wp-register-new-passkey' );
-	const registerMessage = document.querySelector( '.wp-register-passkey--message' );
+	const registerMessage = document.querySelector(
+		'.wp-register-passkey--message'
+	);
 
 	if ( ! registerButton || ! registerMessage ) {
 		return;
@@ -63,7 +68,7 @@ domReady( () => {
 			if ( error.name === 'InvalidStateError' ) {
 				registerMessage.innerText = __(
 					'Error: Authenticator was probably already registered by you',
-					'biometric-authentication',
+					'biometric-authentication'
 				);
 			} else {
 				registerMessage.innerText = `Error: ${ error.message }`;
@@ -84,7 +89,10 @@ async function revokePasskey( event ) {
 	if (
 		// eslint-disable-next-line no-alert
 		! window.confirm(
-			__( 'Are you sure you want to revoke this passkey? This action cannot be undone.', 'biometric-authentication' ),
+			__(
+				'Are you sure you want to revoke this passkey? This action cannot be undone.',
+				'biometric-authentication'
+			)
 		)
 	) {
 		return;
@@ -114,13 +122,15 @@ async function revokePasskey( event ) {
  * Passkey Revoke handler.
  */
 domReady( () => {
-	const revokeButtons = document.querySelectorAll( '.wp-passkey-list-table button.delete' );
+	const revokeButtons = document.querySelectorAll(
+		'.wp-passkey-list-table button.delete'
+	);
 
 	if ( ! revokeButtons ) {
 		return;
 	}
 
-	revokeButtons.forEach( revokeButton => {
+	revokeButtons.forEach( ( revokeButton ) => {
 		revokeButton.addEventListener( 'click', revokePasskey );
 	} );
 } );

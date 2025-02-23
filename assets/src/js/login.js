@@ -1,6 +1,11 @@
-import { browserSupportsWebAuthn, browserSupportsWebAuthnAutofill, startAuthentication } from '@simplewebauthn/browser';
+import {
+	browserSupportsWebAuthn,
+	startAuthentication,
+} from '@simplewebauthn/browser';
 import apiFetch from '@wordpress/api-fetch';
 import domReady from '@wordpress/dom-ready';
+
+import '../scss/login.scss';
 
 /**
  * Authenticate Passkey.
@@ -74,18 +79,19 @@ domReady( async () => {
 		return;
 	}
 
-	const usernameField = document.getElementById( 'user_login' );
+	const loginButton = document.getElementById( 'login-via-passkeys' );
 
-	// add autocomplete="webauthn" to the username field.
-	if ( usernameField ) {
-		usernameField.setAttribute( 'autocomplete', 'username webauthn' );
+	if ( ! loginButton ) {
+		return;
 	}
 
-	if ( browserSupportsWebAuthnAutofill() ) {
+	loginButton.addEventListener( 'click', async ( event ) => {
+		event.preventDefault();
+
 		try {
 			await authenticate();
 		} catch ( error ) {
 			showError( error.message );
 		}
-	}
+	} );
 } );

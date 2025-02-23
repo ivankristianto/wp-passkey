@@ -1,0 +1,74 @@
+name: Unit Tests
+on:
+  push:
+    branches:
+      - "main"
+  pull_request:
+    branches:
+      - "**"
+
+jobs:
+  build:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v1
+
+      - name: Paths filters
+        uses: dorny/paths-filter@v2
+        id: paths
+        with:
+          filters: |
+            workflows: &workflows
+              - '.github/workflows/**/*.yml'
+            composer: &composer
+              - *workflows
+              - 'composer.json'
+              - 'composer.lock'
+            php: &php
+              - *workflows
+              - *composer
+              - '**/*.php'
+            phpunit:
+              - *workflows
+              - *php
+              - 'phpunit.xml.dist'
+
+      - name: Install PHP
+        if: ${{ toJSON( steps.paths.outputs.changes ) != '"[]"' }}
+        uses: shivammathur/setup-php@2.32.0
+        with:
+          php-version: "8.1"
+          coverage: none
+          tools: composer:v2
+
+      - name: Get Composer cache directory
+        if: ${{ toJSON( steps.paths.outputs.changes ) != '"[]"' }}
+        id: composer-cache-dir
+        run: |
+          echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+      - name: Cache PHP dependencies
+        if: ${{ toJSON( steps.paths.outputs.changes ) != '"[]"' }}
+        id: composer-cache
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.composer-cache-dir.outputs.dir }}
+          key: ${{ runner.os }}-composer-8.1-${{ hashFiles('composer.lock') }}
+
+      - name: Cache Docker images.
+        if: ${{ toJSON( steps.paths.outputs.changes ) != '"[]"' }}
+        uses: ScribeMD/docker-cache@0.5.0
+        with:
+          key: ${{ runner.os }}-composer-8.2-${{ hashFiles('composer.lock') }}
+
+      - name: Install PHP dependencies
+        if: ${{ toJSON( steps.paths.outputs.changes ) != '"[]"' }}
+        run: |
+          composer install --no-progress --no-suggest --no-interaction
+
+      - name: Run the tests
+        if: ${{ toJSON( steps.paths.outputs.changes ) != '"[]"' }}
+        run: |
+          npm run server start && npm run test-unit-php

@@ -198,7 +198,7 @@ function signin_request(): WP_REST_Response|WP_Error {
 		return new WP_Error( 'invalid_request', 'Invalid request: ' . $error->getMessage(), array( 'status' => 400 ) );
 	}
 
-	$challenge = $public_key_credential_request_options->getChallenge();
+	$challenge = $public_key_credential_request_options->challenge;
 
 	// Store the challenge in transient for 60 seconds.
 	// For some hosting transient set to persistent object cache like Redis/Memcache. By default it stored in options table.
@@ -246,7 +246,7 @@ function signin_response( WP_REST_Request $request ): WP_REST_Response|WP_Error 
 	try {
 		$public_key_credential_source = $webauthn_server->validate_assertion_response( $assertion_response, $challenge );
 
-		$user_handle = $public_key_credential_source->getUserHandle();
+		$user_handle = $public_key_credential_source->userHandle; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
 		$user        = get_user_by( 'login', $user_handle );
 
 		if ( ! $user instanceof WP_User ) {

@@ -101,9 +101,11 @@ class Webauthn_Server {
 	 * @return AuthenticatorSelectionCriteria
 	 */
 	public function get_authenticator_selection(): AuthenticatorSelectionCriteria {
-		return AuthenticatorSelectionCriteria::create()
-		->setResidentKey( AuthenticatorSelectionCriteria::RESIDENT_KEY_REQUIREMENT_REQUIRED )
-		->setAuthenticatorAttachment( AuthenticatorSelectionCriteria::AUTHENTICATOR_ATTACHMENT_PLATFORM );
+		return AuthenticatorSelectionCriteria::create(
+			AuthenticatorSelectionCriteria::AUTHENTICATOR_ATTACHMENT_PLATFORM,
+			AuthenticatorSelectionCriteria::USER_VERIFICATION_REQUIREMENT_PREFERRED,
+			AuthenticatorSelectionCriteria::RESIDENT_KEY_REQUIREMENT_REQUIRED
+		);
 	}
 
 	/**
@@ -155,11 +157,11 @@ class Webauthn_Server {
 			$user_entity,
 			$challenge,
 			$public_key_credential_parameters_list,
-		)
-		->setTimeout( 30_000 )
-		->setAuthenticatorSelection( $authenticator_selection )
-		->excludeCredentials( ...$excluded_public_key_descriptors )
-		->setAttestation( PublicKeyCredentialCreationOptions::ATTESTATION_CONVEYANCE_PREFERENCE_NONE );
+			$authenticator_selection,
+			PublicKeyCredentialCreationOptions::ATTESTATION_CONVEYANCE_PREFERENCE_NONE,
+			$excluded_public_key_descriptors,
+			30_000
+		);
 
 		// Store challenge in User meta.
 		update_user_meta( $user->ID, 'wp_passkey_challenge', $challenge );
@@ -181,11 +183,10 @@ class Webauthn_Server {
 		$rp_entity                             = $this->get_relying_party();
 		$public_key_credential_request_options = PublicKeyCredentialRequestOptions::create(
 			$challenge,
-		)
-		->setRpId( $rp_entity->getId() )
-		->setTimeout( 30_000 )
-		->setUserVerification(
-			PublicKeyCredentialRequestOptions::USER_VERIFICATION_REQUIREMENT_REQUIRED
+			$rp_entity->id,
+			[],
+			PublicKeyCredentialRequestOptions::USER_VERIFICATION_REQUIREMENT_REQUIRED,
+			30_000
 		);
 
 		return $public_key_credential_request_options;
@@ -212,7 +213,7 @@ class Webauthn_Server {
 		);
 
 		$public_key_credential              = $public_key_credential_loader->load( $data );
-		$authenticator_attestation_response = $public_key_credential->getResponse();
+		$authenticator_attestation_response = $public_key_credential->response;
 
 		if ( ! $authenticator_attestation_response instanceof AuthenticatorAttestationResponse ) {
 			throw new InvalidDataException( $data, 'Invalid request.' ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- This is not an output.
@@ -268,7 +269,7 @@ class Webauthn_Server {
 		);
 
 		$public_key_credential            = $public_key_credential_loader->load( $data );
-		$authenticator_assertion_response = $public_key_credential->getResponse();
+		$authenticator_assertion_response = $public_key_credential->response;
 
 		if ( ! $authenticator_assertion_response instanceof AuthenticatorAssertionResponse ) {
 			throw new InvalidDataException( $data, 'Invalid request.' ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- This is not an output.
@@ -284,7 +285,7 @@ class Webauthn_Server {
 		);
 
 		$public_key_credential_request_options = $this->create_assertion_request( $challenge );
-		$public_key_credential_source          = $public_key_credential_source_repository->findOneByCredentialId( $public_key_credential->getId() );
+		$public_key_credential_source          = $public_key_credential_source_repository->findOneByCredentialId( $public_key_credential->id );
 
 		if ( ! $public_key_credential_source instanceof PublicKeyCredentialSource ) {
 			throw new Exception( 'credential_not_found', 404 );

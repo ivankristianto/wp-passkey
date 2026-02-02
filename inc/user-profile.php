@@ -106,9 +106,8 @@ function display_user_passkeys( WP_User $user ) {
 				endif;
 
 				foreach ( $public_key_credentials as $public_key_credential ) :
-					$extra_data  = $public_key_credential_source_repository->get_extra_data( $public_key_credential );
-					// phpcs:ignore WordPress.NamingConventions.ValidVariableName.NotSnakeCaseMemberVar -- External library property.
-					$fingerprint = Base64UrlSafe::encodeUnpadded( $public_key_credential->publicKeyCredentialId );
+					$extra_data = $public_key_credential_source_repository->get_extra_data( $public_key_credential );
+					$fingerprint = Base64UrlSafe::encodeUnpadded( $public_key_credential->publicKeyCredentialId ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName.NotSnakeCaseMemberVar -- External library property.
 					?>
 				<tr>
 					<td>

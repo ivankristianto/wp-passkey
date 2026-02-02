@@ -18,6 +18,12 @@
 	"settings": {
 		"jsdoc": {
 			"mode": "typescript"
-		}
+		},
+		"import/resolver": {
+			"node": {
+				"extensions": [".js", ".jsx", ".ts", ".tsx"]
+			}
+		},
+		"import/core-modules": ["@wordpress/api-fetch", "@wordpress/dom-ready", "@wordpress/i18n"]
 	}
 }

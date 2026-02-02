@@ -131,6 +131,11 @@ If you would like to contribute to this plugin, please fork the repository and s
 
 ## Changelog
 
+### 0.3.9
+
+- Security: Fix npm vulnerabilities - added overrides for fast-xml-parser and webpack-dev-server
+- Reduced vulnerabilities from 33 to 9 (all remaining are dev-time eslint related)
+
 ### 0.3.8
 
 - Update plugin description

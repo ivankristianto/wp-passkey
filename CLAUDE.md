@@ -144,3 +144,21 @@ Built with `@wordpress/scripts` (Webpack-based):
 - Minimum WordPress version: 6.2
 - Uses PHP strict types (`declare(strict_types=1)`)
 - Namespace: `BioAuth` with sub-namespaces for modules
+
+## Learnings: update-webauthn-lib Branch
+
+### ✅ DO's
+
+- ✅ **Use systematic-debugging skill for bugs** - Forces root cause investigation before fixes
+- ✅ **Read vendor library source code** - Confirms deprecated methods vs valid helpers (check `vendor/web-auth/webauthn-lib/src/`)
+- ✅ **Search for ALL deprecated patterns** - Not just the one reported (use `grep '->get[A-Z]'` to find all getter methods)
+- ✅ **Get exact sniff codes with `-s` flag** - Required for correct phpcs ignores (e.g., `WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase`)
+- ✅ **Use `composer lint` before committing** - Catches formatting issues early
+
+### ❌ DON'Ts
+
+- ❌ **Don't fix only the reported issue** - Audit entire codebase for similar patterns (webauthn-lib 4.7.0 deprecated many getter methods)
+- ❌ **Don't assume phpcs ignore format** - Wrong sniff code = ignored comment fails
+- ❌ **Don't guess sniff codes** - Use `./vendor/bin/phpcs -s` to get exact code
+- ❌ **Don't commit without running lint** - Multiple re-commits waste time and clutter git history
+- ❌ **Don't be lazy with verification** - Always run lint and verify output before claiming done

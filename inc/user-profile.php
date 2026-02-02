@@ -107,7 +107,7 @@ function display_user_passkeys( WP_User $user ) {
 
 				foreach ( $public_key_credentials as $public_key_credential ) :
 					$extra_data  = $public_key_credential_source_repository->get_extra_data( $public_key_credential );
-					$fingerprint = Base64UrlSafe::encodeUnpadded( $public_key_credential->getPublicKeyCredentialId() );
+					$fingerprint = Base64UrlSafe::encodeUnpadded( $public_key_credential->publicKeyCredentialId );
 					?>
 				<tr>
 					<td>
@@ -119,7 +119,7 @@ function display_user_passkeys( WP_User $user ) {
 						?>
 					</td>
 					<td>
-						<?php echo esc_html( $public_key_credential->getPublicKeyCredentialDescriptor()->getType() ); ?>
+						<?php echo esc_html( $public_key_credential->type ); ?>
 					</td>
 					<td>
 						<?php

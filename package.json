@@ -32,5 +32,9 @@
   },
   "dependencies": {
     "@simplewebauthn/browser": "^13.1.0"
+  },
+  "overrides": {
+    "fast-xml-parser": "^5.3.4",
+    "webpack-dev-server": "^5.2.1"
   }
 }

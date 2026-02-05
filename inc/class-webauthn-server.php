@@ -11,8 +11,6 @@ namespace BioAuth;
 
 use Cose\Algorithms;
 use Cose\Algorithm\Manager;
-use DateTimeImmutable;
-use Psr\Clock\ClockInterface;
 use Cose\Algorithm\Signature\ECDSA\ES256;
 use Cose\Algorithm\Signature\ECDSA\ES256K;
 use Cose\Algorithm\Signature\ECDSA\ES384;
@@ -35,6 +33,7 @@ use Webauthn\AuthenticatorAssertionResponseValidator;
 use Webauthn\AuthenticatorAttestationResponse;
 use Webauthn\AuthenticatorAttestationResponseValidator;
 use Webauthn\AuthenticatorSelectionCriteria;
+use Webauthn\CeremonyStep\CeremonyStepManagerFactory;
 use Webauthn\Exception\InvalidDataException;
 use Webauthn\PublicKeyCredentialCreationOptions;
 use Webauthn\PublicKeyCredentialLoader;
@@ -44,22 +43,6 @@ use Webauthn\PublicKeyCredentialRpEntity;
 use Webauthn\PublicKeyCredentialSource;
 use Webauthn\PublicKeyCredentialUserEntity;
 use WP_User;
-
-/**
- * System Clock implementation for PSR-20.
- *
- * @package BioAuth
- */
-class System_Clock implements ClockInterface {
-	/**
-	 * Get current time.
-	 *
-	 * @return DateTimeImmutable
-	 */
-	public function now(): DateTimeImmutable {
-		return new DateTimeImmutable();
-	}
-}
 
 /**
  * Webauthn Server.
@@ -237,14 +220,17 @@ class Webauthn_Server {
 			throw new InvalidDataException( $data, 'Invalid request.' ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- This is not an output.
 		}
 
-		$public_key_credential_source_repository = new Source_Repository();
+		// Create CeremonyStepManagerFactory and configure for creation ceremony.
+		$ceremony_factory = new CeremonyStepManagerFactory();
+		$ceremony_factory->setAlgorithmManager( $this->get_algorithm_manager() );
+		$ceremony_factory->setAttestationStatementSupportManager( $attestation_statement_support_manager );
+		$ceremony_factory->setExtensionOutputCheckerHandler( ExtensionOutputCheckerHandler::create() );
+		$ceremony_factory->setAllowedOrigins( array( 'localhost' ), false );
+
+		$creation_ceremony = $ceremony_factory->creationCeremony();
 
 		$authenticator_attestation_response_validator = AuthenticatorAttestationResponseValidator::create(
-			$attestation_statement_support_manager,
-			$public_key_credential_source_repository,
-			null,
-			ExtensionOutputCheckerHandler::create(),
-			new System_Clock()
+			$creation_ceremony
 		);
 
 		// Get expected challenge from user meta.
@@ -256,8 +242,8 @@ class Webauthn_Server {
 		$public_key_credential_source = $authenticator_attestation_response_validator->check(
 			$authenticator_attestation_response,
 			$public_key_credential_creation_options,
-			$this->get_current_domain(),
-			array( 'localhost' ) // Secure RelyingParty, to make localhost enable.
+			null,
+			$this->get_current_domain()
 		);
 
 		// Delete the challenge from user meta.
@@ -294,18 +280,22 @@ class Webauthn_Server {
 			throw new InvalidDataException( $data, 'Invalid request.' ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- This is not an output.
 		}
 
-		$public_key_credential_source_repository = new Source_Repository();
+		// Create CeremonyStepManagerFactory and configure for request ceremony.
+		$ceremony_factory = new CeremonyStepManagerFactory();
+		$ceremony_factory->setAlgorithmManager( $this->get_algorithm_manager() );
+		$ceremony_factory->setAttestationStatementSupportManager( $attestation_statement_support_manager );
+		$ceremony_factory->setExtensionOutputCheckerHandler( ExtensionOutputCheckerHandler::create() );
+		$ceremony_factory->setAllowedOrigins( array( 'localhost' ), false );
+
+		$request_ceremony = $ceremony_factory->requestCeremony();
 
 		$authenticator_assertion_response_validator = AuthenticatorAssertionResponseValidator::create(
-			$public_key_credential_source_repository, // The Credential Repository service.
-			null,                                     // The token binding handler.
-			ExtensionOutputCheckerHandler::create(),  // The extension output checker handler.
-			$this->get_algorithm_manager(),           // The COSE Algorithm Manager.
-			new System_Clock()                        // The Clock for time validation.
+			$request_ceremony
 		);
 
-		$public_key_credential_request_options = $this->create_assertion_request( $challenge );
-		$public_key_credential_source          = $public_key_credential_source_repository->findOneByCredentialId( $public_key_credential->id );
+		$public_key_credential_source_repository = new Source_Repository();
+		$public_key_credential_request_options   = $this->create_assertion_request( $challenge );
+		$public_key_credential_source            = $public_key_credential_source_repository->findOneByCredentialId( $public_key_credential->id );
 
 		if ( ! $public_key_credential_source instanceof PublicKeyCredentialSource ) {
 			throw new Exception( 'credential_not_found', 404 );
@@ -315,9 +305,8 @@ class Webauthn_Server {
 			$public_key_credential_source,
 			$authenticator_assertion_response,
 			$public_key_credential_request_options,
-			$this->get_current_domain(),
 			null,
-			array( 'localhost' ) // Secure RelyingParty, to make localhost enable.
+			$this->get_current_domain()
 		);
 
 		return $public_key_credential_source;

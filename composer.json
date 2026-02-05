@@ -21,7 +21,13 @@
     "szepeviktor/phpstan-wordpress": "^1.2",
     "wp-phpunit/wp-phpunit": "^5.9",
     "yoast/phpunit-polyfills": "^2.0@dev",
-    "wp-coding-standards/wpcs": "^3.0"
+    "wp-coding-standards/wpcs": "^3.0",
+    "mockery/mockery": "^1.5"
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "BioAuth\\Tests\\Fixtures\\": "tests/php/fixtures/"
+    }
   },
   "scripts": {
     "format": "./vendor/bin/phpcbf -p --standard=phpcs.ruleset.xml ./inc",

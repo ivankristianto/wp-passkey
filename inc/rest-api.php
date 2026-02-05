@@ -289,8 +289,17 @@ function revoke_request( WP_REST_Request $request ): WP_REST_Response|WP_Error {
 		return new WP_Error( 'invalid_request', 'Fingerprint param not exist.', array( 'status' => 400 ) );
 	}
 
+	// Validate base64url format (charset: A-Za-z0-9_-).
+	if ( ! preg_match( '/^[A-Za-z0-9_-]+$/', $fingerprint ) ) {
+		return new WP_Error( 'invalid_request', 'Invalid fingerprint format.', array( 'status' => 400 ) );
+	}
+
 	// Decode fingerprint from UI (already base64url-encoded) to raw binary for lookup.
-	$credential_id = Base64UrlSafe::decodeNoPadding( $fingerprint );
+	try {
+		$credential_id = Base64UrlSafe::decodeNoPadding( $fingerprint );
+	} catch ( Exception $error ) {
+		return new WP_Error( 'invalid_request', 'Fingerprint decoding failed.', array( 'status' => 400 ) );
+	}
 
 	$public_key_credential_source_repository = new Source_Repository();
 	$credential                              = $public_key_credential_source_repository->findOneByCredentialId( $credential_id );

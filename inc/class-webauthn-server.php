@@ -357,10 +357,23 @@ class Webauthn_Server {
 	 * @return string[] Array of allowed origins.
 	 */
 	private function get_allowed_origins(): array {
-		$origin = get_site_url();
+		$site_url = get_site_url();
 
-		if ( empty( $origin ) ) {
+		if ( empty( $site_url ) ) {
 			return array();
+		}
+
+		$parsed = wp_parse_url( $site_url );
+
+		if ( empty( $parsed['scheme'] ) || empty( $parsed['host'] ) ) {
+			return array();
+		}
+
+		// Reconstruct origin: scheme://host[:port]
+		$origin = $parsed['scheme'] . '://' . $parsed['host'];
+
+		if ( ! empty( $parsed['port'] ) ) {
+			$origin .= ':' . $parsed['port'];
 		}
 
 		return array( $origin );

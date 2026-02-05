@@ -24,7 +24,7 @@ Create comprehensive tests for all 5 REST API endpoints, focusing on testable bu
 
 ### Test File Structure
 
-```
+```text
 tests/php/
 ├── test-rest-api.php (expand existing)
 ├── test-source-repository.php (new)
@@ -188,7 +188,7 @@ wp-env run tests-cli --env-cwd=wp-content/plugins/wp-passkey \
 
 **Architecture:** TDD approach - write failing tests first, implement fixes if needed, verify tests pass. Use Mockery for clean mocking of WebAuthn library validators.
 
-**Tech Stack:** PHPUnit 8.5, Mockery 1.5, WordPress test framework, wp-env for test execution
+**Tech Stack:** PHPUnit 9.6, Mockery 1.5, WordPress test framework, wp-env for test execution
 
 ---
 
@@ -994,7 +994,7 @@ Expected output showing:
 
 Add line to `.gitignore`:
 
-```
+```text
 coverage/
 ```
 

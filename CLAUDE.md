@@ -32,7 +32,7 @@ The site runs at http://localhost:8888 once started.
 npm run dev
 ```
 
-This runs Vite in development mode with hot module replacement for files in `assets/src/`.
+This runs `@wordpress/scripts` (Webpack with hot module replacement) for files in `assets/src/`.
 
 ## Commands
 
@@ -144,6 +144,34 @@ Built with `@wordpress/scripts` (Webpack-based):
 - Minimum WordPress version: 6.2
 - Uses PHP strict types (`declare(strict_types=1)`)
 - Namespace: `BioAuth` with sub-namespaces for modules
+
+## Quality Gates
+
+Before claiming any work is complete, committing code, or creating pull requests, you MUST verify:
+
+### 1. Build Verification
+```bash
+npm run build
+```
+- Must complete without errors
+- Verify dist files are generated in `assets/dist/`
+
+### 2. Linting
+```bash
+npm run lint
+```
+- JavaScript linting must pass (`npm run lint:js`)
+- CSS/SCSS linting must pass (`npm run lint:css`)
+- PHP linting must pass (`npm run lint:php` / `composer lint`)
+
+### 3. Unit Tests
+```bash
+npm run test-unit-php
+```
+- All PHP unit tests must pass
+- No skipped or failing tests
+
+**CRITICAL:** Never claim "it's working" or "tests pass" without running these commands and verifying the actual output. Evidence before assertions always.
 
 ## Learnings: update-webauthn-lib Branch
 

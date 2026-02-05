@@ -86,7 +86,7 @@ To build the plugin for development, run the following command:
 npm run dev
 ```
 
-This will run Vite in development mode and watch for any changes to the files in the `src` directory. Hot module replacement is enabled by default. The built files will be placed in the `assets/dist` directory.
+This will run `@wordpress/scripts` in development mode with hot module replacement enabled. It watches for changes to files in the `assets/src/` directory and automatically rebuilds. The built files will be placed in the `assets/dist/` directory.
 
 ### Lint and Unit Tests
 

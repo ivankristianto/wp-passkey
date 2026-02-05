@@ -23,4 +23,3 @@ phpcs.ruleset.xml
 phpstan.neon.dist
 phpunit.xml.dist
 setup.log
-vite.config.js

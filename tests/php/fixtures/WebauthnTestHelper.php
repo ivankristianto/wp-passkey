@@ -8,9 +8,7 @@ namespace BioAuth\Tests\Fixtures;
 use Mockery;
 use ParagonIE\ConstantTime\Base64UrlSafe;
 use Symfony\Component\Uid\Uuid;
-use Webauthn\AuthenticatorAssertionResponse;
 use Webauthn\AuthenticatorAssertionResponseValidator;
-use Webauthn\AuthenticatorAttestationResponse;
 use Webauthn\AuthenticatorAttestationResponseValidator;
 use Webauthn\CredentialRecord;
 use Webauthn\PublicKeyCredentialUserEntity;
@@ -62,7 +60,7 @@ class WebauthnTestHelper {
 	 * @param CredentialRecord $return_credential Credential to return.
 	 * @return Mockery\MockInterface
 	 */
-	public static function mock_attestation_validator( CredentialRecord $return_credential ) {
+	public static function mock_attestation_validator( CredentialRecord $return_credential ): \Mockery\MockInterface {
 		$mock = Mockery::mock( AuthenticatorAttestationResponseValidator::class );
 		$mock->shouldReceive( 'check' )->andReturn( $return_credential );
 		return $mock;
@@ -74,7 +72,7 @@ class WebauthnTestHelper {
 	 * @param CredentialRecord $return_credential Credential to return.
 	 * @return Mockery\MockInterface
 	 */
-	public static function mock_assertion_validator( CredentialRecord $return_credential ) {
+	public static function mock_assertion_validator( CredentialRecord $return_credential ): \Mockery\MockInterface {
 		$mock = Mockery::mock( AuthenticatorAssertionResponseValidator::class );
 		$mock->shouldReceive( 'check' )->andReturn( $return_credential );
 		return $mock;

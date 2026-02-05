@@ -56,12 +56,24 @@ TASK 5 IMPLEMENTATION STATUS
 Task 5 incorrectly added PSR-20 Clock to the old 4.x-style constructor calls.
 This needs to be completely refactored to use the new ceremony-based architecture.
 
+REPOSITORY INTERFACE REMOVAL
+-----------------------------
+
+The PublicKeyCredentialSourceRepository interface was completely removed in 5.x.
+The new ceremony-based architecture doesn't use a repository interface at all.
+Credential lookup happens directly in application code, not through validators.
+
+PublicKeyCredentialSource class still exists but is deprecated (will be removed in 6.0).
+It's recommended to migrate to CredentialRecord, but PublicKeyCredentialSource works for now.
+
 REQUIRED CHANGES
 ----------------
 
-1. Remove direct validator instantiation with old constructor signatures
-2. Create CeremonyStepManagerFactory instance(s)
-3. Configure factory with algorithm manager, attestation support, extension handler, allowed origins
-4. Use factory.creationCeremony() for attestation validation
-5. Use factory.requestCeremony() for assertion validation
-6. Update check() method calls to new signature (remove securedRelyingPartyId parameter)
+1. Remove direct validator instantiation with old constructor signatures ✓
+2. Create CeremonyStepManagerFactory instance(s) ✓
+3. Configure factory with algorithm manager, attestation support, extension handler, allowed origins ✓
+4. Use factory.creationCeremony() for attestation validation ✓
+5. Use factory.requestCeremony() for assertion validation ✓
+6. Update check() method calls to new signature (remove securedRelyingPartyId parameter) ✓
+7. Remove PublicKeyCredentialSourceRepository interface implementation from Source_Repository
+8. Keep PublicKeyCredentialSource usage (deprecated but still works in 5.x)

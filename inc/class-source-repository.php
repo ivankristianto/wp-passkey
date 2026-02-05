@@ -14,14 +14,16 @@ use ParagonIE\ConstantTime\Base64UrlSafe;
 use stdClass;
 use Webauthn\Exception\InvalidDataException;
 use Webauthn\PublicKeyCredentialSource;
-use Webauthn\PublicKeyCredentialSourceRepository;
 use Webauthn\PublicKeyCredentialUserEntity;
 use WP_User;
 
 /**
  * Public Key Credential Source Repository.
+ *
+ * Note: In webauthn-lib 5.x, the PublicKeyCredentialSourceRepository interface was removed.
+ * This class no longer implements an interface but provides the same credential storage functionality.
  */
-class Source_Repository implements PublicKeyCredentialSourceRepository {
+class Source_Repository {
 
 	/**
 	 * Meta key prefix.

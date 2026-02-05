@@ -32,7 +32,7 @@
   "scripts": {
     "format": "./vendor/bin/phpcbf -p --standard=phpcs.ruleset.xml ./inc",
     "lint": "./vendor/bin/phpcs -p --standard=phpcs.ruleset.xml ./inc",
-    "coverage": "wp-env run tests-cli --env-cwd=wp-content/plugins/upgrade-php82-node22-webauthn vendor/bin/phpunit --coverage-text"
+    "coverage": "wp-env run tests-cli --env-cwd=wp-content/plugins/wp-passkey vendor/bin/phpunit --coverage-text"
   },
   "config": {
     "allow-plugins": {

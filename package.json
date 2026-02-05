@@ -11,7 +11,7 @@
     "lint:php": "composer lint",
     "lint:css": "wp-scripts lint-style './assets/src/**/*.scss'",
     "lint": "npm run lint:js && npm run lint:css && npm run lint:php",
-    "test-unit-php": "wp-env run tests-cli --env-cwd=wp-content/plugins/upgrade-php82-node22-webauthn vendor/bin/phpunit",
+    "test-unit-php": "wp-env run tests-cli --env-cwd=wp-content/plugins/wp-passkey vendor/bin/phpunit",
     "release": "composer install --no-dev --ignore-platform-reqs && npm run build && ./bin/release.cjs && composer install",
     "server": "wp-env",
     "server:start": "wp-env start --runtime=playground"

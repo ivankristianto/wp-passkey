@@ -357,13 +357,13 @@ class Webauthn_Server {
 	 * @return string[] Array of allowed origins.
 	 */
 	private function get_allowed_origins(): array {
-		$domain = $this->get_current_domain();
+		$origin = get_site_url();
 
-		if ( empty( $domain ) ) {
+		if ( empty( $origin ) ) {
 			return array();
 		}
 
-		return array( $domain );
+		return array( $origin );
 	}
 
 	/**

@@ -11,6 +11,8 @@ namespace BioAuth;
 
 use Cose\Algorithms;
 use Cose\Algorithm\Manager;
+use DateTimeImmutable;
+use Psr\Clock\ClockInterface;
 use Cose\Algorithm\Signature\ECDSA\ES256;
 use Cose\Algorithm\Signature\ECDSA\ES256K;
 use Cose\Algorithm\Signature\ECDSA\ES384;
@@ -42,6 +44,22 @@ use Webauthn\PublicKeyCredentialRpEntity;
 use Webauthn\PublicKeyCredentialSource;
 use Webauthn\PublicKeyCredentialUserEntity;
 use WP_User;
+
+/**
+ * System Clock implementation for PSR-20.
+ *
+ * @package BioAuth
+ */
+class System_Clock implements ClockInterface {
+	/**
+	 * Get current time.
+	 *
+	 * @return DateTimeImmutable
+	 */
+	public function now(): DateTimeImmutable {
+		return new DateTimeImmutable();
+	}
+}
 
 /**
  * Webauthn Server.
@@ -225,7 +243,8 @@ class Webauthn_Server {
 			$attestation_statement_support_manager,
 			$public_key_credential_source_repository,
 			null,
-			ExtensionOutputCheckerHandler::create()
+			ExtensionOutputCheckerHandler::create(),
+			new System_Clock()
 		);
 
 		// Get expected challenge from user meta.
@@ -281,7 +300,8 @@ class Webauthn_Server {
 			$public_key_credential_source_repository, // The Credential Repository service.
 			null,                                     // The token binding handler.
 			ExtensionOutputCheckerHandler::create(),  // The extension output checker handler.
-			$this->get_algorithm_manager()            // The COSE Algorithm Manager.
+			$this->get_algorithm_manager(),           // The COSE Algorithm Manager.
+			new System_Clock()                        // The Clock for time validation.
 		);
 
 		$public_key_credential_request_options = $this->create_assertion_request( $challenge );

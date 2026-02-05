@@ -1,0 +1,67 @@
+WebAuthn Library 5.x Constructor Signature Findings
+====================================================
+
+Date: 2026-02-05
+Context: Upgrading from webauthn-lib 4.x to 5.x
+
+CRITICAL API CHANGE
+-------------------
+
+webauthn-lib 5.x completely redesigned the validator constructors using a ceremony-based architecture.
+
+OLD API (4.x) - Multiple parameters:
+- AuthenticatorAttestationResponseValidator::create($attestationSupportManager, $repository, $tokenBinding, $extensionHandler, $clock)
+- AuthenticatorAssertionResponseValidator::create($repository, $tokenBinding, $extensionHandler, $algorithmManager, $clock)
+
+NEW API (5.x) - Single CeremonyStepManager:
+- AuthenticatorAttestationResponseValidator::create(CeremonyStepManager $ceremonyStepManager)
+- AuthenticatorAssertionResponseValidator::create(CeremonyStepManager $ceremonyStepManager)
+
+CEREMONY STEP MANAGER
+---------------------
+
+The CeremonyStepManager is created using CeremonyStepManagerFactory with builder pattern:
+
+$factory = new CeremonyStepManagerFactory();
+$factory->setAlgorithmManager($algorithmManager);
+$factory->setAttestationStatementSupportManager($attestationStatementSupportManager);
+$factory->setExtensionOutputCheckerHandler($extensionOutputCheckerHandler);
+$factory->setAllowedOrigins(['localhost'], false);
+
+// For registration (attestation)
+$creationCeremony = $factory->creationCeremony();
+$attestationValidator = AuthenticatorAttestationResponseValidator::create($creationCeremony);
+
+// For authentication (assertion)
+$requestCeremony = $factory->requestCeremony();
+$assertionValidator = AuthenticatorAssertionResponseValidator::create($requestCeremony);
+
+VALIDATOR CHECK METHOD SIGNATURES
+----------------------------------
+
+The check() method signatures also changed:
+
+OLD API - Multiple parameters including host and securedRelyingPartyId:
+$validator->check($response, $options, $host, $securedRelyingPartyId)
+
+NEW API - Only credential, response, options, userHandle, host:
+$validator->check($credential, $response, $options, $userHandle, $host)
+
+The securedRelyingPartyId (allowed origins) is now configured in the CeremonyStepManagerFactory,
+not passed to check() method.
+
+TASK 5 IMPLEMENTATION STATUS
+-----------------------------
+
+Task 5 incorrectly added PSR-20 Clock to the old 4.x-style constructor calls.
+This needs to be completely refactored to use the new ceremony-based architecture.
+
+REQUIRED CHANGES
+----------------
+
+1. Remove direct validator instantiation with old constructor signatures
+2. Create CeremonyStepManagerFactory instance(s)
+3. Configure factory with algorithm manager, attestation support, extension handler, allowed origins
+4. Use factory.creationCeremony() for attestation validation
+5. Use factory.requestCeremony() for assertion validation
+6. Update check() method calls to new signature (remove securedRelyingPartyId parameter)

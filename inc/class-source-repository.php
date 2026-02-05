@@ -12,9 +12,13 @@ namespace BioAuth;
 use Exception;
 use ParagonIE\ConstantTime\Base64UrlSafe;
 use stdClass;
+use Symfony\Component\Uid\Uuid;
+use Webauthn\CredentialRecord;
 use Webauthn\Exception\InvalidDataException;
 use Webauthn\PublicKeyCredentialSource;
 use Webauthn\PublicKeyCredentialUserEntity;
+use Webauthn\TrustPath\CertificateTrustPath;
+use Webauthn\TrustPath\EmptyTrustPath;
 use WP_User;
 
 /**
@@ -35,14 +39,15 @@ class Source_Repository {
 	/**
 	 * Find a credential source by its credential ID.
 	 *
-	 * @param string $public_key_credential_id The credential ID to find.
-	 * @return null|PublicKeyCredentialSource The credential source, if found.
+	 * @param string $public_key_credential_id The credential ID (raw binary) to find.
+	 * @return null|CredentialRecord The credential record, if found.
 	 * @throws InvalidDataException If the credential source is invalid.
 	 */
-	public function findOneByCredentialId( string $public_key_credential_id ): ?PublicKeyCredentialSource {
+	public function findOneByCredentialId( string $public_key_credential_id ): ?CredentialRecord {
 		global $wpdb;
 
-		$meta_key   = $this->meta_key . $public_key_credential_id;
+		// Encode credential ID to match the format used when saving.
+		$meta_key   = $this->meta_key . Base64UrlSafe::encodeUnpadded( $public_key_credential_id );
 		$public_key = $wpdb->get_row( $wpdb->prepare( "SELECT meta_value FROM {$wpdb->usermeta} WHERE meta_key = %s", $meta_key ) );
 
 		if ( ! $public_key instanceof stdClass || ! $public_key->meta_value ) {
@@ -51,14 +56,14 @@ class Source_Repository {
 
 		$public_key = (array) json_decode( $public_key->meta_value, true );
 
-		return PublicKeyCredentialSource::createFromArray( $public_key );
+		return $this->array_to_credential( $public_key );
 	}
 
 	/**
 	 * Find all credential sources for a given user entity.
 	 *
 	 * @param PublicKeyCredentialUserEntity $public_key_credential_user_entity The user entity to find credential sources for.
-	 * @return PublicKeyCredentialSource[] The credential sources, if found.
+	 * @return CredentialRecord[] The credential records, if found.
 	 * @throws Exception If the user is not found.
 	 */
 	public function findAllForUserEntity( PublicKeyCredentialUserEntity $public_key_credential_user_entity ): array {
@@ -96,7 +101,7 @@ class Source_Repository {
 
 		return array_map(
 			function ( $public_key ) {
-				return PublicKeyCredentialSource::createFromArray( $public_key );
+				return $this->array_to_credential( $public_key );
 			},
 			$public_keys
 		);
@@ -105,14 +110,15 @@ class Source_Repository {
 	/**
 	 * Save a new credential source.
 	 *
-	 * @param PublicKeyCredentialSource $public_key_credential_source The credential source to save.
+	 * @param CredentialRecord $credential The credential record to save.
 	 * @param string[] $extra_data Extra data to store.
 	 * @return void
 	 * @throws Exception If the user is not found.
 	 */
-	public function saveCredentialSource( PublicKeyCredentialSource $public_key_credential_source, array $extra_data = array() ): void {
-		$public_key = $public_key_credential_source->jsonSerialize();
+	public function saveCredentialSource( CredentialRecord $credential, array $extra_data = array() ): void {
+		$public_key = $this->credential_to_array( $credential );
 
+		// Decode userHandle to get the plain username for lookup.
 		$user_handle = Base64UrlSafe::decodeNoPadding( $public_key['userHandle'] );
 		$user        = get_user_by( 'login', $user_handle );
 
@@ -128,6 +134,7 @@ class Source_Repository {
 		// Store the public key credential source. And need to add extra slashes to escape the slashes in the JSON.
 		$public_key_json = addcslashes( wp_json_encode( $public_key, JSON_UNESCAPED_SLASHES ), '\\' );
 
+		// Use base64url-encoded credential ID as meta key (already encoded in array).
 		$meta_key = $this->meta_key . $public_key['publicKeyCredentialId'];
 		update_user_meta( $user->ID, $meta_key, $public_key_json );
 	}
@@ -135,14 +142,14 @@ class Source_Repository {
 	/**
 	 * Delete a credential source.
 	 *
-	 * @param PublicKeyCredentialSource $public_key_credential_source The credential source to delete.
+	 * @param CredentialRecord $credential The credential record to delete.
 	 * @return void
 	 * @throws Exception If the user is not found.
 	 */
-	public function deleteCredentialSource( PublicKeyCredentialSource $public_key_credential_source ): void {
-		$public_key_credential_id = Base64UrlSafe::encodeUnpadded( $public_key_credential_source->publicKeyCredentialId );
+	public function deleteCredentialSource( CredentialRecord $credential ): void {
+		$public_key_credential_id = Base64UrlSafe::encodeUnpadded( $credential->publicKeyCredentialId );
 
-		$user_handle = $public_key_credential_source->userHandle;
+		$user_handle = $credential->userHandle;
 		$user        = get_user_by( 'login', $user_handle );
 
 		if ( ! $user instanceof WP_User ) {
@@ -160,14 +167,14 @@ class Source_Repository {
 	/**
 	 * Get extra data for a credential source.
 	 *
-	 * @param PublicKeyCredentialSource $public_key_credential_source The credential source to get extra data for.
+	 * @param CredentialRecord $credential The credential record to get extra data for.
 	 * @return string[] The extra data.
 	 * @throws Exception If the user is not found.
 	 */
-	public function get_extra_data( PublicKeyCredentialSource $public_key_credential_source ): array {
-		$meta_key = $this->meta_key . Base64UrlSafe::encodeUnpadded( $public_key_credential_source->publicKeyCredentialId );
+	public function get_extra_data( CredentialRecord $credential ): array {
+		$meta_key = $this->meta_key . Base64UrlSafe::encodeUnpadded( $credential->publicKeyCredentialId );
 
-		$user_handle = $public_key_credential_source->userHandle;
+		$user_handle = $credential->userHandle;
 
 		$user = get_user_by( 'login', $user_handle );
 
@@ -184,5 +191,89 @@ class Source_Repository {
 		$public_key = json_decode( $public_key, true );
 
 		return $public_key['extra'] ?? [];
+	}
+
+	/**
+	 * Convert CredentialRecord to array for storage.
+	 *
+	 * @param CredentialRecord $credential The credential to serialize.
+	 * @return array<string, mixed> The serialized credential.
+	 */
+	private function credential_to_array( CredentialRecord $credential ): array {
+		return array(
+			'publicKeyCredentialId' => Base64UrlSafe::encodeUnpadded( $credential->publicKeyCredentialId ),
+			'type'                  => $credential->type,
+			'transports'            => $credential->transports,
+			'attestationType'       => $credential->attestationType,
+			'trustPath'             => $this->serialize_trust_path( $credential->trustPath ),
+			'aaguid'                => $credential->aaguid->toRfc4122(),
+			'credentialPublicKey'   => Base64UrlSafe::encodeUnpadded( $credential->credentialPublicKey ),
+			'userHandle'            => Base64UrlSafe::encodeUnpadded( $credential->userHandle ),
+			'counter'               => $credential->counter,
+			'otherUI'               => $credential->otherUI,
+			'backupEligible'        => $credential->backupEligible,
+			'backupStatus'          => $credential->backupStatus,
+			'uvInitialized'         => $credential->uvInitialized,
+		);
+	}
+
+	/**
+	 * Convert array to CredentialRecord.
+	 *
+	 * @param array<string, mixed> $data The serialized credential data.
+	 * @return CredentialRecord The credential record.
+	 */
+	private function array_to_credential( array $data ): CredentialRecord {
+		return CredentialRecord::create(
+			Base64UrlSafe::decodeNoPadding( $data['publicKeyCredentialId'] ),
+			$data['type'],
+			$data['transports'] ?? [],
+			$data['attestationType'],
+			$this->deserialize_trust_path( $data['trustPath'] ?? [] ),
+			Uuid::fromString( $data['aaguid'] ?? Uuid::v4()->toRfc4122() ),
+			Base64UrlSafe::decodeNoPadding( $data['credentialPublicKey'] ),
+			Base64UrlSafe::decodeNoPadding( $data['userHandle'] ),
+			$data['counter'] ?? 0,
+			$data['otherUI'] ?? null,
+			$data['backupEligible'] ?? null,
+			$data['backupStatus'] ?? null,
+			$data['uvInitialized'] ?? null
+		);
+	}
+
+	/**
+	 * Serialize TrustPath to array.
+	 *
+	 * @param \Webauthn\TrustPath\TrustPath $trust_path The trust path to serialize.
+	 * @return array<string, mixed> The serialized trust path.
+	 */
+	private function serialize_trust_path( $trust_path ): array {
+		if ( $trust_path instanceof EmptyTrustPath ) {
+			return array( 'type' => 'empty' );
+		}
+
+		// For other TrustPath types, store the class name.
+		return array(
+			'type'  => 'certificate',
+			'class' => get_class( $trust_path ),
+		);
+	}
+
+	/**
+	 * Deserialize TrustPath from array.
+	 *
+	 * @param array<string, mixed> $data The serialized trust path data.
+	 * @return \Webauthn\TrustPath\TrustPath The trust path.
+	 */
+	private function deserialize_trust_path( array $data ) {
+		$type = $data['type'] ?? 'empty';
+
+		if ( 'empty' === $type ) {
+			return EmptyTrustPath::create();
+		}
+
+		// For certificate trust paths, return EmptyTrustPath as fallback.
+		// Full certificate chain reconstruction would require storing certificate data.
+		return EmptyTrustPath::create();
 	}
 }

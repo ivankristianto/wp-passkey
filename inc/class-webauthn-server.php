@@ -24,6 +24,7 @@ use Cose\Algorithm\Signature\RSA\RS256;
 use Cose\Algorithm\Signature\RSA\RS384;
 use Cose\Algorithm\Signature\RSA\RS512;
 use Exception;
+use ParagonIE\ConstantTime\Base64UrlSafe;
 use Webauthn\AttestationStatement\AttestationObjectLoader;
 use Webauthn\AttestationStatement\AttestationStatementSupportManager;
 use Webauthn\AttestationStatement\NoneAttestationStatementSupport;
@@ -34,9 +35,11 @@ use Webauthn\AuthenticatorAttestationResponse;
 use Webauthn\AuthenticatorAttestationResponseValidator;
 use Webauthn\AuthenticatorSelectionCriteria;
 use Webauthn\CeremonyStep\CeremonyStepManagerFactory;
+use Webauthn\CredentialRecord;
+use Webauthn\Denormalizer\WebauthnSerializerFactory;
 use Webauthn\Exception\InvalidDataException;
+use Webauthn\PublicKeyCredential;
 use Webauthn\PublicKeyCredentialCreationOptions;
-use Webauthn\PublicKeyCredentialLoader;
 use Webauthn\PublicKeyCredentialParameters;
 use Webauthn\PublicKeyCredentialRequestOptions;
 use Webauthn\PublicKeyCredentialRpEntity;
@@ -147,7 +150,7 @@ class Webauthn_Server {
 		$excluded_credentials                    = $public_key_credential_source_repository->findAllForUserEntity( $user_entity );
 
 		$excluded_public_key_descriptors = array_map(
-			function ( PublicKeyCredentialSource $credential ) {
+			function ( CredentialRecord $credential ) {
 				return $credential->getPublicKeyCredentialDescriptor();
 			},
 			$excluded_credentials
@@ -198,22 +201,17 @@ class Webauthn_Server {
 	 *
 	 * @param string $data Data from the request.
 	 * @param WP_User $user Current User.
-	 * @return PublicKeyCredentialSource
+	 * @return CredentialRecord
 	 * @throws InvalidDataException If the request is invalid.
 	 */
-	public function validate_attestation_response( string $data, WP_User $user ): PublicKeyCredentialSource {
+	public function validate_attestation_response( string $data, WP_User $user ): CredentialRecord {
 		$attestation_statement_support_manager = AttestationStatementSupportManager::create();
 		$attestation_statement_support_manager->add( NoneAttestationStatementSupport::create() );
 
-		$attestation_object_loader = AttestationObjectLoader::create(
-			$attestation_statement_support_manager
-		);
+		// Use Symfony Serializer to deserialize PublicKeyCredential from JSON.
+		$serializer = $this->get_serializer();
+		$public_key_credential = $serializer->deserialize( $data, PublicKeyCredential::class, 'json' );
 
-		$public_key_credential_loader = PublicKeyCredentialLoader::create(
-			$attestation_object_loader
-		);
-
-		$public_key_credential              = $public_key_credential_loader->load( $data );
 		$authenticator_attestation_response = $public_key_credential->response;
 
 		if ( ! $authenticator_attestation_response instanceof AuthenticatorAttestationResponse ) {
@@ -225,7 +223,7 @@ class Webauthn_Server {
 		$ceremony_factory->setAlgorithmManager( $this->get_algorithm_manager() );
 		$ceremony_factory->setAttestationStatementSupportManager( $attestation_statement_support_manager );
 		$ceremony_factory->setExtensionOutputCheckerHandler( ExtensionOutputCheckerHandler::create() );
-		$ceremony_factory->setAllowedOrigins( array( 'localhost' ), false );
+		$ceremony_factory->setAllowedOrigins( $this->get_allowed_origins(), false );
 
 		$creation_ceremony = $ceremony_factory->creationCeremony();
 
@@ -239,17 +237,16 @@ class Webauthn_Server {
 		$public_key_credential_creation_options = $this->create_attestation_request( $user, $challenge );
 
 		// Validate the Attestation Response.
-		$public_key_credential_source = $authenticator_attestation_response_validator->check(
+		$credential_record = $authenticator_attestation_response_validator->check(
 			$authenticator_attestation_response,
 			$public_key_credential_creation_options,
-			null,
 			$this->get_current_domain()
 		);
 
 		// Delete the challenge from user meta.
 		delete_user_meta( $user->ID, 'wp_passkey_challenge' );
 
-		return $public_key_credential_source;
+		return $credential_record;
 	}
 
 	/**
@@ -257,23 +254,17 @@ class Webauthn_Server {
 	 *
 	 * @param string $data Data from the request.
 	 * @param string $challenge Challenge string.
-	 * @return PublicKeyCredentialSource
+	 * @return CredentialRecord
 	 * @throws InvalidDataException If the request is invalid.
 	 * @throws Exception If the credential id is not found.
 	 */
-	public function validate_assertion_response( string $data, string $challenge ): PublicKeyCredentialSource {
+	public function validate_assertion_response( string $data, string $challenge ): CredentialRecord {
 		$attestation_statement_support_manager = AttestationStatementSupportManager::create();
 		$attestation_statement_support_manager->add( NoneAttestationStatementSupport::create() );
 
-		$attestation_object_loader = AttestationObjectLoader::create(
-			$attestation_statement_support_manager
-		);
-
-		$public_key_credential_loader = PublicKeyCredentialLoader::create(
-			$attestation_object_loader
-		);
-
-		$public_key_credential            = $public_key_credential_loader->load( $data );
+		// Use Symfony Serializer to deserialize PublicKeyCredential from JSON.
+		$serializer                       = $this->get_serializer();
+		$public_key_credential            = $serializer->deserialize( $data, PublicKeyCredential::class, 'json' );
 		$authenticator_assertion_response = $public_key_credential->response;
 
 		if ( ! $authenticator_assertion_response instanceof AuthenticatorAssertionResponse ) {
@@ -285,7 +276,7 @@ class Webauthn_Server {
 		$ceremony_factory->setAlgorithmManager( $this->get_algorithm_manager() );
 		$ceremony_factory->setAttestationStatementSupportManager( $attestation_statement_support_manager );
 		$ceremony_factory->setExtensionOutputCheckerHandler( ExtensionOutputCheckerHandler::create() );
-		$ceremony_factory->setAllowedOrigins( array( 'localhost' ), false );
+		$ceremony_factory->setAllowedOrigins( $this->get_allowed_origins(), false );
 
 		$request_ceremony = $ceremony_factory->requestCeremony();
 
@@ -295,21 +286,34 @@ class Webauthn_Server {
 
 		$public_key_credential_source_repository = new Source_Repository();
 		$public_key_credential_request_options   = $this->create_assertion_request( $challenge );
-		$public_key_credential_source            = $public_key_credential_source_repository->findOneByCredentialId( $public_key_credential->id );
+		$credential_record                       = $public_key_credential_source_repository->findOneByCredentialId( $public_key_credential->rawId );
 
-		if ( ! $public_key_credential_source instanceof PublicKeyCredentialSource ) {
+		if ( ! $credential_record instanceof CredentialRecord ) {
 			throw new Exception( 'credential_not_found', 404 );
 		}
 
-		$public_key_credential_source = $authenticator_assertion_response_validator->check(
-			$public_key_credential_source,
+		$credential_record = $authenticator_assertion_response_validator->check(
+			$credential_record,
 			$authenticator_assertion_response,
 			$public_key_credential_request_options,
-			null,
-			$this->get_current_domain()
+			$this->get_current_domain(),
+			null
 		);
 
-		return $public_key_credential_source;
+		return $credential_record;
+	}
+
+	/**
+	 * Get the webauthn serializer for deserializing PublicKeyCredential objects.
+	 *
+	 * @return \Symfony\Component\Serializer\SerializerInterface
+	 */
+	private function get_serializer() {
+		$attestation_statement_support_manager = AttestationStatementSupportManager::create();
+		$attestation_statement_support_manager->add( NoneAttestationStatementSupport::create() );
+
+		$serializer_factory = new WebauthnSerializerFactory( $attestation_statement_support_manager );
+		return $serializer_factory->create();
 	}
 
 	/**
@@ -345,5 +349,99 @@ class Webauthn_Server {
 		$domain = wp_parse_url( get_site_url(), PHP_URL_HOST );
 
 		return $domain;
+	}
+
+	/**
+	 * Get allowed origins for WebAuthn ceremonies.
+	 *
+	 * @return string[] Array of allowed origins.
+	 */
+	private function get_allowed_origins(): array {
+		$domain = $this->get_current_domain();
+
+		if ( empty( $domain ) ) {
+			return array();
+		}
+
+		return array( $domain );
+	}
+
+	/**
+	 * Serialize PublicKeyCredentialCreationOptions to array for JSON response.
+	 *
+	 * @param PublicKeyCredentialCreationOptions $options The options to serialize.
+	 * @return array<string, mixed> The serialized options.
+	 */
+	public function serialize_creation_options( PublicKeyCredentialCreationOptions $options ): array {
+		$result = array(
+			'challenge'             => Base64UrlSafe::encodeUnpadded( $options->challenge ),
+			'timeout'               => $options->timeout,
+			'rp'                    => array(
+				'name' => $options->rp->name,
+				'id'   => $options->rp->id,
+			),
+			'user'                  => array(
+				'id'          => Base64UrlSafe::encodeUnpadded( $options->user->id ),
+				'name'        => $options->user->name,
+				'displayName' => $options->user->displayName,
+			),
+			'pubKeyCredParams'      => array_map(
+				function ( $param ) {
+					return array(
+						'type' => $param->type,
+						'alg'  => $param->alg,
+					);
+				},
+				$options->pubKeyCredParams
+			),
+			'excludeCredentials'    => array_map(
+				function ( $descriptor ) {
+					return array(
+						'type'       => $descriptor->type,
+						'id'         => Base64UrlSafe::encodeUnpadded( $descriptor->id ),
+						'transports' => $descriptor->transports,
+					);
+				},
+				$options->excludeCredentials
+			),
+			'authenticatorSelection' => null,
+			'attestation'           => $options->attestation,
+		);
+
+		if ( $options->authenticatorSelection ) {
+			$result['authenticatorSelection'] = array(
+				'authenticatorAttachment' => $options->authenticatorSelection->authenticatorAttachment,
+				'requireResidentKey'      => $options->authenticatorSelection->requireResidentKey,
+				'residentKey'             => $options->authenticatorSelection->residentKey,
+				'userVerification'        => $options->authenticatorSelection->userVerification,
+			);
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Serialize PublicKeyCredentialRequestOptions to array for JSON response.
+	 *
+	 * @param PublicKeyCredentialRequestOptions $options The options to serialize.
+	 * @return array<string, mixed> The serialized options.
+	 */
+	public function serialize_request_options( PublicKeyCredentialRequestOptions $options ): array {
+		return array(
+			'challenge'        => Base64UrlSafe::encodeUnpadded( $options->challenge ),
+			'timeout'          => $options->timeout,
+			'rpId'             => $options->rpId,
+			'allowCredentials' => array_map(
+				function ( $descriptor ) {
+					return array(
+						'type'       => $descriptor->type,
+						'id'         => Base64UrlSafe::encodeUnpadded( $descriptor->id ),
+						'transports' => $descriptor->transports,
+					);
+				},
+				$options->allowCredentials
+			),
+			'userVerification' => $options->userVerification,
+		);
 	}
 }

@@ -106,11 +106,12 @@ function register_request(): WP_REST_Response|WP_Error {
 
 	try {
 		$public_key_credential_creation_options = $webauthn_server->create_attestation_request( wp_get_current_user() );
+		$serialized_options                     = $webauthn_server->serialize_creation_options( $public_key_credential_creation_options );
 	} catch ( Exception $error ) {
 		return new WP_Error( 'invalid_request', 'Invalid request: ' . $error->getMessage(), array( 'status' => 400 ) );
 	}
 
-	return rest_ensure_response( $public_key_credential_creation_options );
+	return rest_ensure_response( $serialized_options );
 }
 
 /**
@@ -194,6 +195,7 @@ function signin_request(): WP_REST_Response|WP_Error {
 
 	try {
 		$public_key_credential_request_options = $webauthn_server->create_assertion_request();
+		$serialized_options                    = $webauthn_server->serialize_request_options( $public_key_credential_request_options );
 	} catch ( Exception $error ) {
 		return new WP_Error( 'invalid_request', 'Invalid request: ' . $error->getMessage(), array( 'status' => 400 ) );
 	}
@@ -205,7 +207,7 @@ function signin_request(): WP_REST_Response|WP_Error {
 	set_transient( 'wp_passkey_' . $request_id, $challenge, 60 );
 
 	$response = array(
-		'options'    => $public_key_credential_request_options,
+		'options'    => $serialized_options,
 		'request_id' => $request_id,
 	);
 
@@ -286,8 +288,11 @@ function revoke_request( WP_REST_Request $request ): WP_REST_Response|WP_Error {
 		return new WP_Error( 'invalid_request', 'Fingerprint param not exist.', array( 'status' => 400 ) );
 	}
 
+	// Decode fingerprint from UI (already base64url-encoded) to raw binary for lookup.
+	$credential_id = Base64UrlSafe::decodeNoPadding( $fingerprint );
+
 	$public_key_credential_source_repository = new Source_Repository();
-	$credential                              = $public_key_credential_source_repository->findOneByCredentialId( $fingerprint );
+	$credential                              = $public_key_credential_source_repository->findOneByCredentialId( $credential_id );
 
 	if ( ! $credential ) {
 		return new WP_Error( 'not_found', 'Fingeprint not found.', array( 'status' => 404 ) );

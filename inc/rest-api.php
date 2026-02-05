@@ -10,6 +10,7 @@ namespace BioAuth\Rest_API;
 use Exception;
 use BioAuth\Source_Repository;
 use BioAuth\Webauthn_Server;
+use ParagonIE\ConstantTime\Base64UrlSafe;
 use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;

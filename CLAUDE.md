@@ -140,7 +140,7 @@ Built with `@wordpress/scripts` (Webpack-based):
 ## Coding Standards
 
 - PHP: WordPress Coding Standards (WordPress-Extra) with Yoda conditions disabled
-- Minimum PHP version: 8.1
+- Minimum PHP version: 8.2
 - Minimum WordPress version: 6.2
 - Uses PHP strict types (`declare(strict_types=1)`)
 - Namespace: `BioAuth` with sub-namespaces for modules

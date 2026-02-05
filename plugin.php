@@ -9,12 +9,12 @@
  *
  * Plugin Name:  Biometric Authentication
  * Description:  Passkeys are a safer and easier alternative to passwords. Simply use your fingerprint or face ID to log in with ease. No more struggling to remember complex passwords.
- * Version:      0.3.9
+ * Version:      0.4.0
  * Author:       Ivan Kristianto
  * Author URI:   https://github.com/ivankristianto/
  * Plugin URI:   https://github.com/ivankristianto/wp-passkey/
  * Text Domain:  biometric-authentication
- * Requires PHP: 8.1
+ * Requires PHP: 8.2
  * Tested up to: 6.5
  * License:      GPLv2 or later
  *

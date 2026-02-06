@@ -212,6 +212,11 @@ class Webauthn_Server {
 		$serializer = $this->get_serializer();
 		$public_key_credential = $serializer->deserialize( $data, PublicKeyCredential::class, 'json' );
 
+		// Validate deserialized output type before property access.
+		if ( ! $public_key_credential instanceof PublicKeyCredential ) {
+			throw new InvalidDataException( $data, 'Invalid request: malformed credential data.' ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- This is not an output.
+		}
+
 		$authenticator_attestation_response = $public_key_credential->response;
 
 		if ( ! $authenticator_attestation_response instanceof AuthenticatorAttestationResponse ) {
@@ -265,6 +270,12 @@ class Webauthn_Server {
 		// Use Symfony Serializer to deserialize PublicKeyCredential from JSON.
 		$serializer                       = $this->get_serializer();
 		$public_key_credential            = $serializer->deserialize( $data, PublicKeyCredential::class, 'json' );
+
+		// Validate deserialized output type before property access.
+		if ( ! $public_key_credential instanceof PublicKeyCredential ) {
+			throw new InvalidDataException( $data, 'Invalid request: malformed credential data.' ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- This is not an output.
+		}
+
 		$authenticator_assertion_response = $public_key_credential->response;
 
 		if ( ! $authenticator_assertion_response instanceof AuthenticatorAssertionResponse ) {

@@ -308,6 +308,14 @@ function revoke_request( WP_REST_Request $request ): WP_REST_Response|WP_Error {
 		return new WP_Error( 'not_found', 'Fingeprint not found.', array( 'status' => 404 ) );
 	}
 
+	// Verify the credential belongs to the current user before allowing revocation.
+	$current_user           = wp_get_current_user();
+	$credential_user_handle = $credential->userHandle; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
+
+	if ( $credential_user_handle !== $current_user->user_login ) {
+		return new WP_Error( 'forbidden', 'You do not have permission to revoke this passkey.', array( 'status' => 403 ) );
+	}
+
 	try {
 		$public_key_credential_source_repository->deleteCredentialSource( $credential );
 	} catch ( Exception $error ) {

@@ -54,10 +54,10 @@ You need certain pieces of software on your computer before setting up this proj
 
 Whilst newer versions of the above packages may be available, the versions of the these the team is predominately running are:
 
-- PHP v8.1.x or above
+- PHP v8.2.x or above
 - Composer v2.x
-- Node.js v16.x
-- npm v7.x
+- Node.js v22.x
+- npm v10.x
 - Docker v20.x
 
 ### Installation

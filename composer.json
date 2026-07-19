@@ -11,21 +11,28 @@
     }
   ],
   "require": {
-    "php": ">=8.1",
-    "web-auth/webauthn-lib": "^4.9.2"
+    "php": ">=8.2",
+    "web-auth/webauthn-lib": "^5.2.3"
   },
   "require-dev": {
     "johnpbloch/wordpress": "dev-master",
     "phpstan/phpstan": "1.11.x-dev",
-    "phpunit/phpunit": "^8.5",
+    "phpunit/phpunit": "^9.6",
     "szepeviktor/phpstan-wordpress": "^1.2",
     "wp-phpunit/wp-phpunit": "^5.9",
     "yoast/phpunit-polyfills": "^2.0@dev",
-    "wp-coding-standards/wpcs": "^3.0"
+    "wp-coding-standards/wpcs": "^3.0",
+    "mockery/mockery": "^1.5"
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "BioAuth\\Tests\\Fixtures\\": "tests/php/fixtures/"
+    }
   },
   "scripts": {
     "format": "./vendor/bin/phpcbf -p --standard=phpcs.ruleset.xml ./inc",
-    "lint": "./vendor/bin/phpcs -p --standard=phpcs.ruleset.xml ./inc"
+    "lint": "./vendor/bin/phpcs -p --standard=phpcs.ruleset.xml ./inc",
+    "coverage": "wp-env run tests-cli --env-cwd=wp-content/plugins/wp-passkey vendor/bin/phpunit --coverage-text"
   },
   "config": {
     "allow-plugins": {

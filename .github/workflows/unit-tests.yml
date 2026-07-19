@@ -39,7 +39,7 @@ jobs:
         if: ${{ toJSON( steps.paths.outputs.changes ) != '"[]"' }}
         uses: shivammathur/setup-php@2.32.0
         with:
-          php-version: "8.1"
+          php-version: "8.2"
           coverage: none
           tools: composer:v2
 
@@ -55,13 +55,13 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ${{ steps.composer-cache-dir.outputs.dir }}
-          key: ${{ runner.os }}-composer-8.1-${{ hashFiles('composer.lock') }}
+          key: ${{ runner.os }}-composer-8.2-${{ hashFiles('composer.lock') }}
 
       - name: Cache Docker images.
         if: ${{ toJSON( steps.paths.outputs.changes ) != '"[]"' }}
         uses: ScribeMD/docker-cache@0.5.0
         with:
-          key: ${{ runner.os }}-composer-8.2-${{ hashFiles('composer.lock') }}
+          key: ${{ runner.os }}-docker-8.2-${{ hashFiles('composer.lock') }}
 
       - name: Install PHP dependencies
         if: ${{ toJSON( steps.paths.outputs.changes ) != '"[]"' }}

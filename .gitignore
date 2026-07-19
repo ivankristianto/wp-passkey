@@ -43,6 +43,7 @@ wordpress/
 # Testing #
 ###########
 .config/cache/*
+coverage/
 
 # Ignore temporary OS files #
 ############################

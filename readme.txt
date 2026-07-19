@@ -3,8 +3,8 @@ Contributors: ivankristianto
 Requires at least: 6.1
 Tags: authentication, biometric, passwordless, passkey, security
 Tested up to: 6.4
-Requires PHP: 8.1
-Stable tag: 0.3.8
+Requires PHP: 8.2
+Stable tag: 0.4.0
 License: GPLv2 or later
 
 Passkeys are a safer and easier alternative to passwords. Simply use your fingerprint or face ID to log in with ease.

@@ -111,7 +111,7 @@ class Source_Repository {
 	 * Save a new credential source.
 	 *
 	 * @param CredentialRecord $credential The credential record to save.
-	 * @param string[] $extra_data Extra data to store.
+	 * @param array<string, mixed> $extra_data Extra data to store.
 	 * @return void
 	 * @throws Exception If the user is not found.
 	 */

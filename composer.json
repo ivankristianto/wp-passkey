@@ -3,7 +3,6 @@
   "description": "Passkeys are a safer and easier alternative to passwords. Simply use your fingerprint or face ID to log in with ease.",
   "type": "wordpress-plugin",
   "license": "GPL-2.0+",
-  "minimum-stability": "dev",
   "authors": [
     {
       "name": "Ivan Kristianto",
@@ -12,17 +11,17 @@
   ],
   "require": {
     "php": ">=8.2",
-    "web-auth/webauthn-lib": "^5.2.3"
+    "web-auth/webauthn-lib": "^5.3.9"
   },
   "require-dev": {
-    "johnpbloch/wordpress": "dev-master",
-    "phpstan/phpstan": "1.11.x-dev",
+    "johnpbloch/wordpress": "^7.1",
+    "phpstan/phpstan": "^2.3",
     "phpunit/phpunit": "^9.6",
-    "szepeviktor/phpstan-wordpress": "^1.2",
-    "wp-phpunit/wp-phpunit": "^5.9",
-    "yoast/phpunit-polyfills": "^2.0@dev",
-    "wp-coding-standards/wpcs": "^3.0",
-    "mockery/mockery": "^1.5"
+    "szepeviktor/phpstan-wordpress": "^2.0",
+    "wp-phpunit/wp-phpunit": "^7.1",
+    "yoast/phpunit-polyfills": "^4.0",
+    "wp-coding-standards/wpcs": "^3.4.1",
+    "mockery/mockery": "^1.6"
   },
   "autoload-dev": {
     "psr-4": {
@@ -35,6 +34,9 @@
     "coverage": "wp-env run tests-cli --env-cwd=wp-content/plugins/wp-passkey vendor/bin/phpunit --coverage-text"
   },
   "config": {
+    "platform": {
+      "php": "8.2"
+    },
     "allow-plugins": {
       "johnpbloch/wordpress-core-installer": true,
       "dealerdirect/phpcodesniffer-composer-installer": true

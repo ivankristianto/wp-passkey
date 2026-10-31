@@ -10,4 +10,8 @@ parameters:
     analyse:
       - wordpress
   ignoreErrors:
-      - '#Function BioAuth\\Rest_API\\.*\(\) has parameter \$request with generic class WP_REST_Request but does not specify its types: T#'
+      # Deserialized WebAuthn payloads are re-checked at runtime even though their PHPDoc types say otherwise.
+      -
+        identifier: instanceof.alwaysTrue
+        path: inc/class-webauthn-server.php
+        count: 2

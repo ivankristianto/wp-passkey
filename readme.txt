@@ -4,7 +4,7 @@ Requires at least: 6.2
 Tags: authentication, biometric, passwordless, passkey, security
 Tested up to: 7.1
 Requires PHP: 8.2
-Stable tag: 0.4.0
+Stable tag: 0.5.0
 License: GPLv2 or later
 
 Passkeys are a safer and easier alternative to passwords. Simply use your fingerprint or face ID to log in with ease.
@@ -35,6 +35,16 @@ You can find the source code of this plugin on [GitHub](https://github.com/ivank
 To be added later, in the meantime file your question through [GitHub Issue](https://github.com/ivankristianto/wp-passkey/issues)
 
 == Changelog ==
+
+### 0.5.0
+
+- Security: Validate the post-login redirect on the server to prevent XSS and open redirects via `redirect_to`
+- Security: Save the passkey signature counter after each login so cloned authenticators are rejected
+- Security: Use cryptographically secure challenges; registration challenges now expire after 5 minutes and are single-use
+- Security: Reject registering a passkey that is already registered
+- Security: Update web-auth/webauthn-lib to 5.3.9 and web-auth/cose-lib to 4.8.2 (full-origin checks, EdDSA signature verification)
+- Replace non-standard Ed256/Ed512 algorithms with standard EdDSA, enabled only when the sodium extension is available
+- Show login errors as plain text
 
 ### 0.4.0
 

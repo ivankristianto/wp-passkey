@@ -53,3 +53,8 @@ coverage/
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# Playwright #
+##############
+tests/e2e/test-results/
+playwright-report/

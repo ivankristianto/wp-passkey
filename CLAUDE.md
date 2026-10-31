@@ -47,7 +47,15 @@ wp-env run tests-cli --env-cwd=wp-content/plugins/wp-passkey vendor/bin/phpunit 
 
 # Run specific test method
 wp-env run tests-cli --env-cwd=wp-content/plugins/wp-passkey vendor/bin/phpunit --filter test_method_name
+
+# Run end-to-end tests (needs `npm run build` and wp-env running; uses Google Chrome)
+npm run test-e2e
+
+# Run one e2e spec
+npx playwright test --config tests/e2e/playwright.config.js tests/e2e/passkey.spec.js
 ```
+
+The e2e suite (`tests/e2e/`) drives Chrome with a CDP WebAuthn virtual authenticator against the dev site (`http://localhost:8888`, override with `WP_BASE_URL`). It creates and deletes its own throwaway administrators through WP-CLI. Set `E2E_BROWSER_CHANNEL=chromium` to use Playwright's bundled Chromium instead of Google Chrome.
 
 ### Linting
 
@@ -175,6 +183,12 @@ npm run test-unit-php
 ```
 - All PHP unit tests must pass
 - No skipped or failing tests
+
+### 4. End-to-End Tests (for login, registration or front-end changes)
+```bash
+npm run test-e2e
+```
+- All Playwright specs in `tests/e2e/` must pass
 
 **CRITICAL:** Never claim "it's working" or "tests pass" without running these commands and verifying the actual output. Evidence before assertions always.
 

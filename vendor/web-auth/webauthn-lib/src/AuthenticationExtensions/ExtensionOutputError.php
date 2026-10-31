@@ -13,16 +13,8 @@ class ExtensionOutputError extends Exception
         public readonly AuthenticationExtension $authenticationExtension,
         string $message = '',
         int $code = 0,
-        Throwable $previous = null
+        ?Throwable $previous = null
     ) {
         parent::__construct($message, $code, $previous);
-    }
-
-    /**
-     * @deprecated since 4.7.0. Please use the property directly.
-     */
-    public function getAuthenticationExtension(): AuthenticationExtension
-    {
-        return $this->authenticationExtension;
     }
 }

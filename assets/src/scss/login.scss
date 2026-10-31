@@ -1,0 +1,34 @@
+#loginform {
+	display: flex;
+	flex-direction: column;
+}
+
+.wp-passkeys-options {
+	order: 100;
+	display: flex;
+	flex-direction: column;
+	align-items: stretch;
+	row-gap: 0.5em;
+}
+
+.wp-passkeys-sep {
+	text-transform: uppercase;
+	display: flex;
+	height: 1.5em;
+	column-gap: 1em;
+	margin: 1em 0;
+}
+
+.wp-passkeys-sep::before,
+.wp-passkeys-sep::after {
+	display: block;
+	content: "";
+	border-bottom: 1px solid #f0f0f1;
+	flex: 1;
+	height: 0.7em;
+}
+
+.wp-passkeys-options .button {
+	width: 100%;
+	text-align: center;
+}

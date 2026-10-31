@@ -4,101 +4,51 @@ declare(strict_types=1);
 
 namespace Webauthn;
 
+use function in_array;
 use InvalidArgumentException;
-use JsonSerializable;
+use function is_string;
+use function sprintf;
 use Webauthn\AuthenticationExtensions\AuthenticationExtension;
-use Webauthn\AuthenticationExtensions\AuthenticationExtensionsClientInputs;
+use Webauthn\AuthenticationExtensions\AuthenticationExtensions;
 
-abstract class PublicKeyCredentialOptions implements JsonSerializable
+abstract class PublicKeyCredentialOptions
 {
-    public AuthenticationExtensionsClientInputs $extensions;
+    public const HINT_SECURITY_KEY = 'security-key';
+
+    public const HINT_CLIENT_DEVICE = 'client-device';
+
+    public const HINT_HYBRID = 'hybrid';
+
+    public const HINTS = [self::HINT_SECURITY_KEY, self::HINT_CLIENT_DEVICE, self::HINT_HYBRID];
+
+    public AuthenticationExtensions $extensions;
 
     /**
      * @param positive-int|null $timeout
+     * @param null|AuthenticationExtensions|array<array-key, AuthenticationExtension> $extensions
+     * @param string[] $hints
      * @protected
      */
     public function __construct(
-        public readonly string $challenge,
-        /** @readonly  */
+        public string $challenge,
         public null|int $timeout = null,
-        /** @readonly  */
-        null|AuthenticationExtensionsClientInputs $extensions = null,
+        null|array|AuthenticationExtensions $extensions = null,
+        public array $hints = [],
     ) {
         ($this->timeout === null || $this->timeout > 0) || throw new InvalidArgumentException('Invalid timeout');
-        $this->extensions = $extensions ?? AuthenticationExtensionsClientInputs::create();
-    }
-
-    /**
-     * @deprecated since 4.7.0. Please use the {self::create} instead.
-     */
-    public function setTimeout(?int $timeout): static
-    {
-        $this->timeout = $timeout;
-
-        return $this;
-    }
-
-    /**
-     * @deprecated since 4.7.0. Please use the {self::create} instead.
-     */
-    public function addExtension(AuthenticationExtension $extension): static
-    {
-        $this->extensions[$extension->name] = $extension;
-
-        return $this;
-    }
-
-    /**
-     * @param AuthenticationExtension[] $extensions
-     * @deprecated since 4.7.0. No replacement. Please use the {self::create} instead.
-     */
-    public function addExtensions(array $extensions): static
-    {
-        foreach ($extensions as $extension) {
-            $this->extensions[$extension->name] = $extension;
+        if ($extensions === null) {
+            $this->extensions = AuthenticationExtensions::create();
+        } elseif ($extensions instanceof AuthenticationExtensions) {
+            $this->extensions = $extensions;
+        } else {
+            $this->extensions = AuthenticationExtensions::create($extensions);
         }
 
-        return $this;
+        foreach ($this->hints as $hint) {
+            is_string($hint) || throw new InvalidArgumentException('Invalid hint: hints must be strings');
+            in_array($hint, self::HINTS, true) || throw new InvalidArgumentException(
+                sprintf('Invalid hint "%s". Allowed values are: %s', $hint, implode(', ', self::HINTS))
+            );
+        }
     }
-
-    /**
-     * @deprecated since 4.7.0. Please use the {self::create} instead.
-     */
-    public function setExtensions(AuthenticationExtensionsClientInputs $extensions): static
-    {
-        $this->extensions = $extensions;
-
-        return $this;
-    }
-
-    /**
-     * @deprecated since 4.7.0. Please use the property directly.
-     */
-    public function getChallenge(): string
-    {
-        return $this->challenge;
-    }
-
-    /**
-     * @deprecated since 4.7.0. Please use the property directly.
-     */
-    public function getTimeout(): ?int
-    {
-        return $this->timeout;
-    }
-
-    /**
-     * @deprecated since 4.7.0. Please use the property directly.
-     */
-    public function getExtensions(): AuthenticationExtensionsClientInputs
-    {
-        return $this->extensions;
-    }
-
-    abstract public static function createFromString(string $data): static;
-
-    /**
-     * @param mixed[] $json
-     */
-    abstract public static function createFromArray(array $json): static;
 }

@@ -4,71 +4,59 @@ declare(strict_types=1);
 
 namespace Webauthn\Event;
 
-use Psr\Http\Message\ServerRequestInterface;
+use LogicException;
+use function sprintf;
 use Webauthn\AuthenticatorAssertionResponse;
+use Webauthn\CredentialRecord;
 use Webauthn\PublicKeyCredentialRequestOptions;
 use Webauthn\PublicKeyCredentialSource;
 
 class AuthenticatorAssertionResponseValidationSucceededEvent
 {
     public function __construct(
-        private readonly null|string $credentialId,
-        private readonly AuthenticatorAssertionResponse $authenticatorAssertionResponse,
-        private readonly PublicKeyCredentialRequestOptions $publicKeyCredentialRequestOptions,
-        public readonly ServerRequestInterface|string $host,
-        private readonly ?string $userHandle,
-        private readonly PublicKeyCredentialSource $publicKeyCredentialSource
+        public readonly AuthenticatorAssertionResponse $authenticatorAssertionResponse,
+        public readonly PublicKeyCredentialRequestOptions $publicKeyCredentialRequestOptions,
+        public readonly string $host,
+        public readonly ?string $userHandle,
+        public readonly CredentialRecord $credentialRecord
     ) {
-        if ($host instanceof ServerRequestInterface) {
-            trigger_deprecation(
-                'web-auth/webauthn-lib',
-                '4.5.0',
-                sprintf(
-                    'Passing a %s to the class "%s" is deprecated since 4.5.0 and will be removed in 5.0.0. Please inject the host as a string instead.',
-                    ServerRequestInterface::class,
-                    self::class
-                )
-            );
-        }
-        if ($this->credentialId !== null) {
-            trigger_deprecation(
-                'web-auth/webauthn-lib',
-                '4.6.0',
-                'The argument "$credentialId" is deprecated since 4.6.0 and will be removed in 5.0.0. Please set null instead.'
-            );
-        }
-    }
-
-    public function getCredentialId(): string
-    {
-        return $this->publicKeyCredentialSource->publicKeyCredentialId;
-    }
-
-    public function getAuthenticatorAssertionResponse(): AuthenticatorAssertionResponse
-    {
-        return $this->authenticatorAssertionResponse;
-    }
-
-    public function getPublicKeyCredentialRequestOptions(): PublicKeyCredentialRequestOptions
-    {
-        return $this->publicKeyCredentialRequestOptions;
     }
 
     /**
-     * @deprecated since 4.5.0 and will be removed in 5.0.0. Please use the `host` property instead
+     * @deprecated since 5.3, use credentialRecord instead. Will be removed in 6.0.
      */
-    public function getRequest(): ServerRequestInterface|string
+    public function __get(string $name): mixed
     {
-        return $this->host;
+        if ($name === 'publicKeyCredentialSource') {
+            return $this->getPublicKeyCredentialSource();
+        }
+
+        throw new LogicException(sprintf('Undefined property: %s::$%s', self::class, $name));
     }
 
-    public function getUserHandle(): ?string
-    {
-        return $this->userHandle;
-    }
-
+    /**
+     * @deprecated since 5.3, use credentialRecord instead. Will be removed in 6.0.
+     */
     public function getPublicKeyCredentialSource(): PublicKeyCredentialSource
     {
-        return $this->publicKeyCredentialSource;
+        if ($this->credentialRecord instanceof PublicKeyCredentialSource) {
+            return $this->credentialRecord;
+        }
+
+        return new PublicKeyCredentialSource(
+            $this->credentialRecord->publicKeyCredentialId,
+            $this->credentialRecord->type,
+            $this->credentialRecord->transports,
+            $this->credentialRecord->attestationType,
+            $this->credentialRecord->trustPath,
+            $this->credentialRecord->aaguid,
+            $this->credentialRecord->credentialPublicKey,
+            $this->credentialRecord->userHandle,
+            $this->credentialRecord->counter,
+            $this->credentialRecord->otherUI,
+            $this->credentialRecord->backupEligible,
+            $this->credentialRecord->backupStatus,
+            $this->credentialRecord->uvInitialized,
+        );
     }
 }

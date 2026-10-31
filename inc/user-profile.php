@@ -8,7 +8,7 @@ declare( strict_types = 1 );
 namespace BioAuth\User_Profile;
 
 use BioAuth;
-use Kucrut\Vite;
+use BioAuth\Helpers;
 use ParagonIE\ConstantTime\Base64UrlSafe;
 use Webauthn\PublicKeyCredentialUserEntity;
 use BioAuth\Source_Repository;
@@ -40,14 +40,25 @@ function enqueue_scripts() {
 		return;
 	}
 
-	Vite\enqueue_asset(
-		trailingslashit( BioAuth\BASE_DIR ) . 'assets/dist',
-		'assets/src/js/user-profile.js',
-		array(
-			'handle'       => 'wp-passkeys-user-profile',
-			'dependencies' => array( 'wp-api-fetch', 'wp-dom-ready', 'wp-i18n' ),
-			'in-footer'    => true,
-		)
+	// Enqueue runtime script for development.
+	Helpers\enqueue_runtime();
+
+	// Get the assets file detail.
+	$asset_file = require_once BioAuth\BASE_DIR . '/assets/dist/user-profile.asset.php';
+
+	wp_enqueue_script(
+		'wp-passkeys-user-profile',
+		trailingslashit( plugin_dir_url( BioAuth\BASE_FILE ) ) . 'assets/dist/user-profile.js',
+		$asset_file['dependencies'],
+		$asset_file['version'],
+		true
+	);
+
+	wp_enqueue_style(
+		'wp-passkeys-user-profile',
+		trailingslashit( plugin_dir_url( BioAuth\BASE_FILE ) ) . 'assets/dist/user-profile.css',
+		array(),
+		$asset_file['version']
 	);
 }
 
@@ -96,7 +107,7 @@ function display_user_passkeys( WP_User $user ) {
 
 				foreach ( $public_key_credentials as $public_key_credential ) :
 					$extra_data  = $public_key_credential_source_repository->get_extra_data( $public_key_credential );
-					$fingerprint = Base64UrlSafe::encodeUnpadded( $public_key_credential->getPublicKeyCredentialId() );
+					$fingerprint = Base64UrlSafe::encodeUnpadded( $public_key_credential->publicKeyCredentialId ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- External library property.
 					?>
 				<tr>
 					<td>
@@ -108,7 +119,7 @@ function display_user_passkeys( WP_User $user ) {
 						?>
 					</td>
 					<td>
-						<?php echo esc_html( $public_key_credential->getPublicKeyCredentialDescriptor()->getType() ); ?>
+						<?php echo esc_html( $public_key_credential->type ); ?>
 					</td>
 					<td>
 						<?php

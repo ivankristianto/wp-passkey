@@ -10,6 +10,7 @@ namespace BioAuth\Rest_API;
 use Exception;
 use BioAuth\Source_Repository;
 use BioAuth\Webauthn_Server;
+use ParagonIE\ConstantTime\Base64UrlSafe;
 use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
@@ -106,11 +107,12 @@ function register_request(): WP_REST_Response|WP_Error {
 
 	try {
 		$public_key_credential_creation_options = $webauthn_server->create_attestation_request( wp_get_current_user() );
+		$serialized_options                     = $webauthn_server->serialize_creation_options( $public_key_credential_creation_options );
 	} catch ( Exception $error ) {
 		return new WP_Error( 'invalid_request', 'Invalid request: ' . $error->getMessage(), array( 'status' => 400 ) );
 	}
 
-	return rest_ensure_response( $public_key_credential_creation_options );
+	return rest_ensure_response( $serialized_options );
 }
 
 /**
@@ -168,6 +170,11 @@ function register_response( WP_REST_Request $request ): WP_REST_Response|WP_Erro
 			'user_agent' => $user_agent,
 		);
 
+		// Credential IDs must be unique across all users.
+		if ( $public_key_credential_source_repository->findOneByCredentialId( $credential->publicKeyCredentialId ) ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
+			return new WP_Error( 'credential_exists', 'This passkey is already registered.', array( 'status' => 409 ) );
+		}
+
 		// Finally store the credential source to database.
 		$public_key_credential_source_repository->saveCredentialSource( $credential, $extra_data );
 
@@ -194,18 +201,19 @@ function signin_request(): WP_REST_Response|WP_Error {
 
 	try {
 		$public_key_credential_request_options = $webauthn_server->create_assertion_request();
+		$serialized_options                    = $webauthn_server->serialize_request_options( $public_key_credential_request_options );
 	} catch ( Exception $error ) {
 		return new WP_Error( 'invalid_request', 'Invalid request: ' . $error->getMessage(), array( 'status' => 400 ) );
 	}
 
-	$challenge = $public_key_credential_request_options->getChallenge();
+	$challenge = $public_key_credential_request_options->challenge;
 
 	// Store the challenge in transient for 60 seconds.
 	// For some hosting transient set to persistent object cache like Redis/Memcache. By default it stored in options table.
 	set_transient( 'wp_passkey_' . $request_id, $challenge, 60 );
 
 	$response = array(
-		'options'    => $public_key_credential_request_options,
+		'options'    => $serialized_options,
 		'request_id' => $request_id,
 	);
 
@@ -246,12 +254,19 @@ function signin_response( WP_REST_Request $request ): WP_REST_Response|WP_Error 
 	try {
 		$public_key_credential_source = $webauthn_server->validate_assertion_response( $assertion_response, $challenge );
 
-		$user_handle = $public_key_credential_source->getUserHandle();
+		$user_handle = $public_key_credential_source->userHandle; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
 		$user        = get_user_by( 'login', $user_handle );
 
 		if ( ! $user instanceof WP_User ) {
 			return new WP_Error( 'user_not_found', 'User not found.', array( 'status' => 404 ) );
 		}
+
+		// Persist the updated signature counter and flags so cloned authenticators can be detected.
+		$public_key_credential_source_repository = new Source_Repository();
+		$public_key_credential_source_repository->saveCredentialSource(
+			$public_key_credential_source,
+			$public_key_credential_source_repository->get_extra_data( $public_key_credential_source )
+		);
 
 		// If user found and authorized, set the login cookie.
 		wp_set_auth_cookie( $user->ID, true, is_ssl() );
@@ -261,10 +276,46 @@ function signin_response( WP_REST_Request $request ): WP_REST_Response|WP_Error 
 
 	return rest_ensure_response(
 		array(
-			'status'  => 'verified',
-			'message' => __( 'Successfully signin with Passkey.', 'biometric-authentication' ),
+			'status'      => 'verified',
+			'message'     => __( 'Successfully signin with Passkey.', 'biometric-authentication' ),
+			'redirect_to' => get_login_redirect( $data['redirect_to'] ?? '', $user ),
 		)
 	);
+}
+
+/**
+ * Get a safe post-login redirect URL.
+ *
+ * Mirrors wp-login.php: the requested URL passes through the `login_redirect` filter
+ * and is then validated so only http(s) URLs on allowed hosts are returned. Anything
+ * else (javascript:, data:, external hosts, ...) falls back to the admin URL.
+ *
+ * @param mixed   $requested_redirect The requested redirect URL from the client.
+ * @param WP_User $user               The user who just signed in.
+ * @return string Safe redirect URL.
+ */
+function get_login_redirect( mixed $requested_redirect, WP_User $user ): string {
+	$fallback           = admin_url();
+	$requested_redirect = is_string( $requested_redirect ) ? trim( $requested_redirect ) : '';
+	$redirect_to        = '' !== $requested_redirect ? $requested_redirect : $fallback;
+
+	/** This filter is documented in wp-login.php */
+	$redirect_to = apply_filters( 'login_redirect', $redirect_to, $requested_redirect, $user );
+
+	if ( ! is_string( $redirect_to ) || '' === trim( $redirect_to ) ) {
+		return $fallback;
+	}
+
+	$redirect_to = trim( $redirect_to );
+
+	// Resolve path-relative URLs (e.g. "wp-admin/") against the login page location, as the
+	// browser would on wp-login.php. Otherwise wp_validate_redirect() resolves them against
+	// the REST route. This runs after the filter so filtered values are resolved too.
+	if ( ! wp_parse_url( $redirect_to, PHP_URL_SCHEME ) && ! str_starts_with( $redirect_to, '/' ) ) {
+		$redirect_to = site_url( $redirect_to );
+	}
+
+	return wp_validate_redirect( wp_sanitize_redirect( $redirect_to ), $fallback );
 }
 
 /**
@@ -286,11 +337,31 @@ function revoke_request( WP_REST_Request $request ): WP_REST_Response|WP_Error {
 		return new WP_Error( 'invalid_request', 'Fingerprint param not exist.', array( 'status' => 400 ) );
 	}
 
+	// Validate base64url format (charset: A-Za-z0-9_-).
+	if ( ! preg_match( '/^[A-Za-z0-9_-]+$/', $fingerprint ) ) {
+		return new WP_Error( 'invalid_request', 'Invalid fingerprint format.', array( 'status' => 400 ) );
+	}
+
+	// Decode fingerprint from UI (already base64url-encoded) to raw binary for lookup.
+	try {
+		$credential_id = Base64UrlSafe::decodeNoPadding( $fingerprint );
+	} catch ( Exception $error ) {
+		return new WP_Error( 'invalid_request', 'Fingerprint decoding failed.', array( 'status' => 400 ) );
+	}
+
 	$public_key_credential_source_repository = new Source_Repository();
-	$credential                              = $public_key_credential_source_repository->findOneByCredentialId( $fingerprint );
+	$credential                              = $public_key_credential_source_repository->findOneByCredentialId( $credential_id );
 
 	if ( ! $credential ) {
 		return new WP_Error( 'not_found', 'Fingeprint not found.', array( 'status' => 404 ) );
+	}
+
+	// Verify the credential belongs to the current user before allowing revocation.
+	$current_user           = wp_get_current_user();
+	$credential_user_handle = $credential->userHandle; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
+
+	if ( $credential_user_handle !== $current_user->user_login ) {
+		return new WP_Error( 'forbidden', 'You do not have permission to revoke this passkey.', array( 'status' => 403 ) );
 	}
 
 	try {

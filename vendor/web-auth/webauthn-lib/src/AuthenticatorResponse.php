@@ -13,12 +13,4 @@ abstract class AuthenticatorResponse
         public readonly CollectedClientData $clientDataJSON
     ) {
     }
-
-    /**
-     * @deprecated since 4.7.0. Please use the property directly.
-     */
-    public function getClientDataJSON(): CollectedClientData
-    {
-        return $this->clientDataJSON;
-    }
 }

@@ -7,12 +7,9 @@
     "authors": [
         {
             "name": "PHP-FIG",
-            "homepage": "https://www.php-fig.org/"
+            "homepage": "http://www.php-fig.org/"
         }
     ],
-    "support": {
-        "source": "https://github.com/php-fig/event-dispatcher"
-    },
     "require": {
         "php": ">=7.2.0"
     },
@@ -20,9 +17,6 @@
         "psr-4": {
             "Psr\\EventDispatcher\\": "src/"
         }
-    },
-    "suggest": {
-        "fig/event-dispatcher-util": "Provides some useful PSR-14 utilities"
     },
     "extra": {
         "branch-alias": {

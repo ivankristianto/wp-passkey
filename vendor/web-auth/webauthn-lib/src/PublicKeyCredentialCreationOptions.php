@@ -4,16 +4,10 @@ declare(strict_types=1);
 
 namespace Webauthn;
 
-use InvalidArgumentException;
-use ParagonIE\ConstantTime\Base64UrlSafe;
-use Webauthn\AuthenticationExtensions\AuthenticationExtensionsClientInputs;
-use Webauthn\Exception\InvalidDataException;
-use Webauthn\Util\Base64;
-use function array_key_exists;
-use function count;
 use function in_array;
-use function is_array;
-use const JSON_THROW_ON_ERROR;
+use InvalidArgumentException;
+use Webauthn\AuthenticationExtensions\AuthenticationExtensions;
+use Webauthn\Exception\InvalidDataException;
 
 final class PublicKeyCredentialCreationOptions extends PublicKeyCredentialOptions
 {
@@ -35,26 +29,43 @@ final class PublicKeyCredentialCreationOptions extends PublicKeyCredentialOption
         self::ATTESTATION_CONVEYANCE_PREFERENCE_ENTERPRISE,
     ];
 
+    public const MEDIATION_DEFAULT = 'default';
+
+    public const MEDIATION_CONDITIONAL = 'conditional';
+
+    public const MEDIATIONS = [self::MEDIATION_DEFAULT, self::MEDIATION_CONDITIONAL];
+
     /**
-     * @private
+     * Server-side mediation hint. Mirrors the JS `mediation` option of `navigator.credentials.create()`
+     * but is *not* sent to the browser — it controls how the framework validates the response.
+     *
+     * - `MEDIATION_DEFAULT` (default) — full ceremony validation, including User Presence (UP) bit.
+     * - `MEDIATION_CONDITIONAL` — auto-register flow (e.g. SimpleWebAuthn `useAutoRegister: true`):
+     *   the UP bit is allowed to be false because the user already authenticated through another
+     *   factor (typically password). All other checks remain.
+     *
+     * @see https://github.com/w3c/webauthn/wiki/Explainer:-Conditional-Create
+     */
+    public null|string $mediation;
+
+    /**
      * @param PublicKeyCredentialParameters[] $pubKeyCredParams
      * @param PublicKeyCredentialDescriptor[] $excludeCredentials
-     * @param positive-int $timeout
+     * @param null|positive-int $timeout
+     * @param string[] $hints
      */
     public function __construct(
         public readonly PublicKeyCredentialRpEntity $rp,
         public readonly PublicKeyCredentialUserEntity $user,
         string $challenge,
-        /** @readonly  */
         public array $pubKeyCredParams = [],
-        /** @readonly  */
         public null|AuthenticatorSelectionCriteria $authenticatorSelection = null,
-        /** @readonly  */
         public null|string $attestation = null,
-        /** @readonly  */
         public array $excludeCredentials = [],
         null|int $timeout = null,
-        null|AuthenticationExtensionsClientInputs $extensions = null,
+        null|AuthenticationExtensions $extensions = null,
+        array $hints = [],
+        null|string $mediation = null,
     ) {
         foreach ($pubKeyCredParams as $pubKeyCredParam) {
             $pubKeyCredParam instanceof PublicKeyCredentialParameters || throw new InvalidArgumentException(
@@ -70,28 +81,34 @@ final class PublicKeyCredentialCreationOptions extends PublicKeyCredentialOption
             $attestation,
             'Invalid attestation conveyance mode'
         );
+        $mediation === null || in_array($mediation, self::MEDIATIONS, true) || throw InvalidDataException::create(
+            $mediation,
+            'Invalid mediation requirement'
+        );
 
-        parent::__construct($challenge, $timeout, $extensions);
+        $this->mediation = $mediation;
+
+        parent::__construct($challenge, $timeout, $extensions, $hints);
     }
 
     /**
      * @param PublicKeyCredentialParameters[] $pubKeyCredParams
      * @param PublicKeyCredentialDescriptor[] $excludeCredentials
-     * @param positive-int $timeout
+     * @param null|positive-int $timeout
+     * @param string[] $hints
      */
     public static function create(
         PublicKeyCredentialRpEntity $rp,
         PublicKeyCredentialUserEntity $user,
         string $challenge,
         array $pubKeyCredParams = [],
-        /** @readonly  */
         null|AuthenticatorSelectionCriteria $authenticatorSelection = null,
-        /** @readonly  */
         null|string $attestation = null,
-        /** @readonly  */
         array $excludeCredentials = [],
         null|int $timeout = null,
-        null|AuthenticationExtensionsClientInputs $extensions = null,
+        null|AuthenticationExtensions $extensions = null,
+        array $hints = [],
+        null|string $mediation = null,
     ): self {
         return new self(
             $rp,
@@ -102,230 +119,9 @@ final class PublicKeyCredentialCreationOptions extends PublicKeyCredentialOption
             $attestation,
             $excludeCredentials,
             $timeout,
-            $extensions
+            $extensions,
+            $hints,
+            $mediation,
         );
-    }
-
-    /**
-     * @deprecated since 4.7.0. Please use the {self::create} instead.
-     */
-    public function addPubKeyCredParam(PublicKeyCredentialParameters $pubKeyCredParam): self
-    {
-        $this->pubKeyCredParams[] = $pubKeyCredParam;
-
-        return $this;
-    }
-
-    /**
-     * @deprecated since 4.7.0. No replacement. Please use the {self::create} instead.
-     */
-    public function addPubKeyCredParams(PublicKeyCredentialParameters ...$pubKeyCredParams): self
-    {
-        foreach ($pubKeyCredParams as $pubKeyCredParam) {
-            $this->pubKeyCredParams[] = $pubKeyCredParam;
-        }
-
-        return $this;
-    }
-
-    /**
-     * @deprecated since 4.7.0. Please use the {self::create} instead.
-     */
-    public function excludeCredential(PublicKeyCredentialDescriptor $excludeCredential): self
-    {
-        $this->excludeCredentials[] = $excludeCredential;
-
-        return $this;
-    }
-
-    /**
-     * @deprecated since 4.7.0. No replacement. Please use the {self::create} instead.
-     */
-    public function excludeCredentials(PublicKeyCredentialDescriptor ...$excludeCredentials): self
-    {
-        foreach ($excludeCredentials as $excludeCredential) {
-            $this->excludeCredentials[] = $excludeCredential;
-        }
-
-        return $this;
-    }
-
-    /**
-     * @deprecated since 4.7.0. Please use the {self::create} instead.
-     */
-    public function setAuthenticatorSelection(?AuthenticatorSelectionCriteria $authenticatorSelection): self
-    {
-        $this->authenticatorSelection = $authenticatorSelection;
-
-        return $this;
-    }
-
-    /**
-     * @deprecated since 4.7.0. Please use the {self::create} instead.
-     */
-    public function setAttestation(string $attestation): self
-    {
-        in_array($attestation, self::ATTESTATION_CONVEYANCE_PREFERENCES, true) || throw InvalidDataException::create(
-            $attestation,
-            'Invalid attestation conveyance mode'
-        );
-        $this->attestation = $attestation;
-
-        return $this;
-    }
-
-    /**
-     * @deprecated since 4.7.0. Please use the property directly.
-     */
-    public function getRp(): PublicKeyCredentialRpEntity
-    {
-        return $this->rp;
-    }
-
-    /**
-     * @deprecated since 4.7.0. Please use the property directly.
-     */
-    public function getUser(): PublicKeyCredentialUserEntity
-    {
-        return $this->user;
-    }
-
-    /**
-     * @return PublicKeyCredentialParameters[]
-     * @deprecated since 4.7.0. Please use the property directly.
-     */
-    public function getPubKeyCredParams(): array
-    {
-        return $this->pubKeyCredParams;
-    }
-
-    /**
-     * @return PublicKeyCredentialDescriptor[]
-     * @deprecated since 4.7.0. Please use the property directly.
-     */
-    public function getExcludeCredentials(): array
-    {
-        return $this->excludeCredentials;
-    }
-
-    /**
-     * @deprecated since 4.7.0. Please use the property directly.
-     */
-    public function getAuthenticatorSelection(): ?AuthenticatorSelectionCriteria
-    {
-        return $this->authenticatorSelection;
-    }
-
-    /**
-     * @deprecated since 4.7.0. Please use the property directly.
-     */
-    public function getAttestation(): ?string
-    {
-        return $this->attestation;
-    }
-
-    public static function createFromString(string $data): static
-    {
-        $data = json_decode($data, true, flags: JSON_THROW_ON_ERROR);
-
-        return self::createFromArray($data);
-    }
-
-    public static function createFromArray(array $json): static
-    {
-        array_key_exists('rp', $json) || throw InvalidDataException::create($json, 'Invalid input. "rp" is missing.');
-        array_key_exists('pubKeyCredParams', $json) || throw InvalidDataException::create(
-            $json,
-            'Invalid input. "pubKeyCredParams" is missing.'
-        );
-        is_array($json['pubKeyCredParams']) || throw InvalidDataException::create(
-            $json,
-            'Invalid input. "pubKeyCredParams" is not an array.'
-        );
-        array_key_exists('challenge', $json) || throw InvalidDataException::create(
-            $json,
-            'Invalid input. "challenge" is missing.'
-        );
-        array_key_exists('attestation', $json) || throw InvalidDataException::create(
-            $json,
-            'Invalid input. "attestation" is missing.'
-        );
-        array_key_exists('user', $json) || throw InvalidDataException::create(
-            $json,
-            'Invalid input. "user" is missing.'
-        );
-
-        $pubKeyCredParams = [];
-        foreach ($json['pubKeyCredParams'] as $pubKeyCredParam) {
-            if (! is_array($pubKeyCredParam)) {
-                continue;
-            }
-            $pubKeyCredParams[] = PublicKeyCredentialParameters::createFromArray($pubKeyCredParam);
-        }
-        $excludeCredentials = [];
-        if (isset($json['excludeCredentials'])) {
-            foreach ($json['excludeCredentials'] as $excludeCredential) {
-                $excludeCredentials[] = PublicKeyCredentialDescriptor::createFromArray($excludeCredential);
-            }
-        }
-
-        $challenge = Base64::decode($json['challenge']);
-
-        $authenticatorSelection = isset($json['authenticatorSelection']) ? AuthenticatorSelectionCriteria::createFromArray(
-            $json['authenticatorSelection']
-        ) : null
-        ;
-        $extensions =
-            isset($json['extensions']) ? AuthenticationExtensionsClientInputs::createFromArray(
-                $json['extensions']
-            ) : AuthenticationExtensionsClientInputs::create()
-        ;
-        return self
-            ::create(
-                PublicKeyCredentialRpEntity::createFromArray($json['rp']),
-                PublicKeyCredentialUserEntity::createFromArray($json['user']),
-                $challenge,
-                $pubKeyCredParams,
-                $authenticatorSelection,
-                $json['attestation'] ?? null,
-                $excludeCredentials,
-                $json['timeout'] ?? null,
-                $extensions
-            );
-    }
-
-    /**
-     * @return mixed[]
-     */
-    public function jsonSerialize(): array
-    {
-        $json = [
-            'rp' => $this->rp,
-            'user' => $this->user,
-            'challenge' => Base64UrlSafe::encodeUnpadded($this->challenge),
-            'pubKeyCredParams' => $this->pubKeyCredParams,
-        ];
-
-        if ($this->timeout !== null) {
-            $json['timeout'] = $this->timeout;
-        }
-
-        if (count($this->excludeCredentials) !== 0) {
-            $json['excludeCredentials'] = $this->excludeCredentials;
-        }
-
-        if ($this->authenticatorSelection !== null) {
-            $json['authenticatorSelection'] = $this->authenticatorSelection;
-        }
-
-        if ($this->attestation !== null) {
-            $json['attestation'] = $this->attestation;
-        }
-
-        if ($this->extensions->count() !== 0) {
-            $json['extensions'] = $this->extensions;
-        }
-
-        return $json;
     }
 }

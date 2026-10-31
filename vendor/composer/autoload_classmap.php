@@ -6,5 +6,28 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
+    'CURLStringFile' => $vendorDir . '/symfony/polyfill-php81/Resources/stubs/CURLStringFile.php',
     'Composer\\InstalledVersions' => $vendorDir . '/composer/InstalledVersions.php',
+    'DateError' => $vendorDir . '/symfony/polyfill-php83/Resources/stubs/DateError.php',
+    'DateException' => $vendorDir . '/symfony/polyfill-php83/Resources/stubs/DateException.php',
+    'DateInvalidOperationException' => $vendorDir . '/symfony/polyfill-php83/Resources/stubs/DateInvalidOperationException.php',
+    'DateInvalidTimeZoneException' => $vendorDir . '/symfony/polyfill-php83/Resources/stubs/DateInvalidTimeZoneException.php',
+    'DateMalformedIntervalStringException' => $vendorDir . '/symfony/polyfill-php83/Resources/stubs/DateMalformedIntervalStringException.php',
+    'DateMalformedPeriodStringException' => $vendorDir . '/symfony/polyfill-php83/Resources/stubs/DateMalformedPeriodStringException.php',
+    'DateMalformedStringException' => $vendorDir . '/symfony/polyfill-php83/Resources/stubs/DateMalformedStringException.php',
+    'DateObjectError' => $vendorDir . '/symfony/polyfill-php83/Resources/stubs/DateObjectError.php',
+    'DateRangeError' => $vendorDir . '/symfony/polyfill-php83/Resources/stubs/DateRangeError.php',
+    'Deprecated' => $vendorDir . '/symfony/polyfill-php84/Resources/stubs/Deprecated.php',
+    'Normalizer' => $vendorDir . '/symfony/polyfill-intl-normalizer/Resources/stubs/Normalizer.php',
+    'Override' => $vendorDir . '/symfony/polyfill-php83/Resources/stubs/Override.php',
+    'Pdo\\Dblib' => $vendorDir . '/symfony/polyfill-php84/Resources/stubs/Pdo/Dblib.php',
+    'Pdo\\Firebird' => $vendorDir . '/symfony/polyfill-php84/Resources/stubs/Pdo/Firebird.php',
+    'Pdo\\Mysql' => $vendorDir . '/symfony/polyfill-php84/Resources/stubs/Pdo/Mysql.php',
+    'Pdo\\Odbc' => $vendorDir . '/symfony/polyfill-php84/Resources/stubs/Pdo/Odbc.php',
+    'Pdo\\Pgsql' => $vendorDir . '/symfony/polyfill-php84/Resources/stubs/Pdo/Pgsql.php',
+    'Pdo\\Sqlite' => $vendorDir . '/symfony/polyfill-php84/Resources/stubs/Pdo/Sqlite.php',
+    'ReflectionConstant' => $vendorDir . '/symfony/polyfill-php84/Resources/stubs/ReflectionConstant.php',
+    'ReturnTypeWillChange' => $vendorDir . '/symfony/polyfill-php81/Resources/stubs/ReturnTypeWillChange.php',
+    'RoundingMode' => $vendorDir . '/symfony/polyfill-php84/Resources/stubs/RoundingMode.php',
+    'SQLite3Exception' => $vendorDir . '/symfony/polyfill-php83/Resources/stubs/SQLite3Exception.php',
 );

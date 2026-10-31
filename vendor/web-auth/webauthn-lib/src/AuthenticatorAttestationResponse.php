@@ -32,22 +32,4 @@ class AuthenticatorAttestationResponse extends AuthenticatorResponse
     ): self {
         return new self($clientDataJSON, $attestationObject, $transports);
     }
-
-    /**
-     * @deprecated since 4.7.0. Please use the property directly.
-     */
-    public function getAttestationObject(): AttestationObject
-    {
-        return $this->attestationObject;
-    }
-
-    /**
-     * @deprecated since 4.7.0. Please use the property directly.
-     *
-     * @return string[]
-     */
-    public function getTransports(): array
-    {
-        return $this->transports;
-    }
 }

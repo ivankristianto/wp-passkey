@@ -15,8 +15,7 @@ use Cose\Algorithm\Signature\ECDSA\ES256;
 use Cose\Algorithm\Signature\ECDSA\ES256K;
 use Cose\Algorithm\Signature\ECDSA\ES384;
 use Cose\Algorithm\Signature\ECDSA\ES512;
-use Cose\Algorithm\Signature\EdDSA\Ed256;
-use Cose\Algorithm\Signature\EdDSA\Ed512;
+use Cose\Algorithm\Signature\EdDSA\EdDSA;
 use Cose\Algorithm\Signature\RSA\PS256;
 use Cose\Algorithm\Signature\RSA\PS384;
 use Cose\Algorithm\Signature\RSA\PS512;
@@ -24,6 +23,7 @@ use Cose\Algorithm\Signature\RSA\RS256;
 use Cose\Algorithm\Signature\RSA\RS384;
 use Cose\Algorithm\Signature\RSA\RS512;
 use Exception;
+use ParagonIE\ConstantTime\Base64UrlSafe;
 use Webauthn\AttestationStatement\AttestationObjectLoader;
 use Webauthn\AttestationStatement\AttestationStatementSupportManager;
 use Webauthn\AttestationStatement\NoneAttestationStatementSupport;
@@ -33,9 +33,12 @@ use Webauthn\AuthenticatorAssertionResponseValidator;
 use Webauthn\AuthenticatorAttestationResponse;
 use Webauthn\AuthenticatorAttestationResponseValidator;
 use Webauthn\AuthenticatorSelectionCriteria;
+use Webauthn\CeremonyStep\CeremonyStepManagerFactory;
+use Webauthn\CredentialRecord;
+use Webauthn\Denormalizer\WebauthnSerializerFactory;
 use Webauthn\Exception\InvalidDataException;
+use Webauthn\PublicKeyCredential;
 use Webauthn\PublicKeyCredentialCreationOptions;
-use Webauthn\PublicKeyCredentialLoader;
 use Webauthn\PublicKeyCredentialParameters;
 use Webauthn\PublicKeyCredentialRequestOptions;
 use Webauthn\PublicKeyCredentialRpEntity;
@@ -49,6 +52,11 @@ use WP_User;
  * @package BioAuth
  */
 class Webauthn_Server {
+
+	/**
+	 * Lifetime of a pending registration challenge, in seconds.
+	 */
+	const REGISTRATION_CHALLENGE_TTL = 5 * MINUTE_IN_SECONDS;
 
 	/**
 	 * Constructor.
@@ -79,7 +87,7 @@ class Webauthn_Server {
 	 * @return PublicKeyCredentialParameters[]
 	 */
 	public function get_public_key_credential_parameters_list(): array {
-		return array(
+		$parameters = array(
 			PublicKeyCredentialParameters::create( 'public-key', Algorithms::COSE_ALGORITHM_ES256 ),  // ECDSA w/ SHA-256.
 			PublicKeyCredentialParameters::create( 'public-key', Algorithms::COSE_ALGORITHM_ES256K ), // ECDSA w/ SHA-256K.
 			PublicKeyCredentialParameters::create( 'public-key', Algorithms::COSE_ALGORITHM_ES384 ),  // ECDSA w/ SHA-384.
@@ -90,9 +98,25 @@ class Webauthn_Server {
 			PublicKeyCredentialParameters::create( 'public-key', Algorithms::COSE_ALGORITHM_PS256 ),  // RSASSA-PSS w/ SHA-256.
 			PublicKeyCredentialParameters::create( 'public-key', Algorithms::COSE_ALGORITHM_PS384 ),  // RSASSA-PSS w/ SHA-384.
 			PublicKeyCredentialParameters::create( 'public-key', Algorithms::COSE_ALGORITHM_PS512 ),  // RSASSA-PSS w/ SHA-512.
-			PublicKeyCredentialParameters::create( 'public-key', Algorithms::COSE_ALGORITHM_ED256 ),  // EdDSA w/ SHA-256.
-			PublicKeyCredentialParameters::create( 'public-key', Algorithms::COSE_ALGORITHM_ED512 ),  // EdDSA w/ SHA-512.
 		);
+
+		if ( $this->is_eddsa_supported() ) {
+			$parameters[] = PublicKeyCredentialParameters::create( 'public-key', Algorithms::COSE_ALGORITHM_EDDSA ); // EdDSA (Ed25519).
+		}
+
+		return $parameters;
+	}
+
+	/**
+	 * Whether EdDSA can be used.
+	 *
+	 * EdDSA requires the sodium extension; constructing the algorithm without it throws,
+	 * which would otherwise break every ceremony rather than just EdDSA ones.
+	 *
+	 * @return bool
+	 */
+	protected function is_eddsa_supported(): bool {
+		return EdDSA::isSupported();
 	}
 
 	/**
@@ -101,9 +125,11 @@ class Webauthn_Server {
 	 * @return AuthenticatorSelectionCriteria
 	 */
 	public function get_authenticator_selection(): AuthenticatorSelectionCriteria {
-		return AuthenticatorSelectionCriteria::create()
-		->setResidentKey( AuthenticatorSelectionCriteria::RESIDENT_KEY_REQUIREMENT_REQUIRED )
-		->setAuthenticatorAttachment( AuthenticatorSelectionCriteria::AUTHENTICATOR_ATTACHMENT_PLATFORM );
+		return AuthenticatorSelectionCriteria::create(
+			AuthenticatorSelectionCriteria::AUTHENTICATOR_ATTACHMENT_PLATFORM,
+			AuthenticatorSelectionCriteria::USER_VERIFICATION_REQUIREMENT_PREFERRED,
+			AuthenticatorSelectionCriteria::RESIDENT_KEY_REQUIREMENT_REQUIRED
+		);
 	}
 
 	/**
@@ -137,14 +163,14 @@ class Webauthn_Server {
 		$authenticator_selection               = $this->get_authenticator_selection();
 
 		if ( ! $challenge ) {
-			$challenge = wp_generate_uuid4();
+			$challenge = self::generate_challenge();
 		}
 
 		$public_key_credential_source_repository = new Source_Repository();
 		$excluded_credentials                    = $public_key_credential_source_repository->findAllForUserEntity( $user_entity );
 
 		$excluded_public_key_descriptors = array_map(
-			function ( PublicKeyCredentialSource $credential ) {
+			function ( CredentialRecord $credential ) {
 				return $credential->getPublicKeyCredentialDescriptor();
 			},
 			$excluded_credentials
@@ -155,16 +181,38 @@ class Webauthn_Server {
 			$user_entity,
 			$challenge,
 			$public_key_credential_parameters_list,
-		)
-		->setTimeout( 30_000 )
-		->setAuthenticatorSelection( $authenticator_selection )
-		->excludeCredentials( ...$excluded_public_key_descriptors )
-		->setAttestation( PublicKeyCredentialCreationOptions::ATTESTATION_CONVEYANCE_PREFERENCE_NONE );
+			$authenticator_selection,
+			PublicKeyCredentialCreationOptions::ATTESTATION_CONVEYANCE_PREFERENCE_NONE,
+			$excluded_public_key_descriptors,
+			30_000
+		);
 
-		// Store challenge in User meta.
-		update_user_meta( $user->ID, 'wp_passkey_challenge', $challenge );
+		// Store the challenge in a short-lived, user-scoped transient so it expires if registration is abandoned.
+		set_transient( self::get_registration_challenge_key( $user ), $challenge, self::REGISTRATION_CHALLENGE_TTL );
 
 		return $public_key_credential_creation_options;
+	}
+
+	/**
+	 * Generate a cryptographically secure challenge.
+	 *
+	 * The challenge is 32 random bytes, base64url-encoded so it can be safely stored in
+	 * transients/meta (raw binary would be mangled by slashing and charset handling).
+	 *
+	 * @return string
+	 */
+	public static function generate_challenge(): string {
+		return Base64UrlSafe::encodeUnpadded( random_bytes( 32 ) );
+	}
+
+	/**
+	 * Get the transient key holding the pending registration challenge for a user.
+	 *
+	 * @param WP_User $user User.
+	 * @return string
+	 */
+	private static function get_registration_challenge_key( WP_User $user ): string {
+		return 'wp_passkey_reg_challenge_' . $user->ID;
 	}
 
 	/**
@@ -175,17 +223,16 @@ class Webauthn_Server {
 	 */
 	public function create_assertion_request( ?string $challenge = null ): PublicKeyCredentialRequestOptions {
 		if ( ! $challenge ) {
-			$challenge = wp_generate_uuid4();
+			$challenge = self::generate_challenge();
 		}
 
 		$rp_entity                             = $this->get_relying_party();
 		$public_key_credential_request_options = PublicKeyCredentialRequestOptions::create(
 			$challenge,
-		)
-		->setRpId( $rp_entity->getId() )
-		->setTimeout( 30_000 )
-		->setUserVerification(
-			PublicKeyCredentialRequestOptions::USER_VERIFICATION_REQUIREMENT_REQUIRED
+			$rp_entity->id,
+			[],
+			PublicKeyCredentialRequestOptions::USER_VERIFICATION_REQUIREMENT_REQUIRED,
+			30_000
 		);
 
 		return $public_key_credential_request_options;
@@ -196,54 +243,64 @@ class Webauthn_Server {
 	 *
 	 * @param string $data Data from the request.
 	 * @param WP_User $user Current User.
-	 * @return PublicKeyCredentialSource
+	 * @return CredentialRecord
 	 * @throws InvalidDataException If the request is invalid.
 	 */
-	public function validate_attestation_response( string $data, WP_User $user ): PublicKeyCredentialSource {
+	public function validate_attestation_response( string $data, WP_User $user ): CredentialRecord {
 		$attestation_statement_support_manager = AttestationStatementSupportManager::create();
 		$attestation_statement_support_manager->add( NoneAttestationStatementSupport::create() );
 
-		$attestation_object_loader = AttestationObjectLoader::create(
-			$attestation_statement_support_manager
-		);
+		// Use Symfony Serializer to deserialize PublicKeyCredential from JSON.
+		$serializer = $this->get_serializer();
+		$public_key_credential = $serializer->deserialize( $data, PublicKeyCredential::class, 'json' );
 
-		$public_key_credential_loader = PublicKeyCredentialLoader::create(
-			$attestation_object_loader
-		);
+		// Validate deserialized output type before property access.
+		// @phpstan-ignore instanceof.alwaysTrue (Deserialized payload is untrusted at runtime despite its PHPDoc type)
+		if ( ! $public_key_credential instanceof PublicKeyCredential ) {
+			throw new InvalidDataException( $data, 'Invalid request: malformed credential data.' ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- This is not an output.
+		}
 
-		$public_key_credential              = $public_key_credential_loader->load( $data );
-		$authenticator_attestation_response = $public_key_credential->getResponse();
+		$authenticator_attestation_response = $public_key_credential->response;
 
 		if ( ! $authenticator_attestation_response instanceof AuthenticatorAttestationResponse ) {
 			throw new InvalidDataException( $data, 'Invalid request.' ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- This is not an output.
 		}
 
-		$public_key_credential_source_repository = new Source_Repository();
+		// Create CeremonyStepManagerFactory and configure for creation ceremony.
+		$ceremony_factory = new CeremonyStepManagerFactory();
+		$ceremony_factory->setAlgorithmManager( $this->get_algorithm_manager() );
+		$ceremony_factory->setAttestationStatementSupportManager( $attestation_statement_support_manager );
+		$ceremony_factory->setExtensionOutputCheckerHandler( ExtensionOutputCheckerHandler::create() );
+		$ceremony_factory->setAllowedOrigins( $this->get_allowed_origins(), false );
+
+		$creation_ceremony = $ceremony_factory->creationCeremony();
 
 		$authenticator_attestation_response_validator = AuthenticatorAttestationResponseValidator::create(
-			$attestation_statement_support_manager,
-			$public_key_credential_source_repository,
-			null,
-			ExtensionOutputCheckerHandler::create()
+			$creation_ceremony
 		);
 
-		// Get expected challenge from user meta.
-		$challenge = get_user_meta( $user->ID, 'wp_passkey_challenge', true );
+		// Get the expected challenge. It is single-use: consume it before validating.
+		$challenge_key = self::get_registration_challenge_key( $user );
+		$challenge     = get_transient( $challenge_key );
 
-		$public_key_credential_creation_options = $this->create_attestation_request( $user, $challenge );
-
-		// Validate the Attestation Response.
-		$public_key_credential_source = $authenticator_attestation_response_validator->check(
-			$authenticator_attestation_response,
-			$public_key_credential_creation_options,
-			$this->get_current_domain(),
-			array( 'localhost' ) // Secure RelyingParty, to make localhost enable.
-		);
-
-		// Delete the challenge from user meta.
+		// Clean up the legacy (non-expiring) challenge storage from older plugin versions.
 		delete_user_meta( $user->ID, 'wp_passkey_challenge' );
 
-		return $public_key_credential_source;
+		if ( ! is_string( $challenge ) || '' === $challenge ) {
+			throw new InvalidDataException( $data, 'Registration challenge expired. Please try again.' ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- This is not an output.
+		}
+
+		$public_key_credential_creation_options = $this->create_attestation_request( $user, $challenge );
+		delete_transient( $challenge_key );
+
+		// Validate the Attestation Response.
+		$credential_record = $authenticator_attestation_response_validator->check(
+			$authenticator_attestation_response,
+			$public_key_credential_creation_options,
+			$this->get_current_domain()
+		);
+
+		return $credential_record;
 	}
 
 	/**
@@ -251,55 +308,73 @@ class Webauthn_Server {
 	 *
 	 * @param string $data Data from the request.
 	 * @param string $challenge Challenge string.
-	 * @return PublicKeyCredentialSource
+	 * @return CredentialRecord
 	 * @throws InvalidDataException If the request is invalid.
 	 * @throws Exception If the credential id is not found.
 	 */
-	public function validate_assertion_response( string $data, string $challenge ): PublicKeyCredentialSource {
+	public function validate_assertion_response( string $data, string $challenge ): CredentialRecord {
 		$attestation_statement_support_manager = AttestationStatementSupportManager::create();
 		$attestation_statement_support_manager->add( NoneAttestationStatementSupport::create() );
 
-		$attestation_object_loader = AttestationObjectLoader::create(
-			$attestation_statement_support_manager
-		);
+		// Use Symfony Serializer to deserialize PublicKeyCredential from JSON.
+		$serializer                       = $this->get_serializer();
+		$public_key_credential            = $serializer->deserialize( $data, PublicKeyCredential::class, 'json' );
 
-		$public_key_credential_loader = PublicKeyCredentialLoader::create(
-			$attestation_object_loader
-		);
+		// Validate deserialized output type before property access.
+		// @phpstan-ignore instanceof.alwaysTrue (Deserialized payload is untrusted at runtime despite its PHPDoc type)
+		if ( ! $public_key_credential instanceof PublicKeyCredential ) {
+			throw new InvalidDataException( $data, 'Invalid request: malformed credential data.' ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- This is not an output.
+		}
 
-		$public_key_credential            = $public_key_credential_loader->load( $data );
-		$authenticator_assertion_response = $public_key_credential->getResponse();
+		$authenticator_assertion_response = $public_key_credential->response;
 
 		if ( ! $authenticator_assertion_response instanceof AuthenticatorAssertionResponse ) {
 			throw new InvalidDataException( $data, 'Invalid request.' ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- This is not an output.
 		}
 
-		$public_key_credential_source_repository = new Source_Repository();
+		// Create CeremonyStepManagerFactory and configure for request ceremony.
+		$ceremony_factory = new CeremonyStepManagerFactory();
+		$ceremony_factory->setAlgorithmManager( $this->get_algorithm_manager() );
+		$ceremony_factory->setAttestationStatementSupportManager( $attestation_statement_support_manager );
+		$ceremony_factory->setExtensionOutputCheckerHandler( ExtensionOutputCheckerHandler::create() );
+		$ceremony_factory->setAllowedOrigins( $this->get_allowed_origins(), false );
+
+		$request_ceremony = $ceremony_factory->requestCeremony();
 
 		$authenticator_assertion_response_validator = AuthenticatorAssertionResponseValidator::create(
-			$public_key_credential_source_repository, // The Credential Repository service.
-			null,                                     // The token binding handler.
-			ExtensionOutputCheckerHandler::create(),  // The extension output checker handler.
-			$this->get_algorithm_manager()            // The COSE Algorithm Manager.
+			$request_ceremony
 		);
 
-		$public_key_credential_request_options = $this->create_assertion_request( $challenge );
-		$public_key_credential_source          = $public_key_credential_source_repository->findOneByCredentialId( $public_key_credential->getId() );
+		$public_key_credential_source_repository = new Source_Repository();
+		$public_key_credential_request_options   = $this->create_assertion_request( $challenge );
+		$credential_record                       = $public_key_credential_source_repository->findOneByCredentialId( $public_key_credential->rawId );
 
-		if ( ! $public_key_credential_source instanceof PublicKeyCredentialSource ) {
+		if ( ! $credential_record instanceof CredentialRecord ) {
 			throw new Exception( 'credential_not_found', 404 );
 		}
 
-		$public_key_credential_source = $authenticator_assertion_response_validator->check(
-			$public_key_credential_source,
+		$credential_record = $authenticator_assertion_response_validator->check(
+			$credential_record,
 			$authenticator_assertion_response,
 			$public_key_credential_request_options,
 			$this->get_current_domain(),
-			null,
-			array( 'localhost' ) // Secure RelyingParty, to make localhost enable.
+			null
 		);
 
-		return $public_key_credential_source;
+		return $credential_record;
+	}
+
+	/**
+	 * Get the webauthn serializer for deserializing PublicKeyCredential objects.
+	 *
+	 * @return \Symfony\Component\Serializer\SerializerInterface
+	 */
+	private function get_serializer() {
+		$attestation_statement_support_manager = AttestationStatementSupportManager::create();
+		$attestation_statement_support_manager->add( NoneAttestationStatementSupport::create() );
+
+		$serializer_factory = new WebauthnSerializerFactory( $attestation_statement_support_manager );
+		return $serializer_factory->create();
 	}
 
 	/**
@@ -308,8 +383,7 @@ class Webauthn_Server {
 	 * @return Manager
 	 */
 	private function get_algorithm_manager(): Manager {
-		$algorithm_manager = Manager::create()
-		->add(
+		$algorithms = array(
 			ES256::create(),
 			ES256K::create(),
 			ES384::create(),
@@ -320,11 +394,13 @@ class Webauthn_Server {
 			PS256::create(),
 			PS384::create(),
 			PS512::create(),
-			Ed256::create(),
-			Ed512::create(),
 		);
 
-		return $algorithm_manager;
+		if ( $this->is_eddsa_supported() ) {
+			$algorithms[] = new EdDSA();
+		}
+
+		return Manager::create()->add( ...$algorithms );
 	}
 
 	/**
@@ -335,5 +411,112 @@ class Webauthn_Server {
 		$domain = wp_parse_url( get_site_url(), PHP_URL_HOST );
 
 		return $domain;
+	}
+
+	/**
+	 * Get allowed origins for WebAuthn ceremonies.
+	 *
+	 * @return string[] Array of allowed origins.
+	 */
+	private function get_allowed_origins(): array {
+		$site_url = get_site_url();
+
+		if ( empty( $site_url ) ) {
+			return array();
+		}
+
+		$parsed = wp_parse_url( $site_url );
+
+		if ( empty( $parsed['scheme'] ) || empty( $parsed['host'] ) ) {
+			return array();
+		}
+
+		// Reconstruct origin: scheme://host[:port]
+		$origin = $parsed['scheme'] . '://' . $parsed['host'];
+
+		if ( ! empty( $parsed['port'] ) ) {
+			$origin .= ':' . $parsed['port'];
+		}
+
+		return array( $origin );
+	}
+
+	/**
+	 * Serialize PublicKeyCredentialCreationOptions to array for JSON response.
+	 *
+	 * @param PublicKeyCredentialCreationOptions $options The options to serialize.
+	 * @return array<string, mixed> The serialized options.
+	 */
+	public function serialize_creation_options( PublicKeyCredentialCreationOptions $options ): array {
+		$result = array(
+			'challenge'             => Base64UrlSafe::encodeUnpadded( $options->challenge ),
+			'timeout'               => $options->timeout,
+			'rp'                    => array(
+				'name' => $options->rp->name,
+				'id'   => $options->rp->id,
+			),
+			'user'                  => array(
+				'id'          => Base64UrlSafe::encodeUnpadded( $options->user->id ),
+				'name'        => $options->user->name,
+				'displayName' => $options->user->displayName,
+			),
+			'pubKeyCredParams'      => array_map(
+				function ( $param ) {
+					return array(
+						'type' => $param->type,
+						'alg'  => $param->alg,
+					);
+				},
+				$options->pubKeyCredParams
+			),
+			'excludeCredentials'    => array_map(
+				function ( $descriptor ) {
+					return array(
+						'type'       => $descriptor->type,
+						'id'         => Base64UrlSafe::encodeUnpadded( $descriptor->id ),
+						'transports' => $descriptor->transports,
+					);
+				},
+				$options->excludeCredentials
+			),
+			'authenticatorSelection' => null,
+			'attestation'           => $options->attestation,
+		);
+
+		if ( $options->authenticatorSelection ) {
+			$result['authenticatorSelection'] = array(
+				'authenticatorAttachment' => $options->authenticatorSelection->authenticatorAttachment,
+				'requireResidentKey'      => $options->authenticatorSelection->requireResidentKey,
+				'residentKey'             => $options->authenticatorSelection->residentKey,
+				'userVerification'        => $options->authenticatorSelection->userVerification,
+			);
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Serialize PublicKeyCredentialRequestOptions to array for JSON response.
+	 *
+	 * @param PublicKeyCredentialRequestOptions $options The options to serialize.
+	 * @return array<string, mixed> The serialized options.
+	 */
+	public function serialize_request_options( PublicKeyCredentialRequestOptions $options ): array {
+		return array(
+			'challenge'        => Base64UrlSafe::encodeUnpadded( $options->challenge ),
+			'timeout'          => $options->timeout,
+			'rpId'             => $options->rpId,
+			'allowCredentials' => array_map(
+				function ( $descriptor ) {
+					return array(
+						'type'       => $descriptor->type,
+						'id'         => Base64UrlSafe::encodeUnpadded( $descriptor->id ),
+						'transports' => $descriptor->transports,
+					);
+				},
+				$options->allowCredentials
+			),
+			'userVerification' => $options->userVerification,
+		);
 	}
 }

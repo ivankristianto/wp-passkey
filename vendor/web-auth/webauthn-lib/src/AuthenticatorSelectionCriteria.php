@@ -4,15 +4,10 @@ declare(strict_types=1);
 
 namespace Webauthn;
 
-use InvalidArgumentException;
-use JsonSerializable;
-use Webauthn\Exception\InvalidDataException;
 use function in_array;
-use function is_bool;
-use function is_string;
-use const JSON_THROW_ON_ERROR;
+use InvalidArgumentException;
 
-class AuthenticatorSelectionCriteria implements JsonSerializable
+class AuthenticatorSelectionCriteria
 {
     final public const AUTHENTICATOR_ATTACHMENT_NO_PREFERENCE = null;
 
@@ -40,11 +35,6 @@ class AuthenticatorSelectionCriteria implements JsonSerializable
 
     final public const RESIDENT_KEY_REQUIREMENT_NO_PREFERENCE = null;
 
-    /**
-     * @deprecated Please use AuthenticatorSelectionCriteria::RESIDENT_KEY_REQUIREMENT_NO_PREFERENCE instead
-     */
-    final public const RESIDENT_KEY_REQUIREMENT_NONE = null;
-
     final public const RESIDENT_KEY_REQUIREMENT_REQUIRED = 'required';
 
     final public const RESIDENT_KEY_REQUIREMENT_PREFERRED = 'preferred';
@@ -58,15 +48,19 @@ class AuthenticatorSelectionCriteria implements JsonSerializable
         self::RESIDENT_KEY_REQUIREMENT_DISCOURAGED,
     ];
 
+    /**
+     * Legacy property for backward compatibility.
+     *
+     * requireResidentKey is based on residentKey for backward compatibility
+     * Per WebAuthn Level 3 spec: "Relying Parties SHOULD set it to true if, and only if, residentKey is set to required."
+     * Only set when residentKey is "required"; leave uninitialized otherwise
+     */
+    public readonly ?bool $requireResidentKey;
+
     public function __construct(
-        /** @readonly  */
         public null|string $authenticatorAttachment = null,
-        /** @readonly  */
         public string $userVerification = self::USER_VERIFICATION_REQUIREMENT_PREFERRED,
-        /** @readonly  */
-        public null|string $residentKey = self::RESIDENT_KEY_REQUIREMENT_PREFERRED,
-        /** @deprecated Will be removed in 5.0. Please use residentKey instead**/
-        public null|bool $requireResidentKey = false,
+        public null|string $residentKey = self::RESIDENT_KEY_REQUIREMENT_NO_PREFERENCE,
     ) {
         in_array($authenticatorAttachment, self::AUTHENTICATOR_ATTACHMENTS, true) || throw new InvalidArgumentException(
             'Invalid authenticator attachment'
@@ -78,149 +72,18 @@ class AuthenticatorSelectionCriteria implements JsonSerializable
             'Invalid resident key'
         );
 
-        $this->requireResidentKey = $requireResidentKey ?? $residentKey === self::RESIDENT_KEY_REQUIREMENT_REQUIRED;
-        $requireResidentKey = $requireResidentKey === true ? self::RESIDENT_KEY_REQUIREMENT_REQUIRED : self::RESIDENT_KEY_REQUIREMENT_PREFERRED;
-        $this->residentKey = $residentKey ?? $requireResidentKey;
+        if ($residentKey === self::RESIDENT_KEY_REQUIREMENT_REQUIRED) {
+            $this->requireResidentKey = true;
+        } else {
+            $this->requireResidentKey = null;
+        }
     }
 
     public static function create(
         ?string $authenticatorAttachment = null,
         string $userVerification = self::USER_VERIFICATION_REQUIREMENT_PREFERRED,
-        null|string $residentKey = self::RESIDENT_KEY_REQUIREMENT_PREFERRED,
-        null|bool $requireResidentKey = false
+        null|string $residentKey = self::RESIDENT_KEY_REQUIREMENT_NO_PREFERENCE,
     ): self {
-        return new self($authenticatorAttachment, $userVerification, $residentKey, $requireResidentKey);
-    }
-
-    /**
-     * @deprecated since 4.7.0. Please use the {self::create} instead.
-     */
-    public function setAuthenticatorAttachment(?string $authenticatorAttachment): self
-    {
-        $this->authenticatorAttachment = $authenticatorAttachment;
-
-        return $this;
-    }
-
-    /**
-     * @deprecated since v4.1. Please use the {self::create} instead.
-     */
-    public function setRequireResidentKey(bool $requireResidentKey): self
-    {
-        $this->requireResidentKey = $requireResidentKey;
-        if ($requireResidentKey === true) {
-            $this->residentKey = self::RESIDENT_KEY_REQUIREMENT_REQUIRED;
-        }
-
-        return $this;
-    }
-
-    /**
-     * @deprecated since 4.7.0. Please use the {self::create} instead.
-     */
-    public function setUserVerification(string $userVerification): self
-    {
-        $this->userVerification = $userVerification;
-
-        return $this;
-    }
-
-    /**
-     * @deprecated since 4.7.0. Please use the {self::create} instead.
-     */
-    public function setResidentKey(null|string $residentKey): self
-    {
-        $this->residentKey = $residentKey;
-        $this->requireResidentKey = $residentKey === self::RESIDENT_KEY_REQUIREMENT_REQUIRED;
-
-        return $this;
-    }
-
-    /**
-     * @deprecated since 4.7.0. Please use the property directly.
-     */
-    public function getAuthenticatorAttachment(): ?string
-    {
-        return $this->authenticatorAttachment;
-    }
-
-    /**
-     * @deprecated Will be removed in 5.0. Please use the property directly.
-     */
-    public function isRequireResidentKey(): bool
-    {
-        return $this->requireResidentKey;
-    }
-
-    /**
-     * @deprecated since 4.7.0. Please use the property directly.
-     */
-    public function getUserVerification(): string
-    {
-        return $this->userVerification;
-    }
-
-    /**
-     * @deprecated since 4.7.0. Please use the property directly.
-     */
-    public function getResidentKey(): null|string
-    {
-        return $this->residentKey;
-    }
-
-    public static function createFromString(string $data): self
-    {
-        $data = json_decode($data, true, flags: JSON_THROW_ON_ERROR);
-
-        return self::createFromArray($data);
-    }
-
-    /**
-     * @param mixed[] $json
-     */
-    public static function createFromArray(array $json): self
-    {
-        $authenticatorAttachment = $json['authenticatorAttachment'] ?? null;
-        $requireResidentKey = $json['requireResidentKey'] ?? null;
-        $userVerification = $json['userVerification'] ?? self::USER_VERIFICATION_REQUIREMENT_PREFERRED;
-        $residentKey = $json['residentKey'] ?? null;
-
-        $authenticatorAttachment === null || is_string($authenticatorAttachment) || throw InvalidDataException::create(
-            $json,
-            'Invalid "authenticatorAttachment" value'
-        );
-        ($requireResidentKey === null || is_bool($requireResidentKey)) || throw InvalidDataException::create(
-            $json,
-            'Invalid "requireResidentKey" value'
-        );
-        is_string($userVerification) || throw InvalidDataException::create($json, 'Invalid "userVerification" value');
-        ($residentKey === null || is_string($residentKey)) || throw InvalidDataException::create(
-            $json,
-            'Invalid "residentKey" value'
-        );
-
-        return self::create(
-            $authenticatorAttachment ?? null,
-            $userVerification,
-            $residentKey,
-            $requireResidentKey,
-        );
-    }
-
-    /**
-     * @return mixed[]
-     */
-    public function jsonSerialize(): array
-    {
-        $json = [
-            'requireResidentKey' => $this->requireResidentKey,
-            'userVerification' => $this->userVerification,
-            'residentKey' => $this->residentKey,
-        ];
-        if ($this->authenticatorAttachment !== null) {
-            $json['authenticatorAttachment'] = $this->authenticatorAttachment;
-        }
-
-        return $json;
+        return new self($authenticatorAttachment, $userVerification, $residentKey);
     }
 }

@@ -42,7 +42,7 @@ Simply use your fingerprint, face ID, or a secure PIN to log in with ease. You c
 
 Local Development uses the [@wordpress/env](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-env/) environment.
 
-> `wp-env`` lets you easily set up a local WordPress environment for building and testing plugins and themes. It’s simple to install and requires no configuration.
+> `wp-env` lets you easily set up a local WordPress environment for building and testing plugins and themes. It’s simple to install and requires no configuration.
 
 ### Prerequisites
 
@@ -54,11 +54,11 @@ You need certain pieces of software on your computer before setting up this proj
 
 Whilst newer versions of the above packages may be available, the versions of the these the team is predominately running are:
 
-- PHP v8.1.x or above
+- PHP v8.2.x or above
 - Composer v2.x
-- Node.js v16.x
-- npm v7.x
-- Docker v20.x
+- Node.js v24.x (see `.nvmrc`)
+- npm v11.x
+- Docker v29.x
 
 ### Installation
 
@@ -86,7 +86,7 @@ To build the plugin for development, run the following command:
 npm run dev
 ```
 
-This will run Vite in development mode and watch for any changes to the files in the `src` directory. Hot module replacement is enabled by default. The built files will be placed in the `assets/dist` directory.
+This will run `@wordpress/scripts` in development mode with hot module replacement enabled. It watches for changes to files in the `assets/src/` directory and automatically rebuilds. The built files will be placed in the `assets/dist/` directory.
 
 ### Lint and Unit Tests
 
@@ -100,6 +100,18 @@ To run the unit tests, run the following command:
 
 ```bash
 npm run test-unit-php
+```
+
+To run the end-to-end tests, build the assets and start the environment first, then run the following command. The suite uses Google Chrome with a WebAuthn virtual authenticator (set `E2E_BROWSER_CHANNEL=chromium` to use Playwright's bundled Chromium instead):
+
+```bash
+npm run test-e2e
+```
+
+To run static analysis with PHPStan, run the following command:
+
+```bash
+vendor/bin/phpstan analyse --memory-limit=1G
 ```
 
 ### Run WP-CLI
@@ -123,7 +135,7 @@ You can also use GitHub Codespace to develop this plugin. To do so, you can foll
 4. Wait until the Codespace is ready
 
 This will setup the codespace dev environment for you and setup all the dependencies.
-Once the Codespace is ready, you can run the visit the url provided by GitHub Codespace terminal to access the site.
+Once the Codespace is ready, visit the URL shown in the Codespace terminal to access the site.
 
 ## Contributing
 
@@ -131,26 +143,4 @@ If you would like to contribute to this plugin, please fork the repository and s
 
 ## Changelog
 
-### 0.3.8
-
-- Update plugin description
-
-### 0.3.1
-
-- Update plugin name
-- Update dependencies
-- Fix code standards
-
-### 0.2.1
-
-- Fix release GitHub action.
-
-### 0.2.0
-
-- Allow user to revoke passkey.
-- Add name & created date as extra data for passkey entity.
-- Fix name override when signing in with passkey.
-
-### 0.1.0
-
-- Initial release.
+See [CHANGELOG.md](CHANGELOG.md).

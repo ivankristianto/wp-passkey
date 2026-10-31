@@ -31,6 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Technical
 - Pinned Composer platform to PHP 8.2
 - CI workflows now set up Node 24 from `.nvmrc` and install with plain `npm ci`
+- Unit tests now run on a PHP 8.2 and 8.4 matrix (wp-env via `WP_ENV_PHP_VERSION`)
 - Updated GitHub Actions: checkout v7, setup-node v7, cache v6, paths-filter v4, setup-php 2.40.0; replaced deprecated `::set-output`
 - Moved the README changelog into CHANGELOG.md and corrected stale architecture notes in CLAUDE.md
 - `wp-scripts lint-js` runs its bundled ESLint 10; the top-level `eslint` package resolves to 9.x because eslint-plugin-import, eslint-plugin-jsx-a11y and eslint-plugin-react do not yet declare ESLint 10 support

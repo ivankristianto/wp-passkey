@@ -29,25 +29,28 @@ async function authenticate() {
 
 	// POST the response to the endpoint that calls.
 	try {
+		// Pass the requested redirect to the server, which validates it.
+		const urlParams = new URLSearchParams( window.location.search );
+
 		const response = await apiFetch( {
 			path: '/wp-passkey/v1/signin-response',
 			method: 'POST',
 			data: {
 				request_id: requestId,
 				asseResp,
+				redirect_to: urlParams.get( 'redirect_to' ) || '',
 			},
 		} );
 
-		if ( response.status !== 'verified' ) {
+		if (
+			response.status !== 'verified' ||
+			typeof response.redirect_to !== 'string'
+		) {
 			throw new Error( 'Passkey authentication failed.' );
 		}
 
-		// Get redirect_to from query string.
-		const urlParams = new URLSearchParams( window.location.search );
-		const redirect_to = urlParams.get( 'redirect_to' ) || '/wp-admin';
-
-		// Redirect to redirect url or wp-admin as default.
-		window.location.href = redirect_to;
+		// Only navigate to the server-validated redirect URL.
+		window.location.assign( response.redirect_to );
 	} catch ( error ) {
 		throw error;
 	}
@@ -65,7 +68,7 @@ function showError( message ) {
 	const errorElement = document.createElement( 'div' );
 	errorElement.id = 'login_error';
 	errorElement.className = 'notice notice-error';
-	errorElement.innerHTML = message;
+	errorElement.textContent = message;
 
 	// Add error element before login form.
 	loginForm.parentNode.insertBefore( errorElement, loginForm );

@@ -15,8 +15,7 @@ use Cose\Algorithm\Signature\ECDSA\ES256;
 use Cose\Algorithm\Signature\ECDSA\ES256K;
 use Cose\Algorithm\Signature\ECDSA\ES384;
 use Cose\Algorithm\Signature\ECDSA\ES512;
-use Cose\Algorithm\Signature\EdDSA\Ed256;
-use Cose\Algorithm\Signature\EdDSA\Ed512;
+use Cose\Algorithm\Signature\EdDSA\EdDSA;
 use Cose\Algorithm\Signature\RSA\PS256;
 use Cose\Algorithm\Signature\RSA\PS384;
 use Cose\Algorithm\Signature\RSA\PS512;
@@ -55,6 +54,11 @@ use WP_User;
 class Webauthn_Server {
 
 	/**
+	 * Lifetime of a pending registration challenge, in seconds.
+	 */
+	const REGISTRATION_CHALLENGE_TTL = 5 * MINUTE_IN_SECONDS;
+
+	/**
 	 * Constructor.
 	 *
 	 * @return void
@@ -83,7 +87,7 @@ class Webauthn_Server {
 	 * @return PublicKeyCredentialParameters[]
 	 */
 	public function get_public_key_credential_parameters_list(): array {
-		return array(
+		$parameters = array(
 			PublicKeyCredentialParameters::create( 'public-key', Algorithms::COSE_ALGORITHM_ES256 ),  // ECDSA w/ SHA-256.
 			PublicKeyCredentialParameters::create( 'public-key', Algorithms::COSE_ALGORITHM_ES256K ), // ECDSA w/ SHA-256K.
 			PublicKeyCredentialParameters::create( 'public-key', Algorithms::COSE_ALGORITHM_ES384 ),  // ECDSA w/ SHA-384.
@@ -94,9 +98,25 @@ class Webauthn_Server {
 			PublicKeyCredentialParameters::create( 'public-key', Algorithms::COSE_ALGORITHM_PS256 ),  // RSASSA-PSS w/ SHA-256.
 			PublicKeyCredentialParameters::create( 'public-key', Algorithms::COSE_ALGORITHM_PS384 ),  // RSASSA-PSS w/ SHA-384.
 			PublicKeyCredentialParameters::create( 'public-key', Algorithms::COSE_ALGORITHM_PS512 ),  // RSASSA-PSS w/ SHA-512.
-			PublicKeyCredentialParameters::create( 'public-key', Algorithms::COSE_ALGORITHM_ED256 ),  // EdDSA w/ SHA-256.
-			PublicKeyCredentialParameters::create( 'public-key', Algorithms::COSE_ALGORITHM_ED512 ),  // EdDSA w/ SHA-512.
 		);
+
+		if ( $this->is_eddsa_supported() ) {
+			$parameters[] = PublicKeyCredentialParameters::create( 'public-key', Algorithms::COSE_ALGORITHM_EDDSA ); // EdDSA (Ed25519).
+		}
+
+		return $parameters;
+	}
+
+	/**
+	 * Whether EdDSA can be used.
+	 *
+	 * EdDSA requires the sodium extension; constructing the algorithm without it throws,
+	 * which would otherwise break every ceremony rather than just EdDSA ones.
+	 *
+	 * @return bool
+	 */
+	protected function is_eddsa_supported(): bool {
+		return EdDSA::isSupported();
 	}
 
 	/**
@@ -143,7 +163,7 @@ class Webauthn_Server {
 		$authenticator_selection               = $this->get_authenticator_selection();
 
 		if ( ! $challenge ) {
-			$challenge = wp_generate_uuid4();
+			$challenge = self::generate_challenge();
 		}
 
 		$public_key_credential_source_repository = new Source_Repository();
@@ -167,10 +187,32 @@ class Webauthn_Server {
 			30_000
 		);
 
-		// Store challenge in User meta.
-		update_user_meta( $user->ID, 'wp_passkey_challenge', $challenge );
+		// Store the challenge in a short-lived, user-scoped transient so it expires if registration is abandoned.
+		set_transient( self::get_registration_challenge_key( $user ), $challenge, self::REGISTRATION_CHALLENGE_TTL );
 
 		return $public_key_credential_creation_options;
+	}
+
+	/**
+	 * Generate a cryptographically secure challenge.
+	 *
+	 * The challenge is 32 random bytes, base64url-encoded so it can be safely stored in
+	 * transients/meta (raw binary would be mangled by slashing and charset handling).
+	 *
+	 * @return string
+	 */
+	public static function generate_challenge(): string {
+		return Base64UrlSafe::encodeUnpadded( random_bytes( 32 ) );
+	}
+
+	/**
+	 * Get the transient key holding the pending registration challenge for a user.
+	 *
+	 * @param WP_User $user User.
+	 * @return string
+	 */
+	private static function get_registration_challenge_key( WP_User $user ): string {
+		return 'wp_passkey_reg_challenge_' . $user->ID;
 	}
 
 	/**
@@ -181,7 +223,7 @@ class Webauthn_Server {
 	 */
 	public function create_assertion_request( ?string $challenge = null ): PublicKeyCredentialRequestOptions {
 		if ( ! $challenge ) {
-			$challenge = wp_generate_uuid4();
+			$challenge = self::generate_challenge();
 		}
 
 		$rp_entity                             = $this->get_relying_party();
@@ -237,10 +279,19 @@ class Webauthn_Server {
 			$creation_ceremony
 		);
 
-		// Get expected challenge from user meta.
-		$challenge = get_user_meta( $user->ID, 'wp_passkey_challenge', true );
+		// Get the expected challenge. It is single-use: consume it before validating.
+		$challenge_key = self::get_registration_challenge_key( $user );
+		$challenge     = get_transient( $challenge_key );
+
+		// Clean up the legacy (non-expiring) challenge storage from older plugin versions.
+		delete_user_meta( $user->ID, 'wp_passkey_challenge' );
+
+		if ( ! is_string( $challenge ) || '' === $challenge ) {
+			throw new InvalidDataException( $data, 'Registration challenge expired. Please try again.' ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- This is not an output.
+		}
 
 		$public_key_credential_creation_options = $this->create_attestation_request( $user, $challenge );
+		delete_transient( $challenge_key );
 
 		// Validate the Attestation Response.
 		$credential_record = $authenticator_attestation_response_validator->check(
@@ -248,9 +299,6 @@ class Webauthn_Server {
 			$public_key_credential_creation_options,
 			$this->get_current_domain()
 		);
-
-		// Delete the challenge from user meta.
-		delete_user_meta( $user->ID, 'wp_passkey_challenge' );
 
 		return $credential_record;
 	}
@@ -335,8 +383,7 @@ class Webauthn_Server {
 	 * @return Manager
 	 */
 	private function get_algorithm_manager(): Manager {
-		$algorithm_manager = Manager::create()
-		->add(
+		$algorithms = array(
 			ES256::create(),
 			ES256K::create(),
 			ES384::create(),
@@ -347,11 +394,13 @@ class Webauthn_Server {
 			PS256::create(),
 			PS384::create(),
 			PS512::create(),
-			Ed256::create(),
-			Ed512::create(),
 		);
 
-		return $algorithm_manager;
+		if ( $this->is_eddsa_supported() ) {
+			$algorithms[] = new EdDSA();
+		}
+
+		return Manager::create()->add( ...$algorithms );
 	}
 
 	/**

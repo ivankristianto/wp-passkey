@@ -170,6 +170,11 @@ function register_response( WP_REST_Request $request ): WP_REST_Response|WP_Erro
 			'user_agent' => $user_agent,
 		);
 
+		// Credential IDs must be unique across all users.
+		if ( $public_key_credential_source_repository->findOneByCredentialId( $credential->publicKeyCredentialId ) ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
+			return new WP_Error( 'credential_exists', 'This passkey is already registered.', array( 'status' => 409 ) );
+		}
+
 		// Finally store the credential source to database.
 		$public_key_credential_source_repository->saveCredentialSource( $credential, $extra_data );
 
@@ -256,6 +261,13 @@ function signin_response( WP_REST_Request $request ): WP_REST_Response|WP_Error 
 			return new WP_Error( 'user_not_found', 'User not found.', array( 'status' => 404 ) );
 		}
 
+		// Persist the updated signature counter and flags so cloned authenticators can be detected.
+		$public_key_credential_source_repository = new Source_Repository();
+		$public_key_credential_source_repository->saveCredentialSource(
+			$public_key_credential_source,
+			$public_key_credential_source_repository->get_extra_data( $public_key_credential_source )
+		);
+
 		// If user found and authorized, set the login cookie.
 		wp_set_auth_cookie( $user->ID, true, is_ssl() );
 	} catch ( Exception $error ) {
@@ -264,10 +276,46 @@ function signin_response( WP_REST_Request $request ): WP_REST_Response|WP_Error 
 
 	return rest_ensure_response(
 		array(
-			'status'  => 'verified',
-			'message' => __( 'Successfully signin with Passkey.', 'biometric-authentication' ),
+			'status'      => 'verified',
+			'message'     => __( 'Successfully signin with Passkey.', 'biometric-authentication' ),
+			'redirect_to' => get_login_redirect( $data['redirect_to'] ?? '', $user ),
 		)
 	);
+}
+
+/**
+ * Get a safe post-login redirect URL.
+ *
+ * Mirrors wp-login.php: the requested URL passes through the `login_redirect` filter
+ * and is then validated so only http(s) URLs on allowed hosts are returned. Anything
+ * else (javascript:, data:, external hosts, ...) falls back to the admin URL.
+ *
+ * @param mixed   $requested_redirect The requested redirect URL from the client.
+ * @param WP_User $user               The user who just signed in.
+ * @return string Safe redirect URL.
+ */
+function get_login_redirect( mixed $requested_redirect, WP_User $user ): string {
+	$fallback           = admin_url();
+	$requested_redirect = is_string( $requested_redirect ) ? trim( $requested_redirect ) : '';
+	$redirect_to        = '' !== $requested_redirect ? $requested_redirect : $fallback;
+
+	/** This filter is documented in wp-login.php */
+	$redirect_to = apply_filters( 'login_redirect', $redirect_to, $requested_redirect, $user );
+
+	if ( ! is_string( $redirect_to ) || '' === trim( $redirect_to ) ) {
+		return $fallback;
+	}
+
+	$redirect_to = trim( $redirect_to );
+
+	// Resolve path-relative URLs (e.g. "wp-admin/") against the login page location, as the
+	// browser would on wp-login.php. Otherwise wp_validate_redirect() resolves them against
+	// the REST route. This runs after the filter so filtered values are resolved too.
+	if ( ! wp_parse_url( $redirect_to, PHP_URL_SCHEME ) && ! str_starts_with( $redirect_to, '/' ) ) {
+		$redirect_to = site_url( $redirect_to );
+	}
+
+	return wp_validate_redirect( wp_sanitize_redirect( $redirect_to ), $fallback );
 }
 
 /**

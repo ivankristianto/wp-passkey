@@ -102,6 +102,12 @@ To run the unit tests, run the following command:
 npm run test-unit-php
 ```
 
+To run the end-to-end tests, build the assets and start the environment first, then run the following command. The suite uses Google Chrome with a WebAuthn virtual authenticator (set `E2E_BROWSER_CHANNEL=chromium` to use Playwright's bundled Chromium instead):
+
+```bash
+npm run test-e2e
+```
+
 To run static analysis with PHPStan, run the following command:
 
 ```bash

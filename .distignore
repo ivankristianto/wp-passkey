@@ -6,6 +6,7 @@
 /.vscode
 /node_modules
 /bin
+/docs
 /tests
 /wordpress
 
@@ -22,3 +23,7 @@ phpcs.ruleset.xml
 phpstan.neon.dist
 phpunit.xml.dist
 setup.log
+webpack.config.js
+AGENTS.md
+CLAUDE.md
+GEMINI.md

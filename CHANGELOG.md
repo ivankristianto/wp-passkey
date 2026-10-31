@@ -7,7 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-10-31
+
 ### Security
+- Post-login redirect is validated on the server (`wp_validate_redirect()` after the `login_redirect` filter), fixing a DOM XSS / open redirect via `?redirect_to=javascript:...`
+- Signature counter is saved after each login, so a cloned authenticator with a lower counter is rejected
+- Challenges use `random_bytes(32)`; registration challenges live in a 5-minute transient and are single-use
+- Registering a credential ID that already exists returns 409
+- Login errors are rendered with `textContent`
+- Updated web-auth/cose-lib to 4.8.2 (EdDSA signature verification) and web-auth/webauthn-lib to 5.3.9 (full-origin check, GHSA-f7pm-6hr8-7ggm)
 - Updated wp-coding-standards/wpcs to ^3.4.1 (CVE-2026-45293)
 - Updated @wordpress/scripts to ^37.0.0 and @wordpress/env to ^12.0.0, resolving most npm audit advisories
 - Added npm overrides for patched transitive dependencies: qs ^6.17.1, serialize-javascript ^7.1.4 (copy-webpack-plugin), js-yaml ^5.5.0 and smol-toml ^1.9.1 (markdownlint-cli)
@@ -23,6 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **BREAKING:** Node.js development requirement increased from 22 to 24 (`.nvmrc`)
 - Devcontainer now uses PHP 8.2, Node 24 and nvm 0.40.8
 - Plugin header and readme.txt: "Requires at least" 6.2 (matches the documented minimum) and "Tested up to" 7.1
+- Replaced the non-standard Ed256/Ed512 algorithms with standard EdDSA (-8), offered only when the sodium extension is loaded
 
 ### Removed
 - @babel/eslint-parser dev dependency (no longer used by @wordpress/eslint-plugin)
@@ -35,6 +44,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated GitHub Actions: checkout v7, setup-node v7, cache v6, paths-filter v4, setup-php 2.40.0; replaced deprecated `::set-output`
 - Moved the README changelog into CHANGELOG.md and corrected stale architecture notes in CLAUDE.md
 - `wp-scripts lint-js` runs its bundled ESLint 10; the top-level `eslint` package resolves to 9.x because eslint-plugin-import, eslint-plugin-jsx-a11y and eslint-plugin-react do not yet declare ESLint 10 support
+- Added PHPUnit security tests with an ES256 software authenticator, and a Playwright e2e suite (`npm run test-e2e`) using Chrome's WebAuthn virtual authenticator
 
 ## [0.4.0] - 2026-02-05
 

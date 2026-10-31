@@ -3,12 +3,29 @@ on:
   push:
     tags:
     - "*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to deploy; must match the Version header in plugin.php'
+        required: true
 jobs:
   release:
     name: Publish to WordPress.org
     runs-on: ubuntu-latest
     steps:
+    # Check out by SHA: release.yml moves the tag to its built commit, which fails checkout's tag check.
     - uses: actions/checkout@v7
+      with:
+        ref: ${{ github.sha }}
+    - name: Check plugin version
+      env:
+        VERSION: ${{ inputs.version || github.ref_name }}
+      run: |
+        PLUGIN_VERSION=$(sed -n 's/^ \* Version: *//p' plugin.php)
+        if [ "$PLUGIN_VERSION" != "$VERSION" ]; then
+          echo "::error::plugin.php Version ($PLUGIN_VERSION) does not match $VERSION"
+          exit 1
+        fi
     - uses: actions/setup-node@v7
       with:
         node-version-file: '.nvmrc'
@@ -22,3 +39,5 @@ jobs:
         SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
         SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
         SLUG: biometric-authentication
+        # Empty on tag pushes, where the action reads the version from the tag.
+        VERSION: ${{ inputs.version }}

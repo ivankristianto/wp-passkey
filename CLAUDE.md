@@ -62,6 +62,9 @@ npm run lint:php   # PHP CodeSniffer
 
 # Auto-fix PHP code style issues
 composer format
+
+# Static analysis (PHPStan level 6)
+vendor/bin/phpstan analyse --memory-limit=1G
 ```
 
 ### WP-CLI
@@ -102,33 +105,33 @@ npm run release
 **Webauthn_Server** (`inc/class-webauthn-server.php`)
 - Central class that wraps the web-auth/webauthn-lib library
 - Handles creation and validation of WebAuthn credentials
-- Methods: `generatePublicKeyCredentialCreationOptions()`, `generatePublicKeyCredentialRequestOptions()`, `loadAndCheckAttestationResponse()`, `loadAndCheckAssertionResponse()`
+- Methods: `create_attestation_request()`, `create_assertion_request()`, `validate_attestation_response()`, `validate_assertion_response()`, `serialize_creation_options()`, `serialize_request_options()`
 
 **Source_Repository** (`inc/class-source-repository.php`)
-- Implements `PublicKeyCredentialSourceRepository` interface from webauthn-lib
-- Stores passkey credentials in WordPress user meta with prefix `wp_passkey_`
+- Stores webauthn-lib `CredentialRecord` objects in WordPress user meta with prefix `wp_passkey_` (webauthn-lib 5.x no longer provides a repository interface)
 - Handles credential storage, retrieval, and revocation
-- Methods: `findOneByCredentialId()`, `findAllForUserEntity()`, `saveCredentialSource()`
+- Methods: `findOneByCredentialId()`, `findAllForUserEntity()`, `saveCredentialSource()`, `deleteCredentialSource()`, `get_extra_data()`
 
 **REST API** (`inc/rest-api.php`)
 - Namespace: `wp-passkey/v1`
 - Endpoints:
   - `/register-request` - Initiates passkey registration (authenticated users only)
-  - `/register-response` - Completes passkey registration
-  - `/authenticate-request` - Initiates passkey authentication (public)
-  - `/authenticate-response` - Completes passkey authentication and logs in user
+  - `/register-response` - Completes passkey registration (authenticated users only)
+  - `/signin-request` - Initiates passkey authentication (public)
+  - `/signin-response` - Completes passkey authentication and logs in user (public)
+  - `/revoke` - Revokes one of the current user's passkeys (authenticated users only)
 
 **Frontend Integration** (`inc/login.php` and `inc/user-profile.php`)
 - Enqueues JavaScript bundles built from `assets/src/js/`
-- Passes REST API endpoints and WordPress nonces to JavaScript via `wp_localize_script()`
-- JavaScript uses `@simplewebauthn/browser` to communicate with authenticators
+- JavaScript calls the REST endpoints with `@wordpress/api-fetch`
+- JavaScript uses `@simplewebauthn/browser` (`startRegistration()` / `startAuthentication()` with `{ optionsJSON }`) to communicate with authenticators
 
 ### Data Storage
 
 Passkeys are stored as WordPress user meta:
-- Meta key format: `wp_passkey_{credential_id}`
-- Each passkey includes: credential data, device name, creation date
-- User entity handle is the user's ID encoded in base64url
+- Meta key format: `wp_passkey_{credential_id}` (credential ID base64url-encoded, unpadded)
+- Each passkey includes: credential data plus `extra` data (device name, creation date, user agent)
+- User entity handle is the user's `user_login`
 
 ### Asset Build System
 
@@ -142,6 +145,8 @@ Built with `@wordpress/scripts` (Webpack-based):
 - PHP: WordPress Coding Standards (WordPress-Extra) with Yoda conditions disabled
 - Minimum PHP version: 8.2
 - Minimum WordPress version: 6.2
+- Node.js version: 24 (see `.nvmrc`)
+- JavaScript: ESLint flat config in `eslint.config.js` (`@wordpress/eslint-plugin` recommended)
 - Uses PHP strict types (`declare(strict_types=1)`)
 - Namespace: `BioAuth` with sub-namespaces for modules
 

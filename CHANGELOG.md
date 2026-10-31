@@ -20,7 +20,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Migrated ESLint configuration to flat config (`eslint.config.js`) for ESLint 10
 - `comma-dangle` no longer requires trailing commas in multi-line function arguments, matching Prettier's `trailingComma: 'es5'`
 - Updated archiver to ^8.0.0 in the release script
-- Devcontainer now uses PHP 8.2 and Node 22
+- **BREAKING:** Node.js development requirement increased from 22 to 24 (`.nvmrc`)
+- Devcontainer now uses PHP 8.2, Node 24 and nvm 0.40.8
+- Plugin header and readme.txt: "Requires at least" 6.2 (matches the documented minimum) and "Tested up to" 7.1
 
 ### Removed
 - @babel/eslint-parser dev dependency (no longer used by @wordpress/eslint-plugin)
@@ -28,7 +30,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Technical
 - Pinned Composer platform to PHP 8.2
-- CI workflows now set up Node 22 and install with plain `npm ci`
+- CI workflows now set up Node 24 from `.nvmrc` and install with plain `npm ci`
+- Updated GitHub Actions: checkout v7, setup-node v7, cache v6, paths-filter v4, setup-php 2.40.0; replaced deprecated `::set-output`
+- Moved the README changelog into CHANGELOG.md and corrected stale architecture notes in CLAUDE.md
 - `wp-scripts lint-js` runs its bundled ESLint 10; the top-level `eslint` package resolves to 9.x because eslint-plugin-import, eslint-plugin-jsx-a11y and eslint-plugin-react do not yet declare ESLint 10 support
 
 ## [0.4.0] - 2026-02-05
@@ -52,3 +56,32 @@ To update from 0.3.x:
 2. Update the plugin through WordPress admin
 3. Test passkey registration and authentication
 4. Existing passkeys will continue to work without changes
+
+## [0.3.9]
+
+- Security: Fix npm vulnerabilities - added overrides for fast-xml-parser and webpack-dev-server
+- Reduced vulnerabilities from 33 to 9 (all remaining are dev-time eslint related)
+
+## [0.3.8]
+
+- Update plugin description
+
+## [0.3.1]
+
+- Update plugin name
+- Update dependencies
+- Fix code standards
+
+## [0.2.1]
+
+- Fix release GitHub action.
+
+## [0.2.0]
+
+- Allow user to revoke passkey.
+- Add name & created date as extra data for passkey entity.
+- Fix name override when signing in with passkey.
+
+## [0.1.0]
+
+- Initial release.

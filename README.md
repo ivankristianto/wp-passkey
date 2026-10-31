@@ -42,7 +42,7 @@ Simply use your fingerprint, face ID, or a secure PIN to log in with ease. You c
 
 Local Development uses the [@wordpress/env](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-env/) environment.
 
-> `wp-env`` lets you easily set up a local WordPress environment for building and testing plugins and themes. It’s simple to install and requires no configuration.
+> `wp-env` lets you easily set up a local WordPress environment for building and testing plugins and themes. It’s simple to install and requires no configuration.
 
 ### Prerequisites
 
@@ -56,9 +56,9 @@ Whilst newer versions of the above packages may be available, the versions of th
 
 - PHP v8.2.x or above
 - Composer v2.x
-- Node.js v22.x
-- npm v10.x
-- Docker v20.x
+- Node.js v24.x (see `.nvmrc`)
+- npm v11.x
+- Docker v29.x
 
 ### Installation
 
@@ -102,6 +102,12 @@ To run the unit tests, run the following command:
 npm run test-unit-php
 ```
 
+To run static analysis with PHPStan, run the following command:
+
+```bash
+vendor/bin/phpstan analyse --memory-limit=1G
+```
+
 ### Run WP-CLI
 
 To run WP-CLI, run the following command:
@@ -123,7 +129,7 @@ You can also use GitHub Codespace to develop this plugin. To do so, you can foll
 4. Wait until the Codespace is ready
 
 This will setup the codespace dev environment for you and setup all the dependencies.
-Once the Codespace is ready, you can run the visit the url provided by GitHub Codespace terminal to access the site.
+Once the Codespace is ready, visit the URL shown in the Codespace terminal to access the site.
 
 ## Contributing
 
@@ -131,31 +137,4 @@ If you would like to contribute to this plugin, please fork the repository and s
 
 ## Changelog
 
-### 0.3.9
-
-- Security: Fix npm vulnerabilities - added overrides for fast-xml-parser and webpack-dev-server
-- Reduced vulnerabilities from 33 to 9 (all remaining are dev-time eslint related)
-
-### 0.3.8
-
-- Update plugin description
-
-### 0.3.1
-
-- Update plugin name
-- Update dependencies
-- Fix code standards
-
-### 0.2.1
-
-- Fix release GitHub action.
-
-### 0.2.0
-
-- Allow user to revoke passkey.
-- Add name & created date as extra data for passkey entity.
-- Fix name override when signing in with passkey.
-
-### 0.1.0
-
-- Initial release.
+See [CHANGELOG.md](CHANGELOG.md).

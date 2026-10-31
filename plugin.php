@@ -4,7 +4,7 @@
  *
  * @package   biometric-authentication
  * @author    Ivan Kristianto <ivan@ivankristianto.com>
- * @copyright 2023-2024 Ivan Kristianto
+ * @copyright 2023-2026 Ivan Kristianto
  * @license   GPL v2 or later
  *
  * Plugin Name:  Biometric Authentication
@@ -14,8 +14,9 @@
  * Author URI:   https://github.com/ivankristianto/
  * Plugin URI:   https://github.com/ivankristianto/wp-passkey/
  * Text Domain:  biometric-authentication
+ * Requires at least: 6.2
  * Requires PHP: 8.2
- * Tested up to: 6.5
+ * Tested up to: 7.1
  * License:      GPLv2 or later
  *
  * This program is free software; you can redistribute it and/or modify

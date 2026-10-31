@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.1] - 2026-10-31
+
+### Fixed
+- Kept symfony/polyfill-uuid below 1.43. Its `bootstrap85.php` uses PHP 8.5-only syntax, which WordPress.org's SVN pre-commit PHP lint rejects, so 0.5.0 could not be published there
+
+### Technical
+- WordPress.org deploys use `bin/deploy-wporg.sh`: `trunk/vendor` is committed one directory at a time, then the rest of trunk, then the tag is created with a server-side copy (a single 2,800-change commit timed out on the SVN server)
+- The deploy workflow checks out the triggering commit instead of the tag (which `release.yml` moves), checks that `plugin.php`'s Version matches, and can be run by hand with a `version` and `dry_run` input
+- `.distignore` excludes `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `docs/` and `webpack.config.js`
+
 ## [0.5.0] - 2026-10-31
 
 ### Security

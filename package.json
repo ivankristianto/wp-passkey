@@ -1,6 +1,6 @@
 {
   "name": "@ivankristianto/biometric-authentication",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "scripts": {
     "build": "npm run clean && wp-scripts build",
     "clean": "rimraf assets/dist",

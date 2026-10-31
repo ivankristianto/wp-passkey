@@ -11,8 +11,7 @@
 
 .distignore
 .editorconfig
-.eslintignore
-.eslintrc.json
+eslint.config.js
 .gitignore
 .nvmrc
 .prettierignore

@@ -9,14 +9,18 @@ on:
 
 jobs:
   build:
-    name: Unit Tests
+    name: Unit Tests (PHP ${{ matrix.php }})
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ["8.2", "8.4"]
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v1
+        uses: actions/checkout@v7
 
       - name: Paths filters
-        uses: dorny/paths-filter@v2
+        uses: dorny/paths-filter@v4
         id: paths
         with:
           filters: |
@@ -37,9 +41,9 @@ jobs:
 
       - name: Install PHP
         if: ${{ toJSON( steps.paths.outputs.changes ) != '"[]"' }}
-        uses: shivammathur/setup-php@2.32.0
+        uses: shivammathur/setup-php@2.40.0
         with:
-          php-version: "8.2"
+          php-version: ${{ matrix.php }}
           coverage: none
           tools: composer:v2
 
@@ -52,26 +56,33 @@ jobs:
       - name: Cache PHP dependencies
         if: ${{ toJSON( steps.paths.outputs.changes ) != '"[]"' }}
         id: composer-cache
-        uses: actions/cache@v3
+        uses: actions/cache@v6
         with:
           path: ${{ steps.composer-cache-dir.outputs.dir }}
-          key: ${{ runner.os }}-composer-8.2-${{ hashFiles('composer.lock') }}
+          key: ${{ runner.os }}-composer-${{ matrix.php }}-${{ hashFiles('composer.lock') }}
 
       - name: Cache Docker images.
         if: ${{ toJSON( steps.paths.outputs.changes ) != '"[]"' }}
         uses: ScribeMD/docker-cache@0.5.0
         with:
-          key: ${{ runner.os }}-docker-8.2-${{ hashFiles('composer.lock') }}
+          key: ${{ runner.os }}-docker-${{ matrix.php }}-${{ hashFiles('composer.lock') }}
 
       - name: Install PHP dependencies
         if: ${{ toJSON( steps.paths.outputs.changes ) != '"[]"' }}
         run: |
           composer install --no-progress --no-suggest --no-interaction
 
+      - name: Install Node
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: '.nvmrc'
+
       - name: Install Node dependencies
-        run: npm ci --legacy-peer-deps
+        run: npm ci
 
       - name: Run the tests
         if: ${{ toJSON( steps.paths.outputs.changes ) != '"[]"' }}
+        env:
+          WP_ENV_PHP_VERSION: ${{ matrix.php }}
         run: |
           npm run server start && npm run test-unit-php

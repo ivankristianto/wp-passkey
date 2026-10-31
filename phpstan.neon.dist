@@ -9,5 +9,3 @@ parameters:
   excludePaths:
     analyse:
       - wordpress
-  ignoreErrors:
-      - '#Function BioAuth\\Rest_API\\.*\(\) has parameter \$request with generic class WP_REST_Request but does not specify its types: T#'

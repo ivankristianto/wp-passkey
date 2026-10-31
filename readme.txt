@@ -1,8 +1,8 @@
 === Biometric Authentication ===
 Contributors: ivankristianto
-Requires at least: 6.1
+Requires at least: 6.2
 Tags: authentication, biometric, passwordless, passkey, security
-Tested up to: 6.4
+Tested up to: 7.1
 Requires PHP: 8.2
 Stable tag: 0.4.0
 License: GPLv2 or later
@@ -35,6 +35,16 @@ You can find the source code of this plugin on [GitHub](https://github.com/ivank
 To be added later, in the meantime file your question through [GitHub Issue](https://github.com/ivankristianto/wp-passkey/issues)
 
 == Changelog ==
+
+### 0.4.0
+
+- Minimum PHP requirement increased to 8.2
+- Updated web-auth/webauthn-lib to 5.x
+- Security hardening for passkey validation and revocation
+
+### 0.3.9
+
+- Security: Fix npm vulnerabilities
 
 ### 0.3.8
 

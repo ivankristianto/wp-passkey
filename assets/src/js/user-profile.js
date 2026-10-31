@@ -20,7 +20,7 @@ async function createRegistration() {
 			method: 'POST',
 		} );
 
-		attResp = await startRegistration( response );
+		attResp = await startRegistration( { optionsJSON: response } );
 	} catch ( error ) {
 		throw error;
 	}

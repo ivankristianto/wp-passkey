@@ -8,7 +8,7 @@ const { resolve, dirname } = require( 'path' );
 /**
  * External dependencies
  */
-const archiver = require( 'archiver' );
+const { ZipArchive } = require( 'archiver' );
 const fse = require( 'fs-extra' );
 const sanitizeFilename = require( 'sanitize-filename' );
 
@@ -69,7 +69,7 @@ async function makeRelease() {
 	await Promise.all( fileCopyPromises );
 
 	// Archive the release directory.
-	const archive = archiver( 'zip', { zlib: { level: 9 } } );
+	const archive = new ZipArchive( { zlib: { level: 9 } } );
 	archive.pipe( fse.createWriteStream( filename ) );
 	archive.directory( pluginDir, 'biometric-authentication', {} );
 	await archive.finalize();

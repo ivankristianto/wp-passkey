@@ -22,7 +22,7 @@ async function authenticate() {
 		const { options, request_id } = response;
 
 		requestId = request_id;
-		asseResp = await startAuthentication( options );
+		asseResp = await startAuthentication( { optionsJSON: options } );
 	} catch ( error ) {
 		throw error;
 	}

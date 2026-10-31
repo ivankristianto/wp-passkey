@@ -213,6 +213,7 @@ class Webauthn_Server {
 		$public_key_credential = $serializer->deserialize( $data, PublicKeyCredential::class, 'json' );
 
 		// Validate deserialized output type before property access.
+		// @phpstan-ignore instanceof.alwaysTrue (Deserialized payload is untrusted at runtime despite its PHPDoc type)
 		if ( ! $public_key_credential instanceof PublicKeyCredential ) {
 			throw new InvalidDataException( $data, 'Invalid request: malformed credential data.' ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- This is not an output.
 		}
@@ -272,6 +273,7 @@ class Webauthn_Server {
 		$public_key_credential            = $serializer->deserialize( $data, PublicKeyCredential::class, 'json' );
 
 		// Validate deserialized output type before property access.
+		// @phpstan-ignore instanceof.alwaysTrue (Deserialized payload is untrusted at runtime despite its PHPDoc type)
 		if ( ! $public_key_credential instanceof PublicKeyCredential ) {
 			throw new InvalidDataException( $data, 'Invalid request: malformed credential data.' ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- This is not an output.
 		}

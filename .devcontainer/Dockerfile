@@ -1,4 +1,4 @@
-FROM wordpress:php8.1
+FROM wordpress:php8.2
 
 # Allow devcontainer/Codespace use www-data as the remote user instead of root.
 RUN usermod --shell /bin/bash www-data

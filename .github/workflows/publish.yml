@@ -9,6 +9,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
+    - uses: actions/setup-node@v4
+      with:
+        node-version-file: '.nvmrc'
     - name: Build # Remove or modify this step as needed
       run: |
         composer install --no-dev --ignore-platform-reqs

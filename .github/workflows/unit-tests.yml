@@ -68,8 +68,13 @@ jobs:
         run: |
           composer install --no-progress --no-suggest --no-interaction
 
+      - name: Install Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+
       - name: Install Node dependencies
-        run: npm ci --legacy-peer-deps
+        run: npm ci
 
       - name: Run the tests
         if: ${{ toJSON( steps.paths.outputs.changes ) != '"[]"' }}

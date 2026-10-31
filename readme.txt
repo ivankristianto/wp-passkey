@@ -4,7 +4,7 @@ Requires at least: 6.2
 Tags: authentication, biometric, passwordless, passkey, security
 Tested up to: 7.1
 Requires PHP: 8.2
-Stable tag: 0.5.0
+Stable tag: 0.5.1
 License: GPLv2 or later
 
 Passkeys are a safer and easier alternative to passwords. Simply use your fingerprint or face ID to log in with ease.
@@ -35,6 +35,11 @@ You can find the source code of this plugin on [GitHub](https://github.com/ivank
 To be added later, in the meantime file your question through [GitHub Issue](https://github.com/ivankristianto/wp-passkey/issues)
 
 == Changelog ==
+
+### 0.5.1
+
+- Fix the WordPress.org package: keep symfony/polyfill-uuid below 1.43, whose PHP 8.5-only file fails WordPress.org's PHP checks
+- Includes all 0.5.0 changes below (0.5.0 was not published to WordPress.org)
 
 ### 0.5.0
 

@@ -8,6 +8,10 @@ on:
       version:
         description: 'Version to deploy; must match the Version header in plugin.php'
         required: true
+      dry_run:
+        description: 'Prepare the SVN changes and list the planned commits without committing'
+        type: boolean
+        default: false
 jobs:
   release:
     name: Publish to WordPress.org
@@ -33,11 +37,11 @@ jobs:
       run: |
         composer install --no-dev --ignore-platform-reqs
         npm ci && npm run build
-    - name: WordPress Plugin Deploy
-      uses: 10up/action-wordpress-plugin-deploy@stable
+    - name: Deploy to WordPress.org SVN
       env:
         SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
         SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
         SLUG: biometric-authentication
-        # Empty on tag pushes, where the action reads the version from the tag.
-        VERSION: ${{ inputs.version }}
+        VERSION: ${{ inputs.version || github.ref_name }}
+        DRY_RUN: ${{ inputs.dry_run || false }}
+      run: bin/deploy-wporg.sh

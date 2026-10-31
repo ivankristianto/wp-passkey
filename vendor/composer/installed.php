@@ -1,9 +1,9 @@
 <?php return array(
     'root' => array(
         'name' => 'ivankristianto/biometric-authentication',
-        'pretty_version' => '0.5.0',
-        'version' => '0.5.0.0',
-        'reference' => '6fd2bbb0a8b87dfea7f2ee26953d948e0de7f7ce',
+        'pretty_version' => '0.5.1',
+        'version' => '0.5.1.0',
+        'reference' => '5a2997da7ab68d4c26c8f697bb7a1181582f70f3',
         'type' => 'wordpress-plugin',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -29,9 +29,9 @@
             'dev_requirement' => false,
         ),
         'ivankristianto/biometric-authentication' => array(
-            'pretty_version' => '0.5.0',
-            'version' => '0.5.0.0',
-            'reference' => '6fd2bbb0a8b87dfea7f2ee26953d948e0de7f7ce',
+            'pretty_version' => '0.5.1',
+            'version' => '0.5.1.0',
+            'reference' => '5a2997da7ab68d4c26c8f697bb7a1181582f70f3',
             'type' => 'wordpress-plugin',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
@@ -224,9 +224,9 @@
             'dev_requirement' => false,
         ),
         'symfony/polyfill-uuid' => array(
-            'pretty_version' => 'v1.43.0',
-            'version' => '1.43.0.0',
-            'reference' => 'b23ff8245cc5c4479ea2be3d0132d2e6dd433993',
+            'pretty_version' => 'v1.37.0',
+            'version' => '1.37.0.0',
+            'reference' => '26dfec253c4cf3e51b541b52ddf7e42cb0908e94',
             'type' => 'library',
             'install_path' => __DIR__ . '/../symfony/polyfill-uuid',
             'aliases' => array(),

@@ -23,6 +23,9 @@
     "wp-coding-standards/wpcs": "^3.4.1",
     "mockery/mockery": "^1.6"
   },
+  "conflict": {
+    "symfony/polyfill-uuid": ">=1.43"
+  },
   "autoload-dev": {
     "psr-4": {
       "BioAuth\\Tests\\Fixtures\\": "tests/php/fixtures/"

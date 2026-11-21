@@ -55,7 +55,7 @@ jobs:
 
       - name: Install PHP dependencies
         run: |
-          composer install --prefer-dist --no-progress --no-suggest --no-interaction
+          composer install --prefer-dist --no-progress --no-interaction
 
       - name: Install Node dependencies
         run: npm ci

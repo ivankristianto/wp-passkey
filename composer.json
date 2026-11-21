@@ -2,7 +2,7 @@
   "name": "ivankristianto/biometric-authentication",
   "description": "Passkeys are a safer and easier alternative to passwords. Simply use your fingerprint or face ID to log in with ease.",
   "type": "wordpress-plugin",
-  "license": "GPL-2.0+",
+  "license": "GPL-2.0-or-later",
   "authors": [
     {
       "name": "Ivan Kristianto",
@@ -11,7 +11,7 @@
   ],
   "require": {
     "php": ">=8.2",
-    "web-auth/webauthn-lib": "^5.3.9"
+    "web-auth/webauthn-lib": "^5.3.15"
   },
   "require-dev": {
     "johnpbloch/wordpress": "^7.1",

@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Security
+- Updated web-auth/webauthn-lib to 5.3.15 (fixes from 5.3.10 to 5.3.15, including the backup eligibility check on assertions) and symfony/serializer to 7.4.23 (three advisories reported by `composer audit`)
+
+### Technical
+- Updated Composer and npm dependencies to their latest compatible releases (@wordpress/scripts 37.2, @wordpress/env 12.2, Playwright 1.65, PHPStan 2.3.7)
+- Unit tests also run on PHP 8.5
+- Removed the CI Docker image cache step: ScribeMD/docker-cache uses the retired cache service, so every restore failed with "Cache service responded with 400"
+- Dropped Composer's deprecated `--no-suggest` flag from CI
+
 ## [0.5.1] - 2026-10-31
 
 ### Fixed
